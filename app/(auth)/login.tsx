@@ -1,11 +1,14 @@
-import {StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions} from "react-native";
-import React, {useEffect, useState} from "react";
-import {LinearGradient} from 'expo-linear-gradient';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions } from "react-native";
+import React, { useEffect, useState } from "react";
+import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from "expo-router";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { app } from "@/database/Firebaseconfig"
+import { IUserLoginCredentials } from "@/types/interfaces";
 
 
 const LoginScreen = () => {
-    const [userCredentials, setUserCredentials] = useState({
+    const [userCredentials, setUserCredentials] = useState<IUserLoginCredentials>({
         email: '',
         password: '',
     });
@@ -20,9 +23,28 @@ const LoginScreen = () => {
         });
     };
 
-    const tryLogin = () => {
-        console.log("Email: ", userCredentials.email, ", Passwort: ", userCredentials.password)
-        router.replace("/")
+    const tryLogin = async () => {
+        try {
+            const auth = getAuth();
+            await signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    console.log("User Found: ", user)
+                    router.replace("/")
+                    // ...
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    console.log("Error Code: ", errorCode, " ErrorMessage: ", errorMessage)
+                });
+
+            console.log("Email: ", userCredentials.email, ", Passwort: ", userCredentials.password)
+        } catch (error) {
+            console.log("Error: ", error)
+        }
+        
     }
 
     return (
@@ -60,7 +82,7 @@ const LoginScreen = () => {
                 </TouchableOpacity>
                 <Link href={"/register"}>
                     {/* <TouchableOpacity onPress={() => console.log("Navigate To Register")}> */}
-                        <Text style={styles.createAccountText}>Create Account</Text>
+                    <Text style={styles.createAccountText}>Create Account</Text>
                     {/* </TouchableOpacity> */}
                 </Link>
             </View>
