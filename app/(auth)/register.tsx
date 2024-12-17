@@ -57,8 +57,6 @@ const RegisterScreen = () => {
                 } catch (error) {
                     console.log("Error: ", error)
                 }
-            
-
         }
     }
 
