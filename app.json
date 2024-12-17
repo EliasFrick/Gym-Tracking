@@ -6,6 +6,12 @@
     "version": "1.0.0",
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "android": {
+      "package": "com.anonymous.GymTracking"
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.GymTracking"
+    }
   }
 }

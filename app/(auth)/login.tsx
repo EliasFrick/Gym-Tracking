@@ -1,6 +1,7 @@
 import {StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions} from "react-native";
 import React, {useEffect, useState} from "react";
 import {LinearGradient} from 'expo-linear-gradient';
+import { Link, useRouter } from "expo-router";
 
 
 const LoginScreen = () => {
@@ -10,7 +11,8 @@ const LoginScreen = () => {
     });
     const windowWidth = Dimensions.get('window').width;
     const windowHeight = Dimensions.get('window').height;
-    
+    const router = useRouter()
+
     const handleInputChange = (name: string, value: string) => {
         setUserCredentials({
             ...userCredentials,
@@ -20,6 +22,7 @@ const LoginScreen = () => {
 
     const tryLogin = () => {
         console.log("Email: ", userCredentials.email, ", Passwort: ", userCredentials.password)
+        router.replace("/")
     }
 
     return (
@@ -55,9 +58,11 @@ const LoginScreen = () => {
                 <TouchableOpacity style={styles.button} onPress={tryLogin}>
                     <Text style={styles.buttonText}>SIGN IN</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => console.log("Navigate To Register")}>
-                    <Text style={styles.createAccountText}>Create Account</Text>
-                </TouchableOpacity>
+                <Link href={"/register"}>
+                    {/* <TouchableOpacity onPress={() => console.log("Navigate To Register")}> */}
+                        <Text style={styles.createAccountText}>Create Account</Text>
+                    {/* </TouchableOpacity> */}
+                </Link>
             </View>
         </View>
     );

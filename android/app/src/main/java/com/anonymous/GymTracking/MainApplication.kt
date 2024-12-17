@@ -1,4 +1,4 @@
-package com.gymtracking
+package com.anonymous.GymTracking
 
 import android.app.Application
 import android.content.res.Configuration
