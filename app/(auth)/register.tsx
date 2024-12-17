@@ -5,6 +5,7 @@ import { Link, useRouter } from "expo-router";
 import { IUserRegisterCredentials } from "@/types/interfaces";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import {app} from "@/database/Firebaseconfig"
+
 const RegisterScreen = () => {
     const [userCredentials, setUserCredentials] = useState<IUserRegisterCredentials>({
         firstname: '',

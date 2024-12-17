@@ -10,3 +10,10 @@ export interface IUserRegisterCredentials {
     password: string,
     passwordConfirm: string
 }
+
+export interface IUser {
+    firstname: string,
+    lastname: string,
+    email: string,
+    uId: string
+}
