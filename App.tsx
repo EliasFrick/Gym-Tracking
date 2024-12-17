@@ -1,4 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
+/* import { StatusBar } from 'expo-status-bar';
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import LoginScreen from './src/screens/Authentication/login/Login';
@@ -17,3 +17,6 @@ const styles = StyleSheet.create({
     flex: 1
   },
 });
+ */
+
+//import 'expo-router/entry'; 
