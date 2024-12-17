@@ -2,7 +2,7 @@ import { StyleSheet, Text, TextInput, TouchableOpacity, View, Dimensions } from 
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Link, useRouter } from "expo-router";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig"
 import { IUserLoginCredentials } from "@/types/interfaces";
 
@@ -23,7 +23,9 @@ const LoginScreen = () => {
         });
     };
 
+
     const tryLogin = async () => {
+        console.log("Test")
         try {
             const auth = getAuth();
             await signInWithEmailAndPassword(auth, userCredentials.email, userCredentials.password)
@@ -44,7 +46,7 @@ const LoginScreen = () => {
         } catch (error) {
             console.log("Error: ", error)
         }
-        
+
     }
 
     return (
