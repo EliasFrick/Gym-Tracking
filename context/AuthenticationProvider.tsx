@@ -13,7 +13,7 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
     const rootSegments = useSegments()[0]
     const router = useRouter()
     const [user, setUser] = useState<IUser>()
-
+    const [loading, setLoading] = useState(true);
     useEffect(() => {
         const auth = getAuth();
         onAuthStateChanged(auth, (user) => {
@@ -29,20 +29,19 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
 
 
     useEffect(() => {
-        if (user?.uId === undefined) {
-            console.log("undefined")
-            router.replace("/(auth)/login")
-            return;
-        }
+        if (loading) return; // Warten, bis die Authentifizierungsprüfung abgeschlossen ist
 
-        if (!user && rootSegments !== "(auth)") {
-            console.log("Login")
-            router.replace("/(auth)/login")
-        } else if (user && rootSegments !== "(app)") {
-            console.log("App")
-            router.replace("/")
+        if (user) {
+            if (rootSegments !== "(app)") {
+                router.replace("/"); // Benutzer zur App weiterleiten
+            }
+        } else {
+            if (rootSegments !== "(auth)") {
+                router.replace("/(auth)/login"); // Benutzer zur Login-Seite weiterleiten
+            }
         }
-    }, [user])
+    }, [user, loading, rootSegments]);
+
 
     return (
         <AuthenticationContext.Provider
