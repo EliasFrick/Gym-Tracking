@@ -23,26 +23,33 @@ import {
   H2,
   Input,
   Paragraph,
+  ScrollView,
   Select,
   SelectProps,
+  TextArea,
   XStack,
   YStack,
 } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { LinearGradient } from "tamagui/linear-gradient";
 import { CustomDropDown } from "@/components/ui/CustomDropDown";
+import * as ImagePicker from "expo-image-picker";
+import Entypo from "@expo/vector-icons/Entypo";
 
 const spModes = ["percent", "constant", "fit", "mixed"] as const;
 const { width, height } = Dimensions.get("window");
 
 export default function CreateOwnPlan() {
   const navigation = useNavigation();
+  const [bodyPart, setBodyPart] = React.useState("");
+  const [exerciseTitle, setExerciseTitle] = React.useState("");
+  const [exerciseDescription, setExerciseDescription] = React.useState("");
+  const [image, setImage] = React.useState<string | null>(null);
   const [position, setPosition] = React.useState(0);
   const [open, setOpen] = React.useState(false);
-  const [modal, setModal] = React.useState(true);
+  const [modal, setModal] = React.useState(false);
   const [snapPointsMode, setSnapPointsMode] =
     React.useState<(typeof spModes)[number]>("percent");
-
   const snapPoints = [100, 75, 50];
 
   useLayoutEffect(() => {
@@ -69,6 +76,22 @@ export default function CreateOwnPlan() {
     { name: "Triceps" },
     { name: "Abs" },
   ];
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -102,10 +125,12 @@ export default function CreateOwnPlan() {
 
         <Sheet.Handle />
         <Sheet.Frame backgroundColor={"#F0F8FF"}>
-          <View style={styles.sheetContainer}>
+          <ScrollView>
+            <View style={styles.sheetContainer}></View>
             <View
               style={{
                 justifyContent: "space-between",
+                padding: width * 0.025,
                 flexDirection: "row",
                 width: "100%",
               }}
@@ -128,15 +153,60 @@ export default function CreateOwnPlan() {
                   height: height * 1,
                 }}
                 flex={1}
-                /* size={"$4"} */
                 placeholder={`Name of Exercise...`}
+                value={exerciseTitle}
+                onChangeText={(text) => setExerciseTitle(text)}
               />
             </View>
             <View style={styles.titleInputContainer}>
               <Text>Body part:</Text>
-              <CustomDropDown id="select-demo-1" items={items} />
+              <View
+                style={{
+                  width: width * 0.8,
+                  height: height * 1,
+                }}
+              >
+                <CustomDropDown
+                  /*                   id="select-demo-1"
+                   */ items={items}
+                  val={bodyPart}
+                  setVal={setBodyPart}
+                />
+              </View>
             </View>
-          </View>
+            <View style={styles.titleInputContainer}>
+              <Text>Description:</Text>
+              <View
+                style={{
+                  width: width * 0.8,
+                  height: height * 1,
+                }}
+              >
+                <TextArea
+                  placeholder="Description..."
+                  value={exerciseDescription}
+                  onChangeText={(text) => setExerciseDescription(text)}
+                />
+              </View>
+            </View>
+            <View style={styles.titleInputContainer}>
+              <Text>Add Picture:</Text>
+              <View
+                style={{
+                  width: width * 0.8,
+                  height: height * 1,
+                }}
+              >
+                <Button alignSelf="center" size="$6" onPress={pickImage}>
+                  <AntDesign name="cloudupload" size={24} color="black" />
+                  <Text>Add Pictures</Text>
+                </Button>
+                {image && (
+                  <Image source={{ uri: image }} style={styles.image} />
+                )}
+              </View>
+            </View>
+          </ScrollView>
         </Sheet.Frame>
       </Sheet>
     </View>
@@ -149,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F86E51",
   },
   sheetContainer: {
-    padding: 40,
+    marginTop: height * 0.02,
     justifyContent: "flex-start",
     alignItems: "flex-start",
   },
@@ -158,5 +228,9 @@ const styles = StyleSheet.create({
     height: height * 0.06, // Nimmt 20% der Höhe des übergeordneten Containers
     alignItems: "center", // Zentriert den Input horizontal
     marginVertical: 20, // Fügt vertikalen Abstand hinzu
+  },
+  image: {
+    width: 200,
+    height: 200,
   },
 });

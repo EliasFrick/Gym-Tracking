@@ -13,11 +13,16 @@ import React from "react";
 
 interface CustomDropDownProps extends SelectProps {
   items: { name: string }[]; // Typdefinition für die Items
+  val: string; // Aktueller Wert
+  setVal: React.Dispatch<React.SetStateAction<string>>; // Funktion zum Aktualisieren des Werts
 }
 
-export function CustomDropDown({ items, ...props }: CustomDropDownProps) {
-  const [val, setVal] = React.useState("apple");
-
+export function CustomDropDown({
+  items,
+  val,
+  setVal,
+  ...props
+}: CustomDropDownProps) {
   return (
     <Select
       value={val}
@@ -25,8 +30,8 @@ export function CustomDropDown({ items, ...props }: CustomDropDownProps) {
       disablePreventBodyScroll
       {...props}
     >
-      <Select.Trigger width={220} iconAfter={ChevronDown}>
-        <Select.Value placeholder="Something" />
+      <Select.Trigger width={"100%"} iconAfter={ChevronDown}>
+        <Select.Value placeholder="Choose..." />
       </Select.Trigger>
 
       <Adapt when="sm" platform="touch">
@@ -83,7 +88,6 @@ export function CustomDropDown({ items, ...props }: CustomDropDownProps) {
           minWidth={200}
         >
           <Select.Group>
-            <Select.Label>Fruits</Select.Label>
             {/* for longer lists memoizing these is useful */}
             {React.useMemo(
               () =>
