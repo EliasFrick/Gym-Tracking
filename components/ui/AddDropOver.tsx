@@ -32,10 +32,6 @@ export function AddDropOver({
     }
   };
 
-  useEffect(() => {
-    console.log("AddDropOver");
-  }, []);
-
   return (
     <Popover size="$8" allowFlip {...props}>
       <Popover.Trigger asChild>

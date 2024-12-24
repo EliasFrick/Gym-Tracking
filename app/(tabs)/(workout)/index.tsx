@@ -5,34 +5,34 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { AddDropOver } from "@/components/ui/AddDropOver";
+import { Button } from "tamagui";
+import { Activity, Airplay } from "@tamagui/lucide-icons";
+import { Link, useRouter } from "expo-router";
+
+const { width, height } = Dimensions.get("window");
 
 export default function indexScreen() {
   const navigation = useNavigation();
+  const router = useRouter();
 
-  /* useLayoutEffect(() => {
-    console.log("Setting header options");
-    navigation.setOptions({
-      headerTitle: "Start Training",
-      headerRight: () => (
-        <View style={{ marginRight: 10 }}>
-          <AddDropOver />
-        </View>
-      ),
-      headerStyle: {
-        backgroundColor: "#F86E51",
-      },
-      headerTintColor: "#fff",
-    });
-  }, [navigation]); */
+  const navigateToCreateOwnPlan = () => {
+    router.navigate("/createOwnPlan");
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.emptyText}>Create a Workout Routine before</Text>
-      {/*       <AddDropOver />
-       */}
+      <Button
+        onPress={navigateToCreateOwnPlan}
+        alignSelf="center"
+        icon={Airplay}
+        size="$6"
+      >
+        Create New Exercise
+      </Button>
     </View>
   );
 }
