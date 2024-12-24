@@ -1,12 +1,12 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform, View, StyleSheet } from 'react-native';
-import FeatherIcons from "@expo/vector-icons/Feather"
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { Tabs } from "expo-router";
+import React from "react";
+import { Platform, View, StyleSheet } from "react-native";
+import FeatherIcons from "@expo/vector-icons/Feather";
+import { HapticTab } from "@/components/HapticTab";
+import { IconSymbol } from "@/components/ui/IconSymbol";
+import TabBarBackground from "@/components/ui/TabBarBackground";
+import { Colors } from "@/constants/Colors";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,59 +14,66 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: true,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground, 
+        tabBarBackground: TabBarBackground,
         tabBarStyle: {
           backgroundColor: "#F86E51",
         },
         headerStyle: {
           backgroundColor: "#F86E51",
-        }
-      }}>
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: '',
+          title: "",
           tabBarIcon: ({ focused }) => (
             <IconSymbol
               name="house.fill"
               size={focused ? 35 : 29}
-              color={"black"} />
+              color={"black"}
+            />
           ),
-          headerTitle: "Training"
+          headerTitle: "Training",
         }}
       />
       <Tabs.Screen
-        name="startTraining"
+        name="(workout)"
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={[styles.iconContainer, focused && styles.iconContainerFocused]}>
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.iconContainerFocused,
+              ]}
+            >
               <IconSymbol size={focused ? 38 : 35} name="plus" color={"#fff"} />
             </View>
           ),
+          headerShown: false,
           tabBarLabel: "",
-          headerTitle: "Training"
+          headerTitle: "Training",
         }}
       />
       <Tabs.Screen
         name="explore"
         options={{
-          title: 'Explore',
+          title: "Explore",
           tabBarIcon: ({ focused }) => (
             <View style={[styles.settingsIcon]}>
-            <FeatherIcons
-              name="settings"
-              size={focused ? 33 : 29}
-              color={"black"}
-            />
-          </View>
-        
+              <FeatherIcons
+                name="settings"
+                size={focused ? 33 : 29}
+                color={"black"}
+              />
+            </View>
           ),
-          tabBarLabel: ""
+          tabBarLabel: "",
         }}
-     />
+      />
     </Tabs>
   );
 }
@@ -86,9 +93,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#F86E51", // Roter Hintergrund, wenn aktiv
   },
   settingsIcon: {
-      width: 60,
-      height: 60,
-      justifyContent: "center",
-      alignItems: "center",
-  }
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });

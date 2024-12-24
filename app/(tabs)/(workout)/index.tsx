@@ -6,68 +6,14 @@ import {
   TouchableOpacity,
   Animated,
 } from "react-native";
-import FeatherIcons from "@expo/vector-icons/Feather";
 import { useNavigation } from "@react-navigation/native";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
-import {
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  Plus,
-} from "@tamagui/lucide-icons";
-import type { PopoverProps } from "tamagui";
-import {
-  Adapt,
-  Button,
-  Input,
-  isWeb,
-  Label,
-  Popover,
-  XStack,
-  YStack,
-} from "tamagui";
 import { AddDropOver } from "@/components/ui/AddDropOver";
 
-export default function StartTrainingScreen() {
+export default function indexScreen() {
   const navigation = useNavigation();
-  const [shouldAdapt, setShouldAdapt] = useState(true);
 
-  const [isOpen, setIsOpen] = useState(false);
-  const translateY = new Animated.Value(0);
-
-  const newIcons = [
-    {
-      id: "1",
-      name: "plus",
-      description: "Create own plan",
-      onPress: () => addCustomPlan(),
-    },
-    {
-      id: "2",
-      name: "archive",
-      description: "Choose a template",
-      onPress: () => addCustomPlan(),
-    },
-    {
-      id: "3",
-      name: "robot",
-      description: "Create plan with AI",
-      onPress: () => addCustomPlan(),
-    },
-  ];
-
-  const toggleIcons = () => {
-    setIsOpen((prev) => !prev);
-
-    Animated.timing(translateY, {
-      toValue: isOpen ? 0 : 100,
-      duration: 5000,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  useLayoutEffect(() => {
+  /* useLayoutEffect(() => {
+    console.log("Setting header options");
     navigation.setOptions({
       headerTitle: "Start Training",
       headerRight: () => (
@@ -80,15 +26,13 @@ export default function StartTrainingScreen() {
       },
       headerTintColor: "#fff",
     });
-  }, [navigation, isOpen]);
-
-  const addCustomPlan = () => {
-    console.log("Test");
-  };
+  }, [navigation]); */
 
   return (
     <View style={styles.container}>
       <Text style={styles.emptyText}>Create a Workout Routine before</Text>
+      {/*       <AddDropOver />
+       */}
     </View>
   );
 }
@@ -134,7 +78,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    color: "#fff",
+    color: "black",
     fontWeight: "600",
   },
 });
