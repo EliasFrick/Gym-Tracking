@@ -35,6 +35,7 @@ import { LinearGradient } from "tamagui/linear-gradient";
 import { CustomDropDown } from "@/components/ui/CustomDropDown";
 import * as ImagePicker from "expo-image-picker";
 import Entypo from "@expo/vector-icons/Entypo";
+import { AddExerciseComponent } from "@/components/ui/addExerciseComponente";
 
 const spModes = ["percent", "constant", "fit", "mixed"] as const;
 const { width, height } = Dimensions.get("window");
@@ -76,22 +77,6 @@ export default function CreateOwnPlan() {
     { name: "Triceps" },
     { name: "Abs" },
   ];
-
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -145,67 +130,17 @@ export default function CreateOwnPlan() {
                 <AntDesign name="save" size={30} color="black" />
               </TouchableOpacity>
             </View>
-            <View style={styles.titleInputContainer}>
-              <Text>Title:</Text>
-              <Input
-                style={{
-                  width: width * 0.8,
-                  height: height * 1,
-                }}
-                flex={1}
-                placeholder={`Name of Exercise...`}
-                value={exerciseTitle}
-                onChangeText={(text) => setExerciseTitle(text)}
-              />
-            </View>
-            <View style={styles.titleInputContainer}>
-              <Text>Body part:</Text>
-              <View
-                style={{
-                  width: width * 0.8,
-                  height: height * 1,
-                }}
-              >
-                <CustomDropDown
-                  /*                   id="select-demo-1"
-                   */ items={items}
-                  val={bodyPart}
-                  setVal={setBodyPart}
-                />
-              </View>
-            </View>
-            <View style={styles.titleInputContainer}>
-              <Text>Description:</Text>
-              <View
-                style={{
-                  width: width * 0.8,
-                  height: height * 1,
-                }}
-              >
-                <TextArea
-                  placeholder="Description..."
-                  value={exerciseDescription}
-                  onChangeText={(text) => setExerciseDescription(text)}
-                />
-              </View>
-            </View>
-            <View style={styles.titleInputContainer}>
-              <Text>Add Picture:</Text>
-              <View
-                style={{
-                  width: width * 0.8,
-                  height: height * 1,
-                }}
-              >
-                <Button alignSelf="center" size="$6" onPress={pickImage}>
-                  <AntDesign name="cloudupload" size={24} color="black" />
-                  <Text>Add Pictures</Text>
-                </Button>
-                {image && (
-                  <Image source={{ uri: image }} style={styles.image} />
-                )}
-              </View>
-            </View>
+            <AddExerciseComponent
+              items={items}
+              exerciseTitle={exerciseTitle}
+              setExerciseTitle={setExerciseTitle}
+              bodyPart={bodyPart}
+              setBodyPart={setBodyPart}
+              exerciseDescription={exerciseDescription}
+              setExerciseDescription={setExerciseDescription}
+              image={image}
+              setImage={setImage}
+            />
           </ScrollView>
         </Sheet.Frame>
       </Sheet>
@@ -223,14 +158,14 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     alignItems: "flex-start",
   },
-  titleInputContainer: {
+  inputContainer: {
     width: "100%", // Nimmt die volle Breite des übergeordneten Containers
-    height: height * 0.06, // Nimmt 20% der Höhe des übergeordneten Containers
-    alignItems: "center", // Zentriert den Input horizontal
-    marginVertical: 20, // Fügt vertikalen Abstand hinzu
+    marginVertical: height * 0.02,
+    paddingHorizontal: width * 0.05,
+    alignItems: "flex-start", // Text linksbündig
   },
   image: {
-    width: 200,
-    height: 200,
+    width: width * 0.3,
+    height: width * 0.3,
   },
 });
