@@ -4,13 +4,7 @@
     "slug": "Gym-Tracking",
     "scheme": "Gym-Tracking",
     "version": "1.0.0",
-    "plugins": [
-      "expo-router",
-      "expo-image-picker",
-      {
-        "photosPermission": "The app accesses your photos to let you share them with your friends."
-      }
-    ],
+    "plugins": ["expo-router"],
 
     "android": {
       "package": "com.anonymous.GymTracking"
