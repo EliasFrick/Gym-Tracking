@@ -1,28 +1,28 @@
 import { AuthenticationProvider } from "@/context/AuthenticationProvider";
 import { Slot, Stack } from "expo-router";
-import { createTamagui, TamaguiProvider, View } from 'tamagui'
-import defaultConfig from '@tamagui/config/v3'
-import { PortalProvider } from '@tamagui/portal'
+import { createTamagui, TamaguiProvider, View } from "tamagui";
+import defaultConfig from "@tamagui/config/v3";
+import { PortalProvider } from "@tamagui/portal";
 
-const config = createTamagui(defaultConfig)
-
+const config = createTamagui(defaultConfig);
 
 export default function Layout() {
   return (
     <TamaguiProvider config={config}>
-      <PortalProvider shouldAddRootHost>‚
+      <PortalProvider shouldAddRootHost>
         <AuthenticationProvider>
           <Stack
             screenOptions={{
               headerShown: false,
               headerStyle: {
-                backgroundColor: '#f4511e',
+                backgroundColor: "#f4511e",
               },
-              headerTintColor: '#fff',
+              headerTintColor: "#fff",
               headerTitleStyle: {
-                fontWeight: 'bold',
+                fontWeight: "bold",
               },
-            }}>
+            }}
+          >
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="(auth)"
