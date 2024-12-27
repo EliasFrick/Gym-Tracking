@@ -86,6 +86,7 @@ export default function CreateOwnPlan() {
           $sm={{ flexDirection: "column", alignItems: "center" }}
         >
           <Button onPress={() => setOpen(true)}>Add New Exercise</Button>
+          <Button onPress={() => setOpen(true)}>Add New Plan</Button>
         </XStack>
       </YStack>
 
