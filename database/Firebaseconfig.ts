@@ -1,8 +1,13 @@
 // Import the functions you need from the SDKs you need
 // ./services/firebase.js
 import { initializeApp, getApp } from "firebase/app";
-import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  initializeAuth,
+  getAuth,
+  getReactNativePersistence,
+} from "firebase/auth";
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+import { getFirestore } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -16,14 +21,16 @@ const firebaseConfig = {
   storageBucket: "gym-tracking-46835.firebasestorage.app",
   messagingSenderId: "787781092622",
   appId: "1:787781092622:web:73a6da6e06ae178698835f",
-  measurementId: "G-L8SJ0ZZJ6S"
+  measurementId: "G-L8SJ0ZZJ6S",
 };
 
 // initialize Firebase App
 const app = initializeApp(firebaseConfig);
 // initialize Firebase Auth for that app immediately
 const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-export { app, auth, getApp, getAuth };
+const firestoreDB = getFirestore(app);
+
+export { app, auth, getApp, getAuth, firestoreDB };

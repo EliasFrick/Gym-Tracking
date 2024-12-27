@@ -36,21 +36,35 @@ import { CustomDropDown } from "@/components/ui/CustomDropDown";
 import * as ImagePicker from "expo-image-picker";
 import Entypo from "@expo/vector-icons/Entypo";
 import { AddExerciseComponent } from "@/components/ui/addExerciseComponente";
+import { addDoc, collection } from "firebase/firestore";
+import { firestoreDB } from "@/database/Firebaseconfig";
+import { ICreateCustomExercise } from "@/types/interfaces";
+import { getAuth } from "firebase/auth";
 
 const spModes = ["percent", "constant", "fit", "mixed"] as const;
 const { width, height } = Dimensions.get("window");
 
 export default function CreateOwnPlan() {
+  // Aktueller Benutzer wird direkt abgerufen
+  const auth = getAuth();
+  const firebaseUser = auth.currentUser;
+
+  // Hooks
   const navigation = useNavigation();
-  const [bodyPart, setBodyPart] = React.useState("");
-  const [exerciseTitle, setExerciseTitle] = React.useState("");
-  const [exerciseDescription, setExerciseDescription] = React.useState("");
-  const [image, setImage] = React.useState<string | null>(null);
   const [position, setPosition] = React.useState(0);
   const [open, setOpen] = React.useState(false);
   const [modal, setModal] = React.useState(false);
+  const [customExercise, setCustomExercise] =
+    React.useState<ICreateCustomExercise>({
+      userID: firebaseUser!.uid, // Standardwerte
+      exerciseName: "",
+      exerciseDescription: "",
+      exerciseTargetMuscle: "",
+      exerciseImage: null,
+    });
   const [snapPointsMode, setSnapPointsMode] =
     React.useState<(typeof spModes)[number]>("percent");
+
   const snapPoints = [100, 75, 50];
 
   useLayoutEffect(() => {
@@ -64,19 +78,84 @@ export default function CreateOwnPlan() {
     });
   }, [navigation]);
 
-  const saveExercise = () => {
-    setOpen(false);
+  const saveExercise = async () => {
+    console.log("Saving exercise... ", customExercise);
+    try {
+      // Create the document in Firestore
+      const docRef = await addDoc(collection(firestoreDB, "customExercises"), {
+        userID: customExercise.userID,
+        exerciseName: customExercise.exerciseName,
+        exerciseDescription: customExercise.exerciseDescription,
+        exerciseTargetMuscle: customExercise.exerciseTargetMuscle,
+        exerciseImage: customExercise.exerciseImage, // Use the download URL
+      });
+      console.log("Document written with ID: ", docRef.id);
+      setOpen(false);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+    }
+  };
+
+  const tryout = async () => {
+    try {
+      await setDoc(
+        doc(
+          firestoreDB,
+          "CustomExercises",
+          firebaseUser?.uid + ", " + customExercise.exerciseName
+        ),
+        customExercise
+      );
+      alert(
+        "Exercise was only saved locally, go to the settings to save the exercise in the cloud"
+      );
+      deleteData();
+      setOpen(false);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      alert("Error while saving exercise");
+    }
   };
 
   const items = [
     { name: "Chest" },
-    { name: "Back" },
-    { name: "Leg" },
-    { name: "Shoulder" },
+    { name: "Uppcer Chest" },
+    { name: "Lower Chest" },
     { name: "Biceps" },
+    { name: "Back" },
+    { name: "Lats" },
+    { name: "Traps" },
+    { name: "Leg" },
+    { name: "Glutes" },
+    { name: "Shoulder" },
     { name: "Triceps" },
     { name: "Abs" },
+    { name: "Forearms" },
+    { name: "Calves" },
+    { name: "Neck" },
+    { name: "Obliques" },
   ];
+
+  // Funktion, um customExercise zu aktualisieren
+  const updateCustomExercise = (
+    key: keyof ICreateCustomExercise,
+    value: any
+  ) => {
+    setCustomExercise((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const deleteData = () => {
+    setCustomExercise((prev) => ({
+      ...prev,
+      exerciseName: "",
+      exerciseDescription: "",
+      exerciseTargetMuscle: "",
+      exerciseImage: null,
+    }));
+  };
 
   return (
     <View style={styles.container}>
@@ -127,20 +206,26 @@ export default function CreateOwnPlan() {
               >
                 <AntDesign name="close" size={30} color="black" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={saveExercise} activeOpacity={1}>
+              <TouchableOpacity onPress={tryout} activeOpacity={1}>
                 <AntDesign name="save" size={30} color="black" />
               </TouchableOpacity>
             </View>
             <AddExerciseComponent
               items={items}
-              exerciseTitle={exerciseTitle}
-              setExerciseTitle={setExerciseTitle}
-              bodyPart={bodyPart}
-              setBodyPart={setBodyPart}
-              exerciseDescription={exerciseDescription}
-              setExerciseDescription={setExerciseDescription}
-              image={image}
-              setImage={setImage}
+              exerciseTitle={customExercise.exerciseName}
+              setExerciseTitle={(title) =>
+                updateCustomExercise("exerciseName", title)
+              }
+              bodyPart={customExercise.exerciseTargetMuscle}
+              setBodyPart={(part) =>
+                updateCustomExercise("exerciseTargetMuscle", part)
+              }
+              exerciseDescription={customExercise.exerciseDescription}
+              setExerciseDescription={(desc) =>
+                updateCustomExercise("exerciseDescription", desc)
+              }
+              image={customExercise.exerciseImage}
+              setImage={(img) => updateCustomExercise("exerciseImage", img)}
             />
           </ScrollView>
         </Sheet.Frame>
@@ -170,3 +255,13 @@ const styles = StyleSheet.create({
     height: width * 0.3,
   },
 });
+import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
+
+async function setDoc(docRef: any, data: { name: string; age: number }) {
+  try {
+    await firebaseSetDoc(docRef, data);
+    console.log("Document successfully written!");
+  } catch (error) {
+    console.error("Error writing document: ", error);
+  }
+}
