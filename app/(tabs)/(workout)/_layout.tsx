@@ -2,34 +2,12 @@ import { Stack } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import React, { useState, useLayoutEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-} from "react-native";
-import { AddDropOver } from "@/components/ui/AddDropOver";
+import { View } from "react-native";
+import { PopOverAddExercises } from "@/components/ui/PopOverAddExercises";
 
 export default function WorkoutLayout() {
   const colorScheme = useColorScheme();
   const navigation = useNavigation();
-
-  /* useLayoutEffect(() => {
-    console.log("Setting header options");
-    navigation.setOptions({
-      headerTitle: "Start Training",
-      headerRight: () => (
-        <View style={{ marginRight: 10 }}>
-          <AddDropOver />
-        </View>
-      ),
-      headerStyle: {
-        backgroundColor: "#F86E51",
-      },
-      headerTintColor: "#fff",
-    });
-  }, [navigation]); */
 
   return (
     <Stack
@@ -49,16 +27,27 @@ export default function WorkoutLayout() {
           headerTitle: "Start Training",
           headerRight: () => (
             <View style={{ marginRight: 10 }}>
-              <AddDropOver />
+              <PopOverAddExercises />
             </View>
           ),
           headerStyle: {
             backgroundColor: "#F86E51",
           },
-          headerTintColor: "#fff",
+          headerTintColor: "black",
         }}
       />
-      <Stack.Screen name="createOwnPlan" options={{ headerShown: true }} />
+      <Stack.Screen
+        name="createOwnPlan"
+        options={{
+          headerShown: true,
+          headerTitle: "Create Plan",
+          headerStyle: {
+            backgroundColor: "#F86E51",
+          },
+          headerTintColor: "black",
+          headerBackTitle: "Back",
+        }}
+      />
     </Stack>
   );
 }

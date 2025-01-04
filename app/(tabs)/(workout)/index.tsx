@@ -1,17 +1,10 @@
 import React, { useState, useLayoutEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Animated,
-  Dimensions,
-} from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { AddDropOver } from "@/components/ui/AddDropOver";
 import { Button } from "tamagui";
 import { Activity, Airplay } from "@tamagui/lucide-icons";
-import { Link, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
+import { PopOverAddExercises } from "@/components/ui/PopOverAddExercises";
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,18 +16,7 @@ export default function indexScreen() {
     router.navigate("/createOwnPlan");
   };
 
-  return (
-    <View style={styles.container}>
-      <Button
-        onPress={navigateToCreateOwnPlan}
-        alignSelf="center"
-        icon={Airplay}
-        size="$6"
-      >
-        Create New Exercise
-      </Button>
-    </View>
-  );
+  return <View style={styles.container}></View>;
 }
 
 const styles = StyleSheet.create({

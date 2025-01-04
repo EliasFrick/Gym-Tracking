@@ -1,40 +1,10 @@
-import {
-  Dimensions,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import React from "react";
-import { HelloWave } from "@/components/HelloWave";
-import ParallaxScrollView from "@/components/ParallaxScrollView";
-import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { useLayoutEffect } from "react";
 import { useNavigation } from "expo-router";
 import { Sheet } from "@tamagui/sheet";
-import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
-import type { SheetProps } from "@tamagui/sheet";
-import {
-  Adapt,
-  Button,
-  FontSizeTokens,
-  H2,
-  Input,
-  Paragraph,
-  ScrollView,
-  Select,
-  SelectProps,
-  TextArea,
-  XStack,
-  YStack,
-} from "tamagui";
+import { Button, ScrollView, XStack, YStack } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { LinearGradient } from "tamagui/linear-gradient";
-import { CustomDropDown } from "@/components/ui/CustomDropDown";
-import * as ImagePicker from "expo-image-picker";
-import Entypo from "@expo/vector-icons/Entypo";
 import { AddExerciseComponent } from "@/components/ui/addExerciseComponente";
 import { addDoc, collection } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
@@ -66,17 +36,6 @@ export default function CreateOwnPlan() {
     React.useState<(typeof spModes)[number]>("percent");
 
   const snapPoints = [100, 75, 50];
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: "Create Plan",
-      headerStyle: {
-        backgroundColor: "#F86E51",
-      },
-      headerTintColor: "black",
-      headerBackTitle: "Back",
-    });
-  }, [navigation]);
 
   const saveExercise = async () => {
     console.log("Saving exercise... ", customExercise);
@@ -168,7 +127,6 @@ export default function CreateOwnPlan() {
           <Button onPress={() => setOpen(true)}>Add New Plan</Button>
         </XStack>
       </YStack>
-
       <Sheet
         forceRemoveScrollEnabled={open}
         modal={modal}
@@ -257,7 +215,7 @@ const styles = StyleSheet.create({
 });
 import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 
-async function setDoc(docRef: any, data: { name: string; age: number }) {
+async function setDoc(docRef: any, data: ICreateCustomExercise) {
   try {
     await firebaseSetDoc(docRef, data);
     console.log("Document successfully written!");
