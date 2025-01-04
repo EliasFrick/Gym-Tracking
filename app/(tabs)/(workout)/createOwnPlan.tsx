@@ -5,7 +5,7 @@ import { useNavigation } from "expo-router";
 import { Sheet } from "@tamagui/sheet";
 import { Button, ScrollView, XStack, YStack } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { AddExerciseComponent } from "@/components/ui/addExerciseComponente";
+import { AddExerciseComponent } from "@/components/ui/AddExerciseComponente";
 import { addDoc, collection } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { ICreateCustomExercise } from "@/types/interfaces";

@@ -37,3 +37,11 @@ export interface ExerciseComponentProps {
   image: string | null; // Aktueller Wert
   setImage: React.Dispatch<React.SetStateAction<string | null>>; // Funktion zum Aktualisieren des Werts
 }
+
+export interface IExerciseCard {
+  title: string;
+  lastDone?: string;
+  image?: string | { uri: string } | any; // URL-String oder lokales Bild-Asset
+  style?: any;
+  rotation?: string;
+}
