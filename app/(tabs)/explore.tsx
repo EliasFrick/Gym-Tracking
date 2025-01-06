@@ -1,12 +1,24 @@
 import { StyleSheet, Image, Platform } from "react-native";
-
 import { ExternalLink } from "@/components/ExternalLink";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import { ThemedText } from "@/components/ThemedText";
 import { ThemedView } from "@/components/ThemedView";
 import { IconSymbol } from "@/components/ui/IconSymbol";
+import { getAuth, signOut } from "firebase/auth";
+import { Button } from "tamagui";
 
 export default function TabTwoScreen() {
+  const logout = async () => {
+    const auth = getAuth();
+    signOut(auth)
+      .then(() => {
+        // Sign-out successful.
+      })
+      .catch((error) => {
+        // An error happened.
+      });
+  };
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: "#D0D0D0", dark: "#353636" }}
@@ -38,6 +50,7 @@ export default function TabTwoScreen() {
       <ExternalLink href="https://docs.expo.dev/router/introduction">
         <ThemedText type="link">Learn more</ThemedText>
       </ExternalLink>
+      <Button onPress={logout}>Test</Button>
     </ParallaxScrollView>
   );
 }

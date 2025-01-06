@@ -2,7 +2,7 @@
   "expo": {
     "name": "Gym-Tracking",
     "slug": "Gym-Tracking",
-    "scheme": "Gym-Tracking",
+    "scheme": "gym-tracking",
     "version": "1.0.0",
     "plugins": ["expo-router"],
     "newArchEnabled": true,
@@ -11,6 +11,21 @@
     },
     "ios": {
       "bundleIdentifier": "com.anonymous.GymTracking"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "530d34db-8e74-4bb9-9a3f-894d0391f283"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/530d34db-8e74-4bb9-9a3f-894d0391f283",
+      "requestHeaders": {
+        "expo-channel-name": "your-channel-name"
+      }
     }
   }
 }
