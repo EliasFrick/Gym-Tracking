@@ -10,6 +10,7 @@ import { addDoc, collection } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { ICreateCustomExercise } from "@/types/interfaces";
 import { getAuth } from "firebase/auth";
+import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 
 const spModes = ["percent", "constant", "fit", "mixed"] as const;
 const { width, height } = Dimensions.get("window");
@@ -38,24 +39,6 @@ export default function CreateOwnPlan() {
   const snapPoints = [100, 75, 50];
 
   const saveExercise = async () => {
-    console.log("Saving exercise... ", customExercise);
-    try {
-      // Create the document in Firestore
-      const docRef = await addDoc(collection(firestoreDB, "customExercises"), {
-        userID: customExercise.userID,
-        exerciseName: customExercise.exerciseName,
-        exerciseDescription: customExercise.exerciseDescription,
-        exerciseTargetMuscle: customExercise.exerciseTargetMuscle,
-        exerciseImage: customExercise.exerciseImage, // Use the download URL
-      });
-      console.log("Document written with ID: ", docRef.id);
-      setOpen(false);
-    } catch (error) {
-      console.error("Error adding document: ", error);
-    }
-  };
-
-  const tryout = async () => {
     try {
       await setDoc(
         doc(
@@ -65,9 +48,7 @@ export default function CreateOwnPlan() {
         ),
         customExercise
       );
-      alert(
-        "Exercise was only saved locally, go to the settings to save the exercise in the cloud"
-      );
+      alert("Successfull saved");
       deleteData();
       setOpen(false);
     } catch (error) {
@@ -164,7 +145,7 @@ export default function CreateOwnPlan() {
               >
                 <AntDesign name="close" size={30} color="black" />
               </TouchableOpacity>
-              <TouchableOpacity onPress={tryout} activeOpacity={1}>
+              <TouchableOpacity onPress={saveExercise} activeOpacity={1}>
                 <AntDesign name="save" size={30} color="black" />
               </TouchableOpacity>
             </View>
@@ -213,7 +194,6 @@ const styles = StyleSheet.create({
     height: width * 0.3,
   },
 });
-import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 
 async function setDoc(docRef: any, data: ICreateCustomExercise) {
   try {
