@@ -1,5 +1,5 @@
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useLayoutEffect } from "react";
 import { useNavigation } from "expo-router";
 import { Sheet } from "@tamagui/sheet";
@@ -57,6 +57,15 @@ export default function CreateOwnPlan() {
     }
   };
 
+  async function setDoc(docRef: any, data: ICreateCustomExercise) {
+    try {
+      await firebaseSetDoc(docRef, data);
+      console.log("Document successfully written!");
+    } catch (error) {
+      console.error("Error writing document: ", error);
+    }
+  }
+
   const items = [
     { name: "Chest" },
     { name: "Uppcer Chest" },
@@ -96,6 +105,13 @@ export default function CreateOwnPlan() {
       exerciseImage: null,
     }));
   };
+
+  useEffect(() => {
+    if (open) {
+      console.log("Modal wurde geöffnet");
+      // Hier kannst du Logik hinzufügen, um die Modal erneut auszuführen
+    }
+  }, [open]);
 
   return (
     <View style={styles.container}>
@@ -194,12 +210,3 @@ const styles = StyleSheet.create({
     height: width * 0.3,
   },
 });
-
-async function setDoc(docRef: any, data: ICreateCustomExercise) {
-  try {
-    await firebaseSetDoc(docRef, data);
-    console.log("Document successfully written!");
-  } catch (error) {
-    console.error("Error writing document: ", error);
-  }
-}

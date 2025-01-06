@@ -84,3 +84,11 @@ export interface IUser {
   userName: string;
   birthDate: string;
 }
+
+export interface IAddExerciseModal {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  position: number;
+  setPosition: React.Dispatch<React.SetStateAction<number>>;
+  items: { name: string }[];
+}

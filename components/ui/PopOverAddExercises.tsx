@@ -10,28 +10,45 @@ import { View, YStack } from "tamagui";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { AddExerciseComponent } from "./AddExerciseComponente";
+import { getAuth } from "firebase/auth";
+import { ICreateCustomExercise } from "@/types/interfaces";
+import EventEmitter from "@/components/EventListener";
 
 const { width, height } = Dimensions.get("window");
 
 export function PopOverAddExercises() {
+  const auth = getAuth();
+  const firebaseUser = auth.currentUser;
+
   const router = useRouter();
   const [showPopover, setShowPopover] = useState(false);
-
+  const [customExercise, setCustomExercise] =
+    React.useState<ICreateCustomExercise>({
+      userID: firebaseUser!.uid, // Standardwerte
+      exerciseName: "",
+      exerciseDescription: "",
+      exerciseTargetMuscle: "",
+      exerciseImage: null,
+    });
   const options = [
     {
-      label: "Create Own Plan",
+      label: "Add Plan",
       navigation: "createOwnPlan",
       icon: <Ionicons name="create" size={width * 0.07} color="black" />,
+      action: "addPlan",
     },
     {
-      label: "Choose a Template",
-      navigation: "chooseTemplate",
-      icon: <Entypo name="box" size={width * 0.07} color="black" />,
+      label: "Add Exercises",
+      navigation: "createOwnPlan",
+      icon: <Ionicons name="barbell" size={width * 0.07} color="black" />,
+      action: "addExercise",
     },
     {
       label: "Create with AI",
       navigation: "createWithAI",
-      icon: <FontAwesome5 name="robot" size={width * 0.07} color="black" />,
+      icon: <Ionicons name="hardware-chip" size={width * 0.07} color="black" />,
+      action: "createAI",
     },
   ];
 
@@ -54,9 +71,51 @@ export function PopOverAddExercises() {
     console.log("Show Tool Top");
   };
 
+  const items = [
+    { name: "Chest" },
+    { name: "Uppcer Chest" },
+    { name: "Lower Chest" },
+    { name: "Biceps" },
+    { name: "Back" },
+    { name: "Lats" },
+    { name: "Traps" },
+    { name: "Leg" },
+    { name: "Glutes" },
+    { name: "Shoulder" },
+    { name: "Triceps" },
+    { name: "Abs" },
+    { name: "Forearms" },
+    { name: "Calves" },
+    { name: "Neck" },
+    { name: "Obliques" },
+  ];
+
+  // Funktion, um customExercise zu aktualisieren
+  const updateCustomExercise = (
+    key: keyof ICreateCustomExercise,
+    value: any
+  ) => {
+    setCustomExercise((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  const toggleAddExerciseBoolean = () => {
+    const currentValue = EventEmitter.getState("addExerciseBoolean") || false;
+    EventEmitter.setState("addExerciseBoolean", !currentValue);
+  };
+
+  const handleCliedPopover = (index: string) => {
+    setShowPopover(false);
+    if (index === "addExercise") {
+      toggleAddExerciseBoolean();
+    }
+  };
+
   return (
     <Popover
-      displayArea={{ x: width * 0.47, y: height * 0.117, width, height }}
+      displayArea={{ x: width * 0.54, y: height * 0.117, width, height }}
       arrowSize={{ width: -1, height: -1 }}
       isVisible={showPopover}
       /*       mode={PopoverMode.TOOLTIP}
@@ -77,25 +136,27 @@ export function PopOverAddExercises() {
             }}
           >
             {options.map((option, index) => (
-              <Link href={option.navigation} asChild key={index}>
-                <TouchableOpacity
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    width: "100%",
-                    paddingHorizontal: width * 0.03,
-                  }}
-                  onPress={() => setShowPopover(false)}
-                >
-                  <Text
-                    style={{ fontSize: width * 0.04, margin: width * 0.02 }}
+              <View asChild key={index}>
+                <Link href={option.navigation}>
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      width: "100%",
+                      paddingHorizontal: width * 0.01,
+                    }}
+                    onPress={() => handleCliedPopover(option.action)}
                   >
-                    {option.label}
-                  </Text>
-                  {option.icon}
-                </TouchableOpacity>
-              </Link>
+                    <Text
+                      style={{ fontSize: width * 0.04, margin: width * 0.02 }}
+                    >
+                      {option.label}
+                    </Text>
+                    {option.icon}
+                  </TouchableOpacity>
+                </Link>
+              </View>
             ))}
           </View>
         </YStack>
