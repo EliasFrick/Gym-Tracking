@@ -10,6 +10,7 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
 } from "firebase/auth";
+import { auth } from "@/database/Firebaseconfig";
 
 const AuthenticationContext = React.createContext<any>(null);
 
@@ -23,22 +24,8 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
   const [user, setUser] = useState<IUser | null>();
   const [loading, setLoading] = useState(true);
 
-  /*  useEffect(() => {
-    const auth = getAuth();
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUser((prevUser: any) => ({
-          ...prevUser,
-          uId: user.uid,
-          email: user.email,
-        }));
-      }
-    });
-    setLoading(false);
-  }, []); */
-
   useEffect(() => {
-    const auth = getAuth();
+
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser((prevUser: any) => ({
@@ -56,7 +43,7 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
   }, []);
 
   useEffect(() => {
-    if (loading) return; // Warten, bis die Authentifizierungsprüfung abgeschlossen ist
+    //if (loading) return; // Warten, bis die Authentifizierungsprüfung abgeschlossen ist
 
     if (user) {
       if (rootSegments !== "(app)") {

@@ -1,5 +1,5 @@
 import { AuthenticationProvider } from "@/context/AuthenticationProvider";
-import { Slot, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { createTamagui, TamaguiProvider, View } from "tamagui";
 import defaultConfig from "@tamagui/config/v3";
 import { PortalProvider } from "@tamagui/portal";
