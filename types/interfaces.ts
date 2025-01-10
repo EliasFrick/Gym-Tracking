@@ -16,7 +16,7 @@ export interface IUserRegisterCredentials {
 export interface IUser {
   firstname: string;
   lastname: string;
-  email: string ;
+  email: string;
   uId: string;
 }
 

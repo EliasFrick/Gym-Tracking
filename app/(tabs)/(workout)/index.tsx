@@ -1,33 +1,21 @@
-import React, { useState, useLayoutEffect, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  Button,
-  TouchableOpacity,
-} from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
 import { ExerciseCard } from "@/components/ui/ExerciseCard";
 import { ScrollView } from "tamagui";
-import { ICreateCustomExercise, IExerciseCard } from "@/types/interfaces";
-import { ToastDemo } from "@/components/ui/ToastMessage";
-import { AddExerciseComponent } from "@/components/ui/AddExerciseComponente";
-import { getAuth } from "firebase/auth";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
-import { firestoreDB } from "@/database/Firebaseconfig";
+import { IExerciseCard } from "@/types/interfaces";
 import { AddTrainingModal } from "@/components/ui/AddTrainingModal";
 import EventEmitter from "@/components/EventListener";
 
 const { width, height } = Dimensions.get("window");
-const spModes = ["percent", "constant", "fit", "mixed"] as const;
 
 export default function indexScreen() {
   const [position, setPosition] = React.useState(0);
   const [openAddExerciseModal, setOpenAddExerciseModal] = useState(
     EventEmitter.getState("addExerciseBoolean") || false
   );
+
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(
     EventEmitter.getState("addWorkoutBoolean") || false
   );
@@ -38,7 +26,7 @@ export default function indexScreen() {
     };
 
     const listenerforAddWorkout = (newValue: boolean) => {
-      setOpenAddExerciseModal(newValue);
+      setOpenAddWorkoutModal(newValue);
     };
 
     EventEmitter.on("addExerciseBoolean", listenerforAddExercise);
@@ -117,8 +105,8 @@ export default function indexScreen() {
         addExercise={true}
       />
       <AddTrainingModal
-        open={openAddExerciseModal}
-        setOpen={setOpenAddExerciseModal}
+        open={openAddWorkoutModal}
+        setOpen={setOpenAddWorkoutModal}
         position={position}
         setPosition={setPosition}
         items={items}

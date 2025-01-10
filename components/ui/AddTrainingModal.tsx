@@ -18,7 +18,15 @@ import { AddWorkoutComponent } from "./AddWorkoutComponente";
 
 const { width, height } = Dimensions.get("window");
 
-export const AddTrainingModal = (props: IAddTrainingModal) => {
+export const AddTrainingModal = ({
+  open,
+  setOpen,
+  position,
+  setPosition,
+  items,
+  addExercise = false,
+  addWorkout = false,
+}: IAddTrainingModal) => {
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
 
@@ -73,18 +81,17 @@ export const AddTrainingModal = (props: IAddTrainingModal) => {
     const currentValue = EventEmitter.getState("addExerciseBoolean") || false;
     EventEmitter.setState("addExerciseBoolean", !currentValue);
   };
-
   return (
     <Sheet
-      forceRemoveScrollEnabled={props.open}
+      forceRemoveScrollEnabled={open}
       modal={false}
-      open={props.open}
-      onOpenChange={props.setOpen}
+      open={open}
+      onOpenChange={setOpen}
       snapPoints={[100, 75, 50]}
       snapPointsMode={"percent"}
       dismissOnSnapToBottom
-      position={props.position}
-      onPositionChange={props.setPosition}
+      position={position}
+      onPositionChange={setPosition}
       zIndex={100_000}
       animation="medium"
     >
@@ -116,9 +123,9 @@ export const AddTrainingModal = (props: IAddTrainingModal) => {
               <AntDesign name="save" size={30} color="black" />
             </TouchableOpacity>
           </View>
-          {props.addExercise && (
+          {addExercise && (
             <AddExerciseComponent
-              items={props.items}
+              items={items}
               exerciseTitle={customExercise.exerciseName}
               setExerciseTitle={(title) =>
                 updateCustomExercise("exerciseName", title)
@@ -135,9 +142,9 @@ export const AddTrainingModal = (props: IAddTrainingModal) => {
               setImage={(img) => updateCustomExercise("exerciseImage", img)}
             />
           )}
-          {props.addWorkout && (
+          {addWorkout && (
             <AddWorkoutComponent
-              items={props.items}
+              items={items}
               exerciseTitle={customExercise.exerciseName}
               setExerciseTitle={(title) =>
                 updateCustomExercise("exerciseName", title)

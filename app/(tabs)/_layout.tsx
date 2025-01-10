@@ -2,8 +2,6 @@ import { Tabs } from "expo-router";
 import React from "react";
 import { Platform, View, StyleSheet } from "react-native";
 import FeatherIcons from "@expo/vector-icons/Feather";
-import { IconSymbol } from "@/components/ui/IconSymbol";
-import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -16,7 +14,6 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: true,
-        tabBarBackground: TabBarBackground,
         tabBarStyle: {
           backgroundColor: "#F86E51",
         },
@@ -30,11 +27,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
-            <IconSymbol
-              name="house.fill"
-              size={focused ? 35 : 29}
-              color={"black"}
-            />
+            <Ionicons name="home" size={focused ? 35 : 29} color="black" />
           ),
           headerTitle: "Training",
         }}
