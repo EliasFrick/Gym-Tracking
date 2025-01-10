@@ -7,14 +7,14 @@ import {
   Text,
 } from "react-native";
 import { Button, Input, TextArea } from "tamagui";
-import { CustomDropDown } from "./CustomDropDown";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
 import { ExerciseComponentProps } from "@/types/interfaces";
+import { CustomDropDown } from "../CustomDropDown";
 
 const { width, height } = Dimensions.get("window");
 
-export function AddWorkoutComponent({
+export function AddExerciseComponent({
   items,
   bodyPart,
   setBodyPart,
@@ -51,7 +51,7 @@ export function AddWorkoutComponent({
             width: width * 0.9,
             height: height * 0.05,
           }}
-          placeholder={`Name of Workout...`}
+          placeholder={`Name of Exercise...`}
           value={exerciseTitle}
           onChangeText={(text) => setExerciseTitle(text)}
         />

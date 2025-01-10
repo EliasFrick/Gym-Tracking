@@ -7,14 +7,14 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import { AddExerciseComponent } from "./AddExerciseComponente";
+import { AddExerciseComponent } from "@/components/ui/CreateTrainingsplan/AddExercises/AddExerciseComponente";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import React, { useEffect } from "react";
 import { getAuth } from "firebase/auth";
 import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import EventEmitter from "@/components/EventListener";
-import { AddWorkoutComponent } from "./AddWorkoutComponente";
+import { AddWorkoutComponent } from "./AddWorkout/AddWorkoutComponente";
 
 const { width, height } = Dimensions.get("window");
 
@@ -77,10 +77,17 @@ export const AddTrainingModal = ({
     }
   }
 
-  const toggleAddExerciseBoolean = () => {
-    const currentValue = EventEmitter.getState("addExerciseBoolean") || false;
-    EventEmitter.setState("addExerciseBoolean", !currentValue);
+  const toggleAddTrainingBoolean = () => {
+    const exerciseValue = EventEmitter.getState("addExerciseBoolean") || false;
+    const workoutValue = EventEmitter.getState("addWorkoutBoolean") || false;
+
+    if (exerciseValue) {
+      EventEmitter.setState("addExerciseBoolean", !exerciseValue);
+    } else if (workoutValue) {
+      EventEmitter.setState("addWorkoutBoolean", !workoutValue);
+    }
   };
+
   return (
     <Sheet
       forceRemoveScrollEnabled={open}
@@ -114,7 +121,7 @@ export const AddTrainingModal = ({
             }}
           >
             <TouchableOpacity
-              onPress={() => toggleAddExerciseBoolean()}
+              onPress={() => toggleAddTrainingBoolean()}
               activeOpacity={1}
             >
               <AntDesign name="close" size={30} color="black" />

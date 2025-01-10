@@ -126,8 +126,6 @@ export function ExerciseCard({
     );
   };
 
-  const getExercisesToPlan = () => {};
-
   return (
     <View
       style={[

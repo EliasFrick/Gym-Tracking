@@ -17,7 +17,7 @@ import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
-import { CustomDropDown } from "@/components/ui/CustomDropDown";
+import { CustomDropDown } from "@/components/ui/CreateTrainingsplan/CustomDropDown";
 import { Button } from "react-native";
 import DatePicker from "react-native-date-picker";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
