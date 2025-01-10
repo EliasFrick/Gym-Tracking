@@ -17,7 +17,7 @@ import { getAuth } from "firebase/auth";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
-import { AddExerciseModal } from "@/components/ui/AddExercisesModal";
+import { AddTrainingModal } from "@/components/ui/AddTrainingModal";
 import EventEmitter from "@/components/EventListener";
 
 const { width, height } = Dimensions.get("window");
@@ -25,32 +25,31 @@ const spModes = ["percent", "constant", "fit", "mixed"] as const;
 
 export default function indexScreen() {
   const [position, setPosition] = React.useState(0);
-  /*   const [open, setOpen] = React.useState(false);
-   */ const [open, setOpen] = useState(
+  const [openAddExerciseModal, setOpenAddExerciseModal] = useState(
     EventEmitter.getState("addExerciseBoolean") || false
+  );
+  const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(
+    EventEmitter.getState("addWorkoutBoolean") || false
   );
 
   useEffect(() => {
-    const listener = (newValue: boolean) => {
-      setOpen(newValue);
+    const listenerforAddExercise = (newValue: boolean) => {
+      setOpenAddExerciseModal(newValue);
     };
 
-    EventEmitter.on("addExerciseBoolean", listener);
+    const listenerforAddWorkout = (newValue: boolean) => {
+      setOpenAddExerciseModal(newValue);
+    };
+
+    EventEmitter.on("addExerciseBoolean", listenerforAddExercise);
+    EventEmitter.on("addWorkoutBoolean", listenerforAddWorkout);
 
     // Cleanup listener on unmount
     return () => {
-      EventEmitter.off("addExerciseBoolean", listener);
+      EventEmitter.off("addExerciseBoolean", listenerforAddExercise);
+      EventEmitter.off("addWorkoutBoolean", listenerforAddWorkout);
     };
   }, []);
-
-  async function setDoc(docRef: any, data: ICreateCustomExercise) {
-    try {
-      await firebaseSetDoc(docRef, data);
-      console.log("Document successfully written!");
-    } catch (error) {
-      console.error("Error writing document: ", error);
-    }
-  }
 
   const exampleExerciseCard: IExerciseCard[] = [
     {
@@ -104,22 +103,26 @@ export default function indexScreen() {
     { name: "Obliques" },
   ];
 
-  const test = () => {
-    setOpen(true); // Setze `open` auf true
-  };
-
   return (
     <ScrollView
       contentContainerStyle={styles.scrollViewContent} // Zentriert den Inhalt
       style={styles.container}
     >
-      <Button title="Tesfsd" color="#fff" onPress={test} />
-      <AddExerciseModal
-        open={open}
-        setOpen={setOpen}
+      <AddTrainingModal
+        open={openAddExerciseModal}
+        setOpen={setOpenAddExerciseModal}
         position={position}
         setPosition={setPosition}
         items={items}
+        addExercise={true}
+      />
+      <AddTrainingModal
+        open={openAddExerciseModal}
+        setOpen={setOpenAddExerciseModal}
+        position={position}
+        setPosition={setPosition}
+        items={items}
+        addWorkout={true}
       />
       {exampleExerciseCard.map((value, index) => (
         <ExerciseCard key={index} exerciseCard={value} />

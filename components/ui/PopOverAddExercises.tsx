@@ -33,10 +33,10 @@ export function PopOverAddExercises() {
     });
   const options = [
     {
-      label: "Add Plan",
+      label: "Add Workout",
       navigation: "createOwnPlan",
       icon: <Ionicons name="create" size={width * 0.07} color="black" />,
-      action: "addPlan",
+      action: "addWorkout",
     },
     {
       label: "Add Exercises",
@@ -48,7 +48,7 @@ export function PopOverAddExercises() {
       label: "Create with AI",
       navigation: "createWithAI",
       icon: <Ionicons name="hardware-chip" size={width * 0.07} color="black" />,
-      action: "createAI",
+      action: "createWithAi",
     },
   ];
 
@@ -106,20 +106,29 @@ export function PopOverAddExercises() {
     EventEmitter.setState("addExerciseBoolean", !currentValue);
   };
 
+  const toggleAddWorkoutBoolean = () => {
+    const currentValue = EventEmitter.getState("addWorkoutBoolean") || false;
+    EventEmitter.setState("addWorkoutBoolean", !currentValue);
+  };
+
   const handleCliedPopover = (index: string) => {
     setShowPopover(false);
     if (index === "addExercise") {
       toggleAddExerciseBoolean();
+    } else if (index === "addWorkout") {
+      toggleAddExerciseBoolean();
+    } else if (index === "createWithAi") {
+      alert("Create With AI");
     }
   };
 
   return (
     <Popover
-      displayArea={{ x: width * 0.54, y: height * 0.117, width, height }}
+      displayArea={{ x: width * 0.52, y: height * 0.117, width, height }}
       arrowSize={{ width: -1, height: -1 }}
       isVisible={showPopover}
-      /*       mode={PopoverMode.TOOLTIP}
-       */ from={
+      onRequestClose={() => setShowPopover(false)}
+      from={
         <TouchableOpacity onPress={() => setShowPopover(true)}>
           <Feather name="plus" size={width * 0.08} color="black" />
         </TouchableOpacity>
@@ -136,7 +145,7 @@ export function PopOverAddExercises() {
             }}
           >
             {options.map((option, index) => (
-              <View asChild key={index}>
+              <View asChild key={index} style={{ width: width * 0.45 }}>
                 <Link href={option.navigation}>
                   <TouchableOpacity
                     style={{

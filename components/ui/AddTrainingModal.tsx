@@ -1,4 +1,4 @@
-import { IAddExerciseModal, ICreateCustomExercise } from "@/types/interfaces";
+import { IAddTrainingModal, ICreateCustomExercise } from "@/types/interfaces";
 import { Sheet } from "@tamagui/sheet";
 import {
   Dimensions,
@@ -14,10 +14,11 @@ import { getAuth } from "firebase/auth";
 import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import EventEmitter from "@/components/EventListener";
+import { AddWorkoutComponent } from "./AddWorkoutComponente";
 
 const { width, height } = Dimensions.get("window");
 
-export const AddExerciseModal = (props: IAddExerciseModal) => {
+export const AddTrainingModal = (props: IAddTrainingModal) => {
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
 
@@ -115,23 +116,44 @@ export const AddExerciseModal = (props: IAddExerciseModal) => {
               <AntDesign name="save" size={30} color="black" />
             </TouchableOpacity>
           </View>
-          <AddExerciseComponent
-            items={props.items}
-            exerciseTitle={customExercise.exerciseName}
-            setExerciseTitle={(title) =>
-              updateCustomExercise("exerciseName", title)
-            }
-            bodyPart={customExercise.exerciseTargetMuscle}
-            setBodyPart={(part) =>
-              updateCustomExercise("exerciseTargetMuscle", part)
-            }
-            exerciseDescription={customExercise.exerciseDescription}
-            setExerciseDescription={(desc) =>
-              updateCustomExercise("exerciseDescription", desc)
-            }
-            image={customExercise.exerciseImage}
-            setImage={(img) => updateCustomExercise("exerciseImage", img)}
-          />
+          {props.addExercise && (
+            <AddExerciseComponent
+              items={props.items}
+              exerciseTitle={customExercise.exerciseName}
+              setExerciseTitle={(title) =>
+                updateCustomExercise("exerciseName", title)
+              }
+              bodyPart={customExercise.exerciseTargetMuscle}
+              setBodyPart={(part) =>
+                updateCustomExercise("exerciseTargetMuscle", part)
+              }
+              exerciseDescription={customExercise.exerciseDescription}
+              setExerciseDescription={(desc) =>
+                updateCustomExercise("exerciseDescription", desc)
+              }
+              image={customExercise.exerciseImage}
+              setImage={(img) => updateCustomExercise("exerciseImage", img)}
+            />
+          )}
+          {props.addWorkout && (
+            <AddWorkoutComponent
+              items={props.items}
+              exerciseTitle={customExercise.exerciseName}
+              setExerciseTitle={(title) =>
+                updateCustomExercise("exerciseName", title)
+              }
+              bodyPart={customExercise.exerciseTargetMuscle}
+              setBodyPart={(part) =>
+                updateCustomExercise("exerciseTargetMuscle", part)
+              }
+              exerciseDescription={customExercise.exerciseDescription}
+              setExerciseDescription={(desc) =>
+                updateCustomExercise("exerciseDescription", desc)
+              }
+              image={customExercise.exerciseImage}
+              setImage={(img) => updateCustomExercise("exerciseImage", img)}
+            />
+          )}
         </ScrollView>
       </Sheet.Frame>
     </Sheet>

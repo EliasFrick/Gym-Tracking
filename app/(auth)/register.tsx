@@ -5,6 +5,9 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  Platform,
+  ScrollView,
+  KeyboardAvoidingView,
 } from "react-native";
 import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -132,96 +135,104 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <LinearGradient
         colors={["#cd1f12", "transparent"]}
         style={styles.background}
       />
-      <View style={styles.header}>
-        <Text style={styles.title}>Register</Text>
-      </View>
-      {/* Firstname & Lastname */}
-      <View style={styles.rowContainer}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.header}>
+          <Text style={styles.title}>Register</Text>
+        </View>
+        {/* Firstname & Lastname */}
+        <View style={styles.rowContainer}>
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Firstname"
+            placeholderTextColor="#666"
+            autoCapitalize="none"
+            value={userCredentials.firstname}
+            onChangeText={(text) => handleInputChange("firstname", text)}
+          />
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Lastname"
+            placeholderTextColor="#666"
+            autoCapitalize="none"
+            value={userCredentials.lastname}
+            onChangeText={(text) => handleInputChange("lastname", text)}
+          />
+        </View>
+        {/* Email Address */}
         <TextInput
-          style={[styles.input, styles.halfInput]}
-          placeholder="Firstname"
+          style={styles.input}
+          placeholder="Email Address"
           placeholderTextColor="#666"
+          keyboardType="email-address"
           autoCapitalize="none"
-          value={userCredentials.firstname}
-          onChangeText={(text) => handleInputChange("firstname", text)}
-        />
-        <TextInput
-          style={[styles.input, styles.halfInput]}
-          placeholder="Lastname"
-          placeholderTextColor="#666"
-          autoCapitalize="none"
-          value={userCredentials.lastname}
-          onChangeText={(text) => handleInputChange("lastname", text)}
-        />
-      </View>
-      {/* Email Address */}
-      <TextInput
-        style={styles.input}
-        placeholder="Email Address"
-        placeholderTextColor="#666"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={userCredentials.email}
-        onChangeText={(text) => handleInputChange("email", text)}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        placeholderTextColor="#666"
-        autoCapitalize="none"
-        value={userCredentials.userName}
-        onChangeText={(text) => handleInputChange("userName", text)}
-      />
-      <View style={styles.datePicker}>
-        <RNDateTimePicker
-          mode="date"
-          value={selectedDate}
-          maximumDate={new Date()}
-          onChange={handleDateChange} // Handler für Änderungen
-        />
-      </View>
-      {showPicker && (
-        <RNDateTimePicker
-          mode="date"
-          value={selectedDate}
-          maximumDate={new Date()}
-          onChange={handleDateChange} // Datum aktualisieren
-        />
-      )}
-      {/* Password & Confirm Password */}
-      <View style={styles.rowContainer}>
-        <TextInput
-          style={[styles.input, styles.halfInput]}
-          placeholder="Password"
-          placeholderTextColor="#666"
-          secureTextEntry
-          autoCapitalize="none"
-          value={userCredentials.password}
-          onChangeText={(text) => handleInputChange("password", text)}
+          value={userCredentials.email}
+          onChangeText={(text) => handleInputChange("email", text)}
         />
         <TextInput
-          style={[styles.input, styles.halfInput]}
-          placeholder="Confirm Password"
+          style={styles.input}
+          placeholder="Username"
           placeholderTextColor="#666"
-          secureTextEntry
           autoCapitalize="none"
-          value={userCredentials.passwordConfirm}
-          onChangeText={(text) => handleInputChange("passwordConfirm", text)}
+          value={userCredentials.userName}
+          onChangeText={(text) => handleInputChange("userName", text)}
         />
-      </View>
-      <TouchableOpacity style={styles.button} onPress={tryRegister}>
-        <Text style={styles.buttonText}>SIGN IN</Text>
-      </TouchableOpacity>
-      {/* Navigation Link */}
-      <Link href="/login">
-        <Text style={styles.linkText}>Back to login</Text>
-      </Link>
-    </View>
+        <View style={styles.datePicker}>
+          <RNDateTimePicker
+            mode="date"
+            value={selectedDate}
+            maximumDate={new Date()}
+            onChange={handleDateChange} // Handler für Änderungen
+          />
+        </View>
+        {showPicker && (
+          <RNDateTimePicker
+            mode="date"
+            value={selectedDate}
+            maximumDate={new Date()}
+            onChange={handleDateChange} // Datum aktualisieren
+          />
+        )}
+        {/* Password & Confirm Password */}
+        <View style={styles.rowContainer}>
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Password"
+            placeholderTextColor="#666"
+            secureTextEntry
+            autoCapitalize="none"
+            value={userCredentials.password}
+            onChangeText={(text) => handleInputChange("password", text)}
+          />
+          <TextInput
+            style={[styles.input, styles.halfInput]}
+            placeholder="Confirm Password"
+            placeholderTextColor="#666"
+            secureTextEntry
+            autoCapitalize="none"
+            value={userCredentials.passwordConfirm}
+            onChangeText={(text) => handleInputChange("passwordConfirm", text)}
+          />
+        </View>
+        <TouchableOpacity style={styles.button} onPress={tryRegister}>
+          <Text style={styles.buttonText}>SIGN IN</Text>
+        </TouchableOpacity>
+        {/* Navigation Link */}
+        <Link href="/login">
+          <Text style={styles.linkText}>Back to login</Text>
+        </Link>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -231,9 +242,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "black",
-    alignItems: "center",
-    justifyContent: "center",
     padding: 20,
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     alignItems: "center",
@@ -258,7 +272,7 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   halfInput: {
-    width: "48%", // Halbe Breite für 2 Inputs nebeneinander
+    width: "48%",
   },
   background: {
     position: "absolute",
