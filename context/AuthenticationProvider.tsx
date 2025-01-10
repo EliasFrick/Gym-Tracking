@@ -11,6 +11,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { auth } from "@/database/Firebaseconfig";
+import { View, Text, Image, StyleSheet } from "react-native";
 
 const AuthenticationContext = React.createContext<any>(null);
 
@@ -25,7 +26,6 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
         setUser((prevUser: any) => ({
@@ -34,27 +34,43 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
           email: firebaseUser.email,
         }));
       } else {
-        setUser(null); // Kein Benutzer angemeldet
+        setUser(null);
       }
-      setLoading(false); // Authentifizierungsprüfung abgeschlossen
+      setLoading(false);
     });
 
-    return unsubscribe; // Aufräumen, wenn der Effekt neu ausgeführt wird
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
-    //if (loading) return; // Warten, bis die Authentifizierungsprüfung abgeschlossen ist
+    if (loading) return;
 
     if (user) {
       if (rootSegments !== "(app)") {
-        router.replace("/"); // Benutzer zur App weiterleiten
+        router.replace("/");
       }
     } else {
       if (rootSegments !== "(auth)") {
-        router.replace("/(auth)/login"); // Benutzer zur Login-Seite weiterleiten
+        router.replace("/(auth)/login");
       }
     }
   }, [user, loading, rootSegments]);
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  function LoadingScreen() {
+    return (
+      <View style={styles.container}>
+        <Image
+          source={require("@/assets/Logo Design Preview.png")}
+          style={styles.image}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
 
   return (
     <AuthenticationContext.Provider
@@ -66,3 +82,16 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
     </AuthenticationContext.Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5", // Optional: Hintergrundfarbe
+  },
+  image: {
+    width: 150, // Breite des Bildes
+    height: 150, // Höhe des Bildes
+  },
+});

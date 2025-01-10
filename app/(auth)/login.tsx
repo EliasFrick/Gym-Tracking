@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   View,
   Dimensions,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -16,12 +18,13 @@ import {
 } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig";
 import { IUserLoginCredentials } from "@/types/interfaces";
+import { ScrollView } from "tamagui";
 
 const LoginScreen = () => {
   const [userCredentials, setUserCredentials] = useState<IUserLoginCredentials>(
     {
-      email: "",
-      password: "",
+      email: "elias.frick.ef@gmail.com",
+      password: "TestTest",
     }
   );
   const windowWidth = Dimensions.get("window").width;
@@ -75,7 +78,10 @@ const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    >
       <LinearGradient
         colors={["#cd1f12", "transparent"]}
         style={styles.background}
@@ -113,7 +119,7 @@ const LoginScreen = () => {
           {/* </TouchableOpacity> */}
         </Link>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

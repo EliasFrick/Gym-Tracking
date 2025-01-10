@@ -14,7 +14,7 @@ import { ExerciseComponentProps } from "@/types/interfaces";
 
 const { width, height } = Dimensions.get("window");
 
-export function AddExerciseComponent({
+export function AddWorkoutComponent({
   items,
   bodyPart,
   setBodyPart,
@@ -51,7 +51,7 @@ export function AddExerciseComponent({
             width: width * 0.9,
             height: height * 0.05,
           }}
-          placeholder={`Name of Exercise...`}
+          placeholder={`Name of Workout...`}
           value={exerciseTitle}
           onChangeText={(text) => setExerciseTitle(text)}
         />

@@ -16,7 +16,7 @@ export interface IUserRegisterCredentials {
 export interface IUser {
   firstname: string;
   lastname: string;
-  email: string;
+  email: string ;
   uId: string;
 }
 
@@ -85,10 +85,12 @@ export interface IUser {
   birthDate: string;
 }
 
-export interface IAddExerciseModal {
+export interface IAddTrainingModal {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   position: number;
   setPosition: React.Dispatch<React.SetStateAction<number>>;
   items: { name: string }[];
+  addExercise?: boolean;
+  addWorkout?: boolean;
 }
