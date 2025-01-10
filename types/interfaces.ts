@@ -94,3 +94,7 @@ export interface IAddTrainingModal {
   addExercise?: boolean;
   addWorkout?: boolean;
 }
+
+export interface IAddedExercisePanel {
+  title: string;
+}

@@ -10,7 +10,6 @@ import { View, YStack } from "tamagui";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import Entypo from "@expo/vector-icons/Entypo";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { AddExerciseComponent } from "./AddExerciseComponente";
 import { getAuth } from "firebase/auth";
 import { ICreateCustomExercise } from "@/types/interfaces";
 import EventEmitter from "@/components/EventListener";
@@ -97,7 +96,6 @@ export function PopOverAddExercises() {
 
   const toggleAddWorkoutBoolean = () => {
     const currentValue = EventEmitter.getState("addWorkoutBoolean") || false;
-    alert(currentValue);
     EventEmitter.setState("addWorkoutBoolean", !currentValue);
   };
 

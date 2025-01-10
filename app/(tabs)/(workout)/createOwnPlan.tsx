@@ -5,12 +5,12 @@ import { useNavigation } from "expo-router";
 import { Sheet } from "@tamagui/sheet";
 import { Button, ScrollView, XStack, YStack } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { AddExerciseComponent } from "@/components/ui/AddExerciseComponente";
 import { addDoc, collection } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { ICreateCustomExercise } from "@/types/interfaces";
 import { getAuth } from "firebase/auth";
 import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
+import { AddExerciseComponent } from "@/components/ui/CreateTrainingsplan/AddExercises/AddExerciseComponente";
 
 const spModes = ["percent", "constant", "fit", "mixed"] as const;
 const { width, height } = Dimensions.get("window");

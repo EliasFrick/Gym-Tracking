@@ -5,7 +5,7 @@ import { useRouter } from "expo-router";
 import { ExerciseCard } from "@/components/ui/ExerciseCard";
 import { ScrollView } from "tamagui";
 import { IExerciseCard } from "@/types/interfaces";
-import { AddTrainingModal } from "@/components/ui/AddTrainingModal";
+import { AddTrainingModal } from "@/components/ui/CreateTrainingsplan/AddTrainingModal";
 import EventEmitter from "@/components/EventListener";
 
 const { width, height } = Dimensions.get("window");
@@ -91,6 +91,12 @@ export default function indexScreen() {
     { name: "Obliques" },
   ];
 
+  const workoutTypes = [
+    { name: "Weight Traning" },
+    { name: "Cardio" },
+    { name: "Other..." },
+  ];
+
   return (
     <ScrollView
       contentContainerStyle={styles.scrollViewContent} // Zentriert den Inhalt
@@ -109,7 +115,7 @@ export default function indexScreen() {
         setOpen={setOpenAddWorkoutModal}
         position={position}
         setPosition={setPosition}
-        items={items}
+        items={workoutTypes}
         addWorkout={true}
       />
       {exampleExerciseCard.map((value, index) => (
