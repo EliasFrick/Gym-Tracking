@@ -1,5 +1,4 @@
 import { StyleSheet, Text, View, Button } from "react-native";
-import { IconSymbol } from "@/components/ui/IconSymbol";
 import { getAuth, signOut } from "firebase/auth";
 
 export default function TabTwoScreen() {

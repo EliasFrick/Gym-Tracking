@@ -90,17 +90,6 @@ export function PopOverAddExercises() {
     { name: "Obliques" },
   ];
 
-  // Funktion, um customExercise zu aktualisieren
-  const updateCustomExercise = (
-    key: keyof ICreateCustomExercise,
-    value: any
-  ) => {
-    setCustomExercise((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
   const toggleAddExerciseBoolean = () => {
     const currentValue = EventEmitter.getState("addExerciseBoolean") || false;
     EventEmitter.setState("addExerciseBoolean", !currentValue);
@@ -108,6 +97,7 @@ export function PopOverAddExercises() {
 
   const toggleAddWorkoutBoolean = () => {
     const currentValue = EventEmitter.getState("addWorkoutBoolean") || false;
+    alert(currentValue);
     EventEmitter.setState("addWorkoutBoolean", !currentValue);
   };
 
@@ -116,7 +106,7 @@ export function PopOverAddExercises() {
     if (index === "addExercise") {
       toggleAddExerciseBoolean();
     } else if (index === "addWorkout") {
-      toggleAddExerciseBoolean();
+      toggleAddWorkoutBoolean();
     } else if (index === "createWithAi") {
       alert("Create With AI");
     }
