@@ -25,10 +25,11 @@ export function PopOverAddExercises() {
   const [customExercise, setCustomExercise] =
     React.useState<ICreateCustomExercise>({
       userID: firebaseUser!.uid, // Standardwerte
-      exerciseName: "",
-      exerciseDescription: "",
-      exerciseTargetMuscle: "",
-      exerciseImage: null,
+      name: "",
+      description: "",
+      primaryMuscle: [],
+      mainGroup: null,
+      image: null,
     });
   const options = [
     {
@@ -50,20 +51,6 @@ export function PopOverAddExercises() {
       action: "createWithAi",
     },
   ];
-
-  const navigateToNextScreen = (index: number) => {
-    switch (index) {
-      case 0:
-        router.replace("/createOwnPlan");
-        break;
-      case 1:
-        router.replace("/chooseTemplate");
-        break;
-      case 2:
-        router.replace("/createWithAI");
-        break;
-    }
-  };
 
   const showToolTop = () => {
     setShowPopover(true);

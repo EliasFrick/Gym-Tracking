@@ -27,26 +27,26 @@ export function AddWorkoutComponent({
   items,
   bodyPart,
   setBodyPart,
-  exerciseTitle,
-  setExerciseTitle,
-  exerciseDescription,
-  setExerciseDescription,
+  title,
+  setTitle,
+  description,
+  setDescription,
   image,
   setImage,
+  informations,
+  setInformations,
   ...props
 }: ExerciseComponentProps) {
   const [openPickExerciseModal, setOpenPickExerciseModal] =
     useState<boolean>(false);
-  const [pickedExercises, setPickedExercises] = useState<IPickedExercises[]>();
 
   const toggleShowPickExerciseModal = () => {
-    console.log("Tests");
     setOpenPickExerciseModal(!openPickExerciseModal);
   };
 
   useEffect(() => {
     const deleteExerciseFromList = (exerciseID: string) => {
-      setPickedExercises((prev) =>
+      setInformations((prev) =>
         prev?.filter((exercise) => exercise.id !== exerciseID)
       );
     };
@@ -54,7 +54,7 @@ export function AddWorkoutComponent({
     EventEmitter.on("deletetExercise", deleteExerciseFromList);
 
     return () => {
-      EventEmitter.off("buttonClicked", deleteExerciseFromList);
+      EventEmitter.off("deletetExercise", deleteExerciseFromList);
     };
   }, []);
 
@@ -68,8 +68,8 @@ export function AddWorkoutComponent({
             height: height * 0.05,
           }}
           placeholder={`Name of Workout...`}
-          value={exerciseTitle}
-          onChangeText={(text) => setExerciseTitle(text)}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -90,15 +90,15 @@ export function AddWorkoutComponent({
             width: width * 0.9,
           }}
         >
-          {pickedExercises?.map((value, index) => (
+          {informations?.map((value, index) => (
             <SavedExercisePanel
               key={index}
               name={value.name}
               id={value.id}
               primaryMuscle={value.primaryMuscle}
               mainGroup={value.mainGroup}
-              pickedExercises={pickedExercises}
-              setPickedExercises={setPickedExercises}
+              pickedExercises={informations}
+              setPickedExercises={setInformations}
             />
           ))}
           <TouchableOpacity
@@ -106,8 +106,8 @@ export function AddWorkoutComponent({
             style={{ marginTop: height * 0.03 }} // Abstand oben
           >
             <AddExercisePanel
-              pickedExercises={pickedExercises}
-              setPickedExercises={setPickedExercises}
+              pickedExercises={informations}
+              setPickedExercises={setInformations}
             />
           </TouchableOpacity>
         </View>

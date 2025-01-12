@@ -16,7 +16,7 @@ import {
   Unspaced,
   XStack,
 } from "tamagui";
-import { Alertdialog } from "./AlertDialog";
+import { AlertDialogForDeleteWorkout } from "./AlertDialogForDeleteWorkout";
 
 const { width, height } = Dimensions.get("window");
 
@@ -30,7 +30,7 @@ export function ExerciseCard({
 }: ExerciseCardProps) {
   const defaultRotation = "0deg"; // Fallback, wenn keine Rotation angegeben ist
   const [showDeletePopover, setShowDeletePopover] = useState(false);
-  const [showAlertDialog, setShowAlertDialog] = useState(true);
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [exercises, setExercises] = useState<string[]>();
 
   const DeletePopover = (props: IEditCardPopover) => {
@@ -40,6 +40,11 @@ export function ExerciseCard({
         open={showDeletePopover}
         onOpenChange={setShowDeletePopover}
       >
+        {/* <AlertDialogForDeleteWorkout
+          title="Sicher?"
+          open={showAlertDialog} // Sicherstellen, dass `showAlertDialog` korrekt initialisiert ist
+          description="Description"
+        /> */}
         <Adapt platform="touch">
           <Sheet animation="medium" zIndex={200000} modal dismissOnSnapToBottom>
             <Sheet.Frame padding="$4" gap="$4">
@@ -80,6 +85,7 @@ export function ExerciseCard({
             gap="$4"
           >
             <Dialog.Title>{props.title}</Dialog.Title>
+
             <Dialog.Description>{props.lastTrained}</Dialog.Description>
 
             <Button
@@ -135,20 +141,11 @@ export function ExerciseCard({
     >
       {showDeletePopover && (
         <DeletePopover
-          title={exerciseCard?.title}
+          title={exerciseCard?.id}
           lastTrained={exerciseCard.lastDone}
           exercisesInPlan={exercises}
         />
       )}
-      {/* {showAlertDialog && (
-        <Alertdialog
-          title="Sure?"
-          description="Test Description"
-          acceptButtonTitle="Löschen"
-          rejectButtonTitle="Abbrechen"
-          setShowAlertDialog={setShowAlertDialog}
-        />
-      )} */}
       <Card
         elevate
         size="$4"
@@ -161,31 +158,12 @@ export function ExerciseCard({
         onLongPress={() => setShowDeletePopover(true)}
       >
         <Card.Header padded>
-          <H2>{exerciseCard?.title}</H2>
+          <H2>{exerciseCard?.id}</H2>
           <Paragraph theme="alt2">
             Last Trained: {exerciseCard?.lastDone}
           </Paragraph>
         </Card.Header>
-        {/*  <Card.Footer padded>
-          <Paragraph theme="alt2">
-            Last Trained: {exerciseCard?.lastDone}
-          </Paragraph>
-        </Card.Footer> */}
-        <Card.Background>
-          <Image
-            resizeMode="cover"
-            alignSelf="center"
-            source={
-              typeof exerciseCard?.image === "string"
-                ? { uri: exerciseCard.image } // Falls es eine URL ist
-                : exerciseCard.image // Falls es ein lokales Asset ist
-            }
-            style={{
-              width: width * 0.8,
-              height: height * 0.2, // Specify size here if needed
-            }}
-          />
-        </Card.Background>
+        <Card.Background></Card.Background>
       </Card>
     </View>
   );

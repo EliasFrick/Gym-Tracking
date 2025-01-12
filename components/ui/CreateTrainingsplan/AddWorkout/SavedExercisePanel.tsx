@@ -12,9 +12,6 @@ const { width, height } = Dimensions.get("window");
 export function SavedExercisePanel({
   id,
   name,
-  primaryMuscle,
-  mainGroup,
-  pickedExercises,
   setPickedExercises,
 }: IPickedExercisesDeleteList) {
   const deleteExercise = (id: string) => {

@@ -13,8 +13,8 @@ import React from "react";
 
 interface CustomDropDownProps extends SelectProps {
   items: { name: string }[]; // Typdefinition für die Items
-  val: string; // Aktueller Wert
-  setVal: React.Dispatch<React.SetStateAction<string>>; // Funktion zum Aktualisieren des Werts
+  val: string[]; // Aktueller Wert
+  setVal: React.Dispatch<React.SetStateAction<string[]>>; // Funktion zum Aktualisieren des Werts
 }
 
 export function CustomDropDown({

@@ -18,10 +18,10 @@ export function AddExerciseComponent({
   items,
   bodyPart,
   setBodyPart,
-  exerciseTitle,
-  setExerciseTitle,
-  exerciseDescription,
-  setExerciseDescription,
+  title,
+  setTitle,
+  description,
+  setDescription,
   image,
   setImage,
   ...props
@@ -52,8 +52,8 @@ export function AddExerciseComponent({
             height: height * 0.05,
           }}
           placeholder={`Name of Exercise...`}
-          value={exerciseTitle}
-          onChangeText={(text) => setExerciseTitle(text)}
+          value={title}
+          onChangeText={(text) => setTitle(text)}
         />
       </View>
       <View style={styles.inputContainer}>
@@ -71,8 +71,6 @@ export function AddExerciseComponent({
         <View
           style={{
             width: width * 0.9,
-            /*                   height: height * 1,
-             */
           }}
         >
           <TextArea
@@ -80,8 +78,8 @@ export function AddExerciseComponent({
             style={{
               height: height * 0.15,
             }}
-            value={exerciseDescription}
-            onChangeText={(text) => setExerciseDescription(text)}
+            value={description}
+            onChangeText={(text) => setDescription(text)}
           />
         </View>
       </View>
