@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { StyleSheet, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useRouter } from "expo-router";
@@ -8,6 +8,8 @@ import { IExerciseCard } from "@/types/interfaces";
 import { AddTrainingModal } from "@/components/ui/CreateTrainingsplan/AddTrainingModal";
 import EventEmitter from "@/components/EventListener";
 import { fetchUserWorkouts } from "@/database/fetchWorkouts";
+import * as Network from "expo-network";
+import { AppConfigContext } from "@/context/AppConfigProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -20,6 +22,7 @@ export default function indexScreen() {
     EventEmitter.getState("addWorkoutBoolean") || false
   );
   const [workout, setWorkout] = useState<IExerciseCard[]>();
+  const { isConnected } = useContext(AppConfigContext);
 
   useEffect(() => {
     const listenerforAddExercise = (newValue: boolean) => {
@@ -47,30 +50,7 @@ export default function indexScreen() {
       rotation: "5deg",
       image: require("@/assets/Push.jpg"), // Relativer Pfad
     },
-    /* {
-      id: "Pull",
-      lastDone: "2023-02-03",
-      rotation: "-5deg",
-      image: require("@/assets/Pull.jpg"), // Relativer Pfad
-    },
-    {
-      id: "Leg",
-      lastDone: "2023-02-03",
-      rotation: "5deg",
-      image: require("@/assets/Leg.jpeg"), // Relativer Pfad
-    },
-    {
-      id: "Upper Body",
-      lastDone: "2023-02-03",
-      rotation: "-5deg",
-      image: require("@/assets/Push.jpg"), // Relativer Pfad
-    },
-    {
-      id: "Lower Body",
-      lastDone: "2023-02-03",
-      rotation: "5deg",
-      image: require("@/assets/Push.jpg"), // Relativer Pfad
-    }, */
+    
   ];
 
   const items = [
@@ -99,7 +79,10 @@ export default function indexScreen() {
     { name: "Other..." },
   ];
 
+  const checkInternetConnetcion = async () => {};
+
   useEffect(() => {
+    checkInternetConnetcion();
     const fetchWorkouts = async () => {
       const result = await fetchUserWorkouts();
       setWorkout(result);

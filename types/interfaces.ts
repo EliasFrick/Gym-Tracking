@@ -154,3 +154,8 @@ export interface IExerciseListProps {
     React.SetStateAction<IPickedExercises[] | undefined>
   >;
 }
+
+export interface  IAppConfigContextType {
+  isConnected: boolean | null;
+  setIsConnected: React.Dispatch<React.SetStateAction<boolean | null>>;
+}
