@@ -98,3 +98,48 @@ export interface IAddTrainingModal {
 export interface IAddedExercisePanel {
   title: string;
 }
+
+export interface IPickeExerciseModal {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  /*   items: IExercisesToPicker[];
+   */ pickedExercises: IPickedExercises[] | undefined;
+  setPickedExercises: React.Dispatch<
+    React.SetStateAction<IPickedExercises[] | undefined>
+  >;
+}
+
+export interface IExercisesToPicker {
+  title: string;
+  workoutType: string;
+  image?: string | null;
+}
+
+export interface IFetchDataFromFirestore {
+  collectionName: string;
+}
+
+export interface IPickedExercises {
+  id: string;
+  name: string;
+  primaryMuscle: string[];
+  mainGroup: string[];
+}
+
+export interface IPickedExercisesDeleteList {
+  id: string;
+  name: string;
+  primaryMuscle: string[];
+  mainGroup: string[];
+  pickedExercises: IPickedExercises[] | undefined;
+  setPickedExercises: React.Dispatch<
+    React.SetStateAction<IPickedExercises[] | undefined>
+  >;
+}
+
+export interface IExerciseListProps {
+  pickedExercises: IPickedExercises[] | undefined;
+  setPickedExercises: React.Dispatch<
+    React.SetStateAction<IPickedExercises[] | undefined>
+  >;
+}

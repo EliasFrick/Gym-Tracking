@@ -93,6 +93,7 @@ export default function indexScreen() {
 
   const workoutTypes = [
     { name: "Weight Traning" },
+    { name: "Calesthenics" },
     { name: "Cardio" },
     { name: "Other..." },
   ];

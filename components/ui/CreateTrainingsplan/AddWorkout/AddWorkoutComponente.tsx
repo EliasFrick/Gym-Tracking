@@ -6,12 +6,19 @@ import {
   Dimensions,
   Text,
 } from "react-native";
-import { Button, Input, TextArea } from "tamagui";
+import { Button, Input, ScrollView, TextArea } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
-import { ExerciseComponentProps } from "@/types/interfaces";
+import {
+  ExerciseComponentProps,
+  IExercisesToPicker,
+  IPickedExercises,
+} from "@/types/interfaces";
 import { CustomDropDown } from "../CustomDropDown";
 import { AddExercisePanel } from "./AddExercisePanel";
+import { PickExerciseModal } from "./PickExerciseModal";
+import { useState } from "react";
+import { SavedExercisePanel } from "./SavedExercisePanel";
 
 const { width, height } = Dimensions.get("window");
 
@@ -27,26 +34,26 @@ export function AddWorkoutComponent({
   setImage,
   ...props
 }: ExerciseComponentProps) {
-  const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  const [openPickExerciseModal, setOpenPickExerciseModal] =
+    useState<boolean>(false);
+  const [pickedExercises, setPickedExercises] = useState<IPickedExercises[]>();
 
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
+  const toggleShowPickExerciseModal = () => {
+    console.log("Tests");
+    setOpenPickExerciseModal(!openPickExerciseModal);
   };
+
+  const exampleExercises: IExercisesToPicker[] = [
+    /*  {
+      title: "BenchPress",
+      workoutType: "middle Chest",
+    }, */
+  ];
 
   return (
     <View>
       <View style={styles.inputContainer}>
-        <Text style={{ marginBottom: 8 }}>Title:</Text>
+        <Text style={styles.title}>Title:</Text>
         <Input
           style={{
             width: width * 0.9,
@@ -58,7 +65,7 @@ export function AddWorkoutComponent({
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text>Workout type:</Text>
+        <Text style={styles.title}>Workout type:</Text>
         <View
           style={{
             width: width * 0.9,
@@ -67,14 +74,37 @@ export function AddWorkoutComponent({
           <CustomDropDown items={items} val={bodyPart} setVal={setBodyPart} />
         </View>
       </View>
+
       <View style={styles.inputContainer}>
-        <Text>Add Exercises:</Text>
+        <Text style={styles.title}>Add Exercises:</Text>
         <View
           style={{
             width: width * 0.9,
           }}
         >
-          <AddExercisePanel />
+          {pickedExercises?.map((value, index) => (
+            <SavedExercisePanel
+              key={index}
+              name={value.name}
+              id={value.id}
+              primaryMuscle={value.primaryMuscle}
+              mainGroup={value.mainGroup}
+              pickedExercises={pickedExercises}
+              setPickedExercises={setPickedExercises}
+
+            />
+          ))}
+
+          {/* Abstand hinzufügen */}
+          <TouchableOpacity
+            onPress={toggleShowPickExerciseModal}
+            style={{ marginTop: height * 0.03 }} // Abstand oben
+          >
+            <AddExercisePanel
+              pickedExercises={pickedExercises}
+              setPickedExercises={setPickedExercises}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -100,5 +130,8 @@ const styles = StyleSheet.create({
   image: {
     width: width * 0.3,
     height: width * 0.3,
+  },
+  title: {
+    height: height * 0.03,
   },
 });
