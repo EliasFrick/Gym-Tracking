@@ -22,26 +22,38 @@ export interface IUser {
 
 export interface ICreateCustomExercise {
   userID: string;
-  exerciseName: string;
-  exerciseDescription: string;
-  exerciseTargetMuscle: string;
-  exerciseImage: string | null;
+  name: string;
+  description: string;
+  primaryMuscle: string[];
+  mainGroup: string[] | null;
+  image: string | null;
+}
+
+export interface IWorkoutInfrmations {
+  name: string;
+  primaryMuscle: string[];
+  mainGroup: string[] | null;
+  exercises: {} | null;
 }
 
 export interface ExerciseComponentProps {
   items: { name: string }[];
-  exerciseTitle: string;
-  setExerciseTitle: React.Dispatch<React.SetStateAction<string>>;
-  bodyPart: string;
-  setBodyPart: React.Dispatch<React.SetStateAction<string>>;
-  exerciseDescription: string;
-  setExerciseDescription: React.Dispatch<React.SetStateAction<string>>;
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  bodyPart: string[];
+  setBodyPart: React.Dispatch<React.SetStateAction<string[]>>;
+  description: string;
+  setDescription: React.Dispatch<React.SetStateAction<string>>;
   image: string | null;
   setImage: React.Dispatch<React.SetStateAction<string | null>>;
+  informations: IPickedExercises[] | undefined;
+  setInformations: React.Dispatch<
+    React.SetStateAction<IPickedExercises[] | undefined>
+  >;
 }
 
 export interface IExerciseCard {
-  title: string;
+  id: string;
   lastDone?: string;
   image?: string | { uri: string } | any;
   style?: any;
@@ -64,10 +76,9 @@ export interface IEditPopover {
 export interface IAlertDialog {
   title: string;
   description: string;
-  acceptButtonTitle: string;
-  rejectButtonTitle: string;
   setShowAlertDialog?: React.Dispatch<React.SetStateAction<boolean>>;
   showAlertDialog?: boolean;
+  open: boolean
 }
 
 export interface IEditCardPopover {

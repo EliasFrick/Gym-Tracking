@@ -7,6 +7,7 @@ import { ScrollView } from "tamagui";
 import { IExerciseCard } from "@/types/interfaces";
 import { AddTrainingModal } from "@/components/ui/CreateTrainingsplan/AddTrainingModal";
 import EventEmitter from "@/components/EventListener";
+import { fetchUserWorkouts } from "@/database/fetchWorkouts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -15,10 +16,10 @@ export default function indexScreen() {
   const [openAddExerciseModal, setOpenAddExerciseModal] = useState(
     EventEmitter.getState("addExerciseBoolean") || false
   );
-
   const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(
     EventEmitter.getState("addWorkoutBoolean") || false
   );
+  const [workout, setWorkout] = useState<IExerciseCard[]>();
 
   useEffect(() => {
     const listenerforAddExercise = (newValue: boolean) => {
@@ -41,35 +42,35 @@ export default function indexScreen() {
 
   const exampleExerciseCard: IExerciseCard[] = [
     {
-      title: "Push",
+      id: "Push",
       lastDone: "2022-01-01",
       rotation: "5deg",
       image: require("@/assets/Push.jpg"), // Relativer Pfad
     },
-    {
-      title: "Pull",
+    /* {
+      id: "Pull",
       lastDone: "2023-02-03",
       rotation: "-5deg",
       image: require("@/assets/Pull.jpg"), // Relativer Pfad
     },
     {
-      title: "Leg",
+      id: "Leg",
       lastDone: "2023-02-03",
       rotation: "5deg",
       image: require("@/assets/Leg.jpeg"), // Relativer Pfad
     },
     {
-      title: "Upper Body",
+      id: "Upper Body",
       lastDone: "2023-02-03",
       rotation: "-5deg",
       image: require("@/assets/Push.jpg"), // Relativer Pfad
     },
     {
-      title: "Lower Body",
+      id: "Lower Body",
       lastDone: "2023-02-03",
       rotation: "5deg",
       image: require("@/assets/Push.jpg"), // Relativer Pfad
-    },
+    }, */
   ];
 
   const items = [
@@ -98,9 +99,17 @@ export default function indexScreen() {
     { name: "Other..." },
   ];
 
+  useEffect(() => {
+    const fetchWorkouts = async () => {
+      const result = await fetchUserWorkouts();
+      setWorkout(result);
+    };
+    fetchWorkouts();
+  }, []);
+
   return (
     <ScrollView
-      contentContainerStyle={styles.scrollViewContent} // Zentriert den Inhalt
+      contentContainerStyle={styles.scrollViewContent}
       style={styles.container}
     >
       <AddTrainingModal
@@ -119,8 +128,14 @@ export default function indexScreen() {
         items={workoutTypes}
         addWorkout={true}
       />
-      {exampleExerciseCard.map((value, index) => (
-        <ExerciseCard key={index} exerciseCard={value} />
+      {workout?.map((value, index) => (
+        <ExerciseCard
+          key={index}
+          exerciseCard={{
+            ...value,
+            rotation: index % 2 === 0 ? "5deg" : "-5deg",
+          }}
+        />
       ))}
     </ScrollView>
   );
@@ -131,8 +146,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F86E51",
   },
   scrollViewContent: {
-    alignItems: "center", // Zentriert die Items horizontal
-    justifyContent: "center", // Optional, je nach Bedarf
+    alignItems: "center",
+    minHeight: height,
   },
   sheetContainer: {
     marginTop: height * 0.02,

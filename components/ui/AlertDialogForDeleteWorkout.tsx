@@ -1,11 +1,9 @@
 import { IAlertDialog } from "@/types/interfaces";
 import { AlertDialog, Button, XStack, YStack } from "tamagui";
 
-export function Alertdialog(props: IAlertDialog) {
-  const alert = true;
-
+export function AlertDialogForDeleteWorkout(props: IAlertDialog) {
   return (
-    <AlertDialog native open={alert} onOpenChange={props.setShowAlertDialog}>
+    <AlertDialog native open={props.open}>
       <AlertDialog.Portal>
         <AlertDialog.Overlay
           key="overlay"
@@ -34,17 +32,17 @@ export function Alertdialog(props: IAlertDialog) {
           y={0}
         >
           <YStack space>
-            <AlertDialog.Title>{props.title}</AlertDialog.Title>
+            <AlertDialog.Title>Accept</AlertDialog.Title>
             <AlertDialog.Description>
-              {props.description}{" "}
+              By pressing yes, you accept our terms and conditions.
             </AlertDialog.Description>
 
             <XStack gap="$3" justifyContent="flex-end">
               <AlertDialog.Cancel asChild>
-                <Button>{props.rejectButtonTitle}</Button>
+                <Button>Cancel</Button>
               </AlertDialog.Cancel>
               <AlertDialog.Action asChild>
-                <Button theme="active">{props.acceptButtonTitle}</Button>
+                <Button theme="active">Accept</Button>
               </AlertDialog.Action>
             </XStack>
           </YStack>

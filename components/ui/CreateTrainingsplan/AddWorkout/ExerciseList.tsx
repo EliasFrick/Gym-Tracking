@@ -24,16 +24,26 @@ export function ExerciseList({
     },
   ];
 
-  const [data, setData] = useState<DocumentData[]>([]);
+  const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
+  const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDefaultExercises = async () => {
       const result = await fetchDataFromFirestore({
         collectionName: "DefaultExercises",
       });
-      setData(result);
+      setDefaultExercises(result);
     };
-    fetchData();
+
+    const fetchCustomExercises = async () => {
+      const result = await fetchDataFromFirestore({
+        collectionName: "CustomExercises",
+      });
+      setCustomExercises(result);
+    };
+
+    fetchDefaultExercises();
+    fetchCustomExercises();
   }, []);
 
   const selectExercise = (
@@ -58,6 +68,7 @@ export function ExerciseList({
     });
   };
 
+  const combinedExercises = [...defaultExercises, ...customExercises];
   return (
     <Card
       elevate
@@ -69,7 +80,7 @@ export function ExerciseList({
       hoverStyle={{ scale: 0.925 }}
       pressStyle={{ scale: 0.875 }}
     >
-      {data.map((value, index) => (
+      {combinedExercises.map((value, index) => (
         <TouchableOpacity
           key={index}
           onPress={() =>

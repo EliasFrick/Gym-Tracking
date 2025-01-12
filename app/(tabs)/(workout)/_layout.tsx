@@ -36,18 +36,6 @@ export default function WorkoutLayout() {
           headerTintColor: "black",
         }}
       />
-      <Stack.Screen
-        name="createOwnPlan"
-        options={{
-          headerShown: true,
-          headerTitle: "Create Plan",
-          headerStyle: {
-            backgroundColor: "#F86E51",
-          },
-          headerTintColor: "black",
-          headerBackTitle: "Back",
-        }}
-      />
     </Stack>
   );
 }
