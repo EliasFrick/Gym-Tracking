@@ -1,11 +1,7 @@
-import { IExerciseListProps, IPickedExercises } from "@/types/interfaces";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { IPickedExercises } from "@/types/interfaces";
+import { Text, TouchableOpacity, StyleSheet, Dimensions } from "react-native";
+import Feather from "@expo/vector-icons/Feather";
+import EventEmitter from "@/components/EventListener";
 
 // Definiere die Props der Komponente
 interface ListWithAddedExercisesProps {
@@ -17,9 +13,20 @@ const { width, height } = Dimensions.get("window");
 export const ListWithAddedExercises = ({
   exercise,
 }: ListWithAddedExercisesProps) => {
+  const deleteExercise = (id: string) => {
+    console.log(id);
+    EventEmitter.emit("deletetExercise", id);
+  };
+
   return (
-    <TouchableOpacity style={styles.exerciseContainer}>
-      <Text style={styles.exerciseText}>{exercise.name}</Text>
+    <TouchableOpacity
+      style={styles.exerciseContainer}
+      onPress={() => deleteExercise(exercise.id)}
+    >
+      <Text style={styles.exerciseText} numberOfLines={1} ellipsizeMode="tail">
+        {exercise.name}
+      </Text>
+      <Feather name="x-circle" size={24} color="black" />
     </TouchableOpacity>
   );
 };
@@ -27,15 +34,16 @@ export const ListWithAddedExercises = ({
 const styles = StyleSheet.create({
   exerciseContainer: {
     backgroundColor: "#f0f0f0",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
+    padding: 10,
     borderRadius: 8,
-    marginBottom: 10,
-    marginRight: 10,
-    width: (width * 0.9) / 2.5, // Zwei Elemente pro Zeile
+    margin: 5,
+    flexDirection: "row",
+    alignItems: "center",
   },
   exerciseText: {
-    fontSize: 16,
+    marginRight: width * 0.03,
+    fontSize: 14,
     color: "black",
+    textAlign: "center",
   },
 });

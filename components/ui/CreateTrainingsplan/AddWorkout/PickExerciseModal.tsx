@@ -55,16 +55,16 @@ export const PickExerciseModal = (props: IPickeExerciseModal) => {
 };
 
 const SheetContents = memo(
+
+  
   ({ pickedExercises, setPickedExercises }: IExerciseListProps) => {
     return (
       <View style={styles.sheetContentContainer}>
-        {pickedExercises?.map((value, index) => (
-          <View style={styles.addedExercisesContainer} key={index}>
-            <View style={styles.wrapper}>
-              <ListWithAddedExercises exercise={value} />
-            </View>
-          </View>
-        ))}
+        <View style={styles.addedExercisesContainer}>
+          {pickedExercises?.map((value, index) => (
+            <ListWithAddedExercises key={index} exercise={value} />
+          ))}
+        </View>
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.textInput}
@@ -92,7 +92,10 @@ const SheetContents = memo(
 );
 
 const styles = StyleSheet.create({
-  sheetContentContainer: {},
+  sheetContentContainer: {
+    width: "100%",
+  },
+
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -113,14 +116,14 @@ const styles = StyleSheet.create({
     margin: 10,
   },
   wrapper: {
-    flexDirection: "row",
-    width: width * 0.3,
-    backgroundColor: "green",
+    width: width * 0.45, // Etwa die Hälfte der Breite für zwei Elemente pro Zeile
+    marginRight: 10,
+    marginBottom: 10,
   },
   addedExercisesContainer: {
-    backgroundColor: "green",
     flexDirection: "row",
     flexWrap: "wrap",
-    justifyContent: "flex-start", // Links-Ausrichtung
+    justifyContent: "flex-start",
+    width: "100%",
   },
 });
