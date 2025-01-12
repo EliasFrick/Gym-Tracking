@@ -11,6 +11,7 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.2.0",
+    "@react-native-community/netinfo": "11.4.1",
     "@react-native-firebase/app": "^21.6.2",
     "@rehookify/datepicker": "^6.6.8",
     "@tamagui/config": "^1.120.2",
@@ -27,6 +28,7 @@
     "expo-image-picker": "~16.0.4",
     "expo-linear-gradient": "~14.0.2",
     "expo-linking": "~7.0.4",
+    "expo-network": "~7.0.5",
     "expo-router": "~4.0.15",
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.1",
