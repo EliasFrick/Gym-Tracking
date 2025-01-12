@@ -17,8 +17,9 @@ import {
 import { CustomDropDown } from "../CustomDropDown";
 import { AddExercisePanel } from "./AddExercisePanel";
 import { PickExerciseModal } from "./PickExerciseModal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SavedExercisePanel } from "./SavedExercisePanel";
+import EventEmitter from "@/components/EventListener";
 
 const { width, height } = Dimensions.get("window");
 
@@ -43,12 +44,19 @@ export function AddWorkoutComponent({
     setOpenPickExerciseModal(!openPickExerciseModal);
   };
 
-  const exampleExercises: IExercisesToPicker[] = [
-    /*  {
-      title: "BenchPress",
-      workoutType: "middle Chest",
-    }, */
-  ];
+  useEffect(() => {
+    const deleteExerciseFromList = (exerciseID: string) => {
+      setPickedExercises((prev) =>
+        prev?.filter((exercise) => exercise.id !== exerciseID)
+      );
+    };
+
+    EventEmitter.on("deletetExercise", deleteExerciseFromList);
+
+    return () => {
+      EventEmitter.off("buttonClicked", deleteExerciseFromList);
+    };
+  }, []);
 
   return (
     <View>
@@ -91,11 +99,8 @@ export function AddWorkoutComponent({
               mainGroup={value.mainGroup}
               pickedExercises={pickedExercises}
               setPickedExercises={setPickedExercises}
-
             />
           ))}
-
-          {/* Abstand hinzufügen */}
           <TouchableOpacity
             onPress={toggleShowPickExerciseModal}
             style={{ marginTop: height * 0.03 }} // Abstand oben
