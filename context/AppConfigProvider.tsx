@@ -43,6 +43,10 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = ({
     setRefreshDatabase((prev) => prev + 1); // Erhöht den Trigger-Wert
   };
 
+  useEffect(() => {
+    triggerRefreshDatabase();
+  }, [isConnected]);
+
   return (
     <AppConfigContext.Provider
       value={{
