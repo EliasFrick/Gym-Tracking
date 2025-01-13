@@ -158,4 +158,6 @@ export interface IExerciseListProps {
 export interface  IAppConfigContextType {
   isConnected: boolean | null;
   setIsConnected: React.Dispatch<React.SetStateAction<boolean | null>>;
+  refreshDatabase: number; 
+  triggerRefreshDatabase: () => void; 
 }

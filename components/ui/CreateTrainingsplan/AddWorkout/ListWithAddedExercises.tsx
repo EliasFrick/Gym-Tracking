@@ -14,7 +14,6 @@ export const ListWithAddedExercises = ({
   exercise,
 }: ListWithAddedExercisesProps) => {
   const deleteExercise = (id: string) => {
-    console.log(id);
     EventEmitter.emit("deletetExercise", id);
   };
 

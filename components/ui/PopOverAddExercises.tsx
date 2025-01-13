@@ -52,11 +52,6 @@ export function PopOverAddExercises() {
     },
   ];
 
-  const showToolTop = () => {
-    setShowPopover(true);
-    console.log("Show Tool Top");
-  };
-
   const items = [
     { name: "Chest" },
     { name: "Uppcer Chest" },

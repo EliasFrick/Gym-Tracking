@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { AddExerciseComponent } from "@/components/ui/CreateTrainingsplan/AddExercises/AddExerciseComponente";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import {
   doc,
@@ -25,6 +25,8 @@ import {
 import { firestoreDB } from "@/database/Firebaseconfig";
 import EventEmitter from "@/components/EventListener";
 import { AddWorkoutComponent } from "./AddWorkout/AddWorkoutComponente";
+import { AppConfigContext } from "@/context/AppConfigProvider";
+import { setRef } from "tamagui";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,6 +43,8 @@ export const AddTrainingModal = ({
   const firebaseUser = auth.currentUser;
   const [workout, setWorkout] = useState<IPickedExercises[]>();
   const [exercise, setExercise] = useState<IPickedExercises[]>();
+  const { refreshDatabase, triggerRefreshDatabase } =
+    useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] =
     React.useState<ICreateCustomExercise>({
@@ -82,14 +86,19 @@ export const AddTrainingModal = ({
   };
 
   const saveExercise = async () => {
-    if (addExercise) {
-      await saveCustomExercise();
-    } else if (addWorkout) {
-      await saveCustomWorkout();
+    try {
+      if (addExercise) {
+        await saveCustomExercise();
+      } else if (addWorkout) {
+        await saveCustomWorkout();
+      }
+      triggerRefreshDatabase();
+    } catch (err) {
+      console.error("Error adding document: ", err);
     }
   };
 
-  async function setDoc(docRef: any, data: ICreateCustomExercise) {
+  async function setDoc(docRef: any, data: any) {
     try {
       await firebaseSetDoc(docRef, data);
       console.log("Document successfully written!");
@@ -111,14 +120,11 @@ export const AddTrainingModal = ({
 
   const saveCustomExercise = async () => {
     try {
-      await setDoc(
-        doc(
-          firestoreDB,
-          "CustomExercises",
-          firebaseUser?.uid + ", " + customExercise.name
-        ),
-        customExercise
-      );
+      const usersCollection = collection(firestoreDB, "User");
+      const userRef = doc(usersCollection, firebaseUser?.uid);
+      const exerciseRef = collection(userRef, "Exercises");
+      await setDoc(doc(exerciseRef, customExercise.name), customExercise);
+
       alert("Successfull saved");
       deleteExerciseData();
       setOpen(false);
@@ -130,7 +136,7 @@ export const AddTrainingModal = ({
 
   const deleteExerciseData = () => {
     setCustomExercise({
-      userID: firebaseUser!.uid, // Setzt die userID auf die aktuelle Firebase UID
+      userID: firebaseUser!.uid,
       name: "",
       description: "",
       primaryMuscle: [],
@@ -155,8 +161,7 @@ export const AddTrainingModal = ({
       const usersCollection = collection(firestoreDB, "User");
       const userRef = doc(usersCollection, firebaseUser?.uid);
       const workoutRef = collection(userRef, "Workouts");
-      console.log("Wokrout: ", custmoWorkout);
-      await setDoc(doc(workoutRef, custmoWorkout.name), { workout });
+      await setDoc(doc(workoutRef, custmoWorkout.name), workout);
 
       deleteWorkoutData();
       setOpen(false);

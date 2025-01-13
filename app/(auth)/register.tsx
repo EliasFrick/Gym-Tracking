@@ -45,7 +45,6 @@ const RegisterScreen = () => {
       );
       handleInputChange("birthDate", utcDate);
       setSelectedDate(utcDate); // UTC-Datum speichern
-      console.log(utcDate);
     }
   };
 
@@ -101,7 +100,7 @@ const RegisterScreen = () => {
           .catch((error) => {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.log(
+            console.error(
               "Error Code: ",
               errorCode,
               " Error Message: ",
@@ -111,7 +110,7 @@ const RegisterScreen = () => {
             // ..
           });
       } catch (error) {
-        console.log("Error: ", error);
+        console.error("Error: ", error);
       }
     }
   };

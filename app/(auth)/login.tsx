@@ -39,7 +39,6 @@ const LoginScreen = () => {
   };
 
   const tryLogin = async () => {
-    console.log("Test");
     try {
       const auth = getAuth();
       await signInWithEmailAndPassword(
@@ -50,14 +49,13 @@ const LoginScreen = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          console.log("User Found: ", user);
           router.replace("/");
           // ...
         })
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          console.log(
+          console.error(
             "Error Code: ",
             errorCode,
             " ErrorMessage: ",
@@ -66,14 +64,9 @@ const LoginScreen = () => {
           alert(errorMessage.substring(9));
         });
 
-      console.log(
-        "Email: ",
-        userCredentials.email,
-        ", Passwort: ",
-        userCredentials.password
-      );
+     
     } catch (error) {
-      console.log("Error: ", error);
+      console.error("Error: ", error);
     }
   };
 
@@ -114,9 +107,7 @@ const LoginScreen = () => {
           <Text style={styles.buttonText}>SIGN IN</Text>
         </TouchableOpacity>
         <Link href={"/register"}>
-          {/* <TouchableOpacity onPress={() => console.log("Navigate To Register")}> */}
           <Text style={styles.createAccountText}>Create Account</Text>
-          {/* </TouchableOpacity> */}
         </Link>
       </View>
     </KeyboardAvoidingView>
