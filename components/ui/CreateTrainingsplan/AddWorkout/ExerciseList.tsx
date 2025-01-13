@@ -2,7 +2,7 @@ import { Dimensions, Text, TouchableOpacity } from "react-native";
 import { Card, XStack } from "tamagui";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { PickExerciseModal } from "./PickExerciseModal";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   IExerciseListProps,
   IExercisesToPicker,
@@ -10,6 +10,8 @@ import {
 } from "@/types/interfaces";
 import { DocumentData } from "firebase/firestore";
 import { fetchDataFromFirestore } from "@/database/FetchDataFromFirestore";
+import { fetchCustomExercises } from "@/database/fetchCustomExercises";
+import { AppConfigContext } from "@/context/AppConfigProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -17,15 +19,9 @@ export function ExerciseList({
   pickedExercises,
   setPickedExercises,
 }: IExerciseListProps) {
-  const exampleExercises: IExercisesToPicker[] = [
-    {
-      title: "BenchPress",
-      workoutType: "middle Chest",
-    },
-  ];
-
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
+  const { refreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
     const fetchDefaultExercises = async () => {
@@ -35,16 +31,14 @@ export function ExerciseList({
       setDefaultExercises(result);
     };
 
-    const fetchCustomExercises = async () => {
-      const result = await fetchDataFromFirestore({
-        collectionName: "CustomExercises",
-      });
+    const fetchCustomUserExercises = async () => {
+      const result = await fetchCustomExercises();
       setCustomExercises(result);
     };
 
     fetchDefaultExercises();
-    fetchCustomExercises();
-  }, []);
+    fetchCustomUserExercises();
+  }, [refreshDatabase]);
 
   const selectExercise = (
     id: string,
@@ -59,12 +53,11 @@ export function ExerciseList({
       mainGroup,
     };
     setPickedExercises((prev) => {
-      // Prüfen, ob die ID bereits existiert
       if (prev?.some((exercise) => exercise.id === id)) {
         alert("Übung bereits ausgewälts");
-        return prev; // Keine Änderungen, wenn die ID existiert
+        return prev;
       }
-      return [...(prev || []), newExercise]; // Liste erweitern, wenn die ID neu ist
+      return [...(prev || []), newExercise];
     });
   };
 

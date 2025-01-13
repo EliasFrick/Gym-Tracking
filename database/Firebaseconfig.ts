@@ -7,7 +7,11 @@ import {
   getReactNativePersistence,
 } from "firebase/auth";
 import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
+import {
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  initializeFirestore,
+} from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -26,11 +30,22 @@ const firebaseConfig = {
 
 // initialize Firebase App
 const app = initializeApp(firebaseConfig);
+
+/* const firestoreOfflineDb = initializeFirestore(app, {
+  cacheSizeBytes: CACHE_SIZE_UNLIMITED,
+}); */
+
 // initialize Firebase Auth for that app immediately
 const auth = initializeAuth(app, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage),
 });
 
-const firestoreDB = getFirestore(app);
+/* const firestoreDB = getFirestore(app);
+ */
 
+const firestoreDB = initializeFirestore(app, {
+  localCache: persistentLocalCache({
+    tabManager: persistentMultipleTabManager(),
+  }),
+});
 export { app, auth, getApp, getAuth, firestoreDB };

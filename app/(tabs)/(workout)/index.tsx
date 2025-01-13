@@ -22,7 +22,7 @@ export default function indexScreen() {
     EventEmitter.getState("addWorkoutBoolean") || false
   );
   const [workout, setWorkout] = useState<IExerciseCard[]>();
-  const { isConnected } = useContext(AppConfigContext);
+  const { isConnected, refreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
     const listenerforAddExercise = (newValue: boolean) => {
@@ -50,7 +50,6 @@ export default function indexScreen() {
       rotation: "5deg",
       image: require("@/assets/Push.jpg"), // Relativer Pfad
     },
-    
   ];
 
   const items = [
@@ -88,7 +87,7 @@ export default function indexScreen() {
       setWorkout(result);
     };
     fetchWorkouts();
-  }, []);
+  }, [refreshDatabase]);
 
   return (
     <ScrollView
