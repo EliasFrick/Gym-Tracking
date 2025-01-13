@@ -78,13 +78,16 @@ export interface IAlertDialog {
   description: string;
   setShowAlertDialog?: React.Dispatch<React.SetStateAction<boolean>>;
   showAlertDialog?: boolean;
-  open: boolean
+  open: boolean;
 }
 
 export interface IEditCardPopover {
   title: string;
   lastTrained: string | undefined;
   exercisesInPlan: string[] | undefined;
+  showDeletePopover: boolean
+  setShowDeletePopover: React.Dispatch<React.SetStateAction<boolean>>;
+
 }
 
 export interface IUser {
@@ -155,9 +158,18 @@ export interface IExerciseListProps {
   >;
 }
 
-export interface  IAppConfigContextType {
+export interface IAppConfigContextType {
   isConnected: boolean | null;
   setIsConnected: React.Dispatch<React.SetStateAction<boolean | null>>;
-  refreshDatabase: number; 
-  triggerRefreshDatabase: () => void; 
+  refreshDatabase: number;
+  triggerRefreshDatabase: () => void;
+}
+
+export interface IDeleteAlertDialog {
+  title: string | null;
+  description: string | null;
+  acceptButtonText: string | null;
+  cancelButtonText: string | null;
+  showAlertDialog: boolean;
+  setShowAlertDialog: React.Dispatch<React.SetStateAction<boolean>>;
 }

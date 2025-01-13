@@ -26,7 +26,6 @@ import { firestoreDB } from "@/database/Firebaseconfig";
 import EventEmitter from "@/components/EventListener";
 import { AddWorkoutComponent } from "./AddWorkout/AddWorkoutComponente";
 import { AppConfigContext } from "@/context/AppConfigProvider";
-import { setRef } from "tamagui";
 
 const { width, height } = Dimensions.get("window");
 
@@ -101,7 +100,6 @@ export const AddTrainingModal = ({
   async function setDoc(docRef: any, data: any) {
     try {
       await firebaseSetDoc(docRef, data);
-      console.log("Document successfully written!");
     } catch (error) {
       console.error("Error writing document: ", error);
     }
@@ -161,7 +159,7 @@ export const AddTrainingModal = ({
       const usersCollection = collection(firestoreDB, "User");
       const userRef = doc(usersCollection, firebaseUser?.uid);
       const workoutRef = collection(userRef, "Workouts");
-      await setDoc(doc(workoutRef, custmoWorkout.name), workout);
+      await setDoc(doc(workoutRef, custmoWorkout.name), { workout });
 
       deleteWorkoutData();
       setOpen(false);

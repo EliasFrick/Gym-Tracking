@@ -43,15 +43,6 @@ export default function indexScreen() {
     };
   }, []);
 
-  const exampleExerciseCard: IExerciseCard[] = [
-    {
-      id: "Push",
-      lastDone: "2022-01-01",
-      rotation: "5deg",
-      image: require("@/assets/Push.jpg"), // Relativer Pfad
-    },
-  ];
-
   const items = [
     { name: "Chest" },
     { name: "Uppcer Chest" },
@@ -78,10 +69,8 @@ export default function indexScreen() {
     { name: "Other..." },
   ];
 
-  const checkInternetConnetcion = async () => {};
 
   useEffect(() => {
-    checkInternetConnetcion();
     const fetchWorkouts = async () => {
       const result = await fetchUserWorkouts();
       setWorkout(result);
