@@ -28,7 +28,7 @@ export const PickExerciseModal = (props: IPickeExerciseModal) => {
         modal={true}
         open={props.open}
         onOpenChange={props.setOpen}
-        snapPoints={[50]}
+        snapPoints={[80]}
         snapPointsMode="percent"
         dismissOnSnapToBottom
         position={position}
@@ -55,8 +55,6 @@ export const PickExerciseModal = (props: IPickeExerciseModal) => {
 };
 
 const SheetContents = memo(
-
-  
   ({ pickedExercises, setPickedExercises }: IExerciseListProps) => {
     return (
       <View style={styles.sheetContentContainer}>
