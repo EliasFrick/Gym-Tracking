@@ -1,13 +1,13 @@
-import { Dimensions, Text, TouchableOpacity } from "react-native";
-import { Card, XStack } from "tamagui";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { PickExerciseModal } from "./PickExerciseModal";
-import { useContext, useEffect, useState } from "react";
 import {
-  IExerciseListProps,
-  IExercisesToPicker,
-  IPickedExercises,
-} from "@/types/interfaces";
+  Dimensions,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  View,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { useContext, useEffect, useState } from "react";
+import { IExerciseListProps } from "@/types/interfaces";
 import { DocumentData } from "firebase/firestore";
 import { fetchDataFromFirestore } from "@/database/FetchDataFromFirestore";
 import { fetchCustomExercises } from "@/database/fetchCustomExercises";
@@ -21,6 +21,8 @@ export function ExerciseList({
 }: IExerciseListProps) {
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
+  const [paddingBottom, setpaddingBottom] = useState<number>(height * 0.14);
+
   const { refreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
@@ -46,78 +48,82 @@ export function ExerciseList({
     primaryMuscle: string[],
     mainGroup: string[]
   ) => {
-    const newExercise: IPickedExercises = {
-      id,
-      name,
-      primaryMuscle,
-      mainGroup,
-    };
+    const newExercise = { id, name, primaryMuscle, mainGroup };
     setPickedExercises((prev) => {
       if (prev?.some((exercise) => exercise.id === id)) {
-        alert("Übung bereits ausgewälts");
+        alert("Übung bereits ausgewählt");
         return prev;
       }
       return [...(prev || []), newExercise];
     });
+    extendPaddingBottom();
+  };
+
+  const extendPaddingBottom = () => {
+    setpaddingBottom((prev) => prev + height * 0.05);
   };
 
   const combinedExercises = [...defaultExercises, ...customExercises];
+
   return (
-    <Card
-      elevate
-      size="$4"
-      animation="bouncy"
-      width={width * 0.9}
-      height={height * 0.05}
-      scale={0.9}
-      hoverStyle={{ scale: 0.925 }}
-      pressStyle={{ scale: 0.875 }}
-    >
-      {combinedExercises.map((value, index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() =>
-            selectExercise(
-              value.id,
-              value.name,
-              value.primaryMuscle,
-              value.mainGroup
-            )
-          }
-          style={{ height: height * 0.05, marginBottom: height * 0.01 }} // Fügt einen Abstand zwischen den Elementen ein
-        >
-          <XStack
-            justifyContent="space-between"
-            alignItems="center" // Sorgt dafür, dass alle Kinder, inkl. des Icons, vertikal zentriert sind
-            style={{
-              height: "100%",
-              backgroundColor: "lightgrey",
-              borderRadius: 8, // Optional: fügt Ecken hinzu
-              paddingVertical: 8, // Optional: fügt Innenabstand hinzu
-            }}
-          >
-            <Text
+    <View style={{ width: width * 0.9 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: paddingBottom }}>
+        {combinedExercises.length === 0 ? (
+          <Text style={{ textAlign: "center", marginTop: height * 0.2 }}>
+            Keine Übungen gefunden.
+          </Text>
+        ) : (
+          combinedExercises.map((value, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() =>
+                selectExercise(
+                  value.id,
+                  value.name,
+                  value.primaryMuscle,
+                  value.mainGroup
+                )
+              }
               style={{
-                flexShrink: 1,
-                flexWrap: "wrap",
-                marginLeft: width * 0.05,
-                fontSize: 16,
+                height: height * 0.05,
+                marginBottom: height * 0.01,
               }}
             >
-              {value.name}
-            </Text>
-            <Ionicons
-              name="add"
-              size={24}
-              color="black"
-              style={{
-                marginRight: width * 0.03,
-                alignSelf: "center", // Sicherstellt die vertikale Zentrierung des Icons
-              }}
-            />
-          </XStack>
-        </TouchableOpacity>
-      ))}
-    </Card>
+              <View
+                style={{
+                  height: "100%",
+                  backgroundColor: "lightgrey",
+                  borderRadius: 8,
+                  paddingVertical: 8,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <Text
+                  style={{
+                    flexShrink: 1,
+                    flexWrap: "wrap",
+                    marginLeft: width * 0.05,
+                    fontSize: 16,
+                  }}
+                >
+                  {value.name}
+                </Text>
+                <Ionicons
+                  name="add"
+                  size={24}
+                  color="black"
+                  style={{
+                    marginRight: width * 0.03,
+                    alignSelf: "center",
+                  }}
+                />
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+    </View>
   );
 }

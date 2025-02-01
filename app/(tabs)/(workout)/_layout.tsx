@@ -24,12 +24,6 @@ export default function WorkoutLayout() {
       <Stack.Screen
         name="index"
         options={{
-          headerTitle: "Start Training",
-          headerRight: () => (
-            <View style={{ marginRight: 10 }}>
-              <PopOverAddExercises />
-            </View>
-          ),
           headerStyle: {
             backgroundColor: "#F86E51",
           },

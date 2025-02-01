@@ -83,25 +83,34 @@ const DeletePopover = (props: IEditCardPopover) => {
   const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
-    const listenerforDeleteWorkout = () => {
+    const handleDeleteWorkout = () => {
       deleteWorkout(props.title);
     };
 
-    EventEmitter.on("finallyDeleteWorkout", listenerforDeleteWorkout);
-  });
+    EventEmitter.on("finallyDeleteWorkout", handleDeleteWorkout);
+
+    return () => {
+      EventEmitter.off("finallyDeleteWorkout", handleDeleteWorkout);
+    };
+  }, []);
 
   const deleteWorkout = async (id: string) => {
-    const usersCollection = collection(firestoreDB, "User");
-    const userRef = doc(usersCollection, firebaseUser?.uid);
+    try {
+      const usersCollection = collection(firestoreDB, "User");
+      const userRef = doc(usersCollection, firebaseUser?.uid);
+      const workoutRef = collection(userRef, "Workouts");
+      const workoutDocRef = doc(workoutRef, id);
 
-    const workoutRef = collection(userRef, "Workouts");
-    const workoutDocRef = doc(workoutRef, id);
+      await deleteDoc(workoutDocRef);
 
-    await deleteDoc(workoutDocRef);
-
-    alert("Workout deleted successfully!");
-    triggerRefreshDatabase();
-    setShowAlertDialog(false);
+      alert("Workout deleted successfully!");
+      triggerRefreshDatabase();
+      setShowAlertDialog(false);
+      props.setShowDeletePopover(false);
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+      alert("Error deleting workout. Please try again.");
+    }
   };
 
   return (
@@ -212,7 +221,8 @@ function AlertDialogDemo({
   setShowAlertDialog,
 }: IDeleteAlertDialog) {
   const deleteWorkout = () => {
-    EventEmitter.setState("finallyDeleteWorkout", "");
+    EventEmitter.emit("finallyDeleteWorkout");
+    setShowAlertDialog(false);
   };
 
   return (

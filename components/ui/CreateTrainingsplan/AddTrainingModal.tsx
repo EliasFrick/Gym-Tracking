@@ -2,6 +2,7 @@ import {
   IAddTrainingModal,
   ICreateCustomExercise,
   IPickedExercises,
+  IWorkoutInDatabase,
   IWorkoutInfrmations,
 } from "@/types/interfaces";
 import { Sheet } from "@tamagui/sheet";
@@ -42,12 +43,13 @@ export const AddTrainingModal = ({
   const firebaseUser = auth.currentUser;
   const [workout, setWorkout] = useState<IPickedExercises[]>();
   const [exercise, setExercise] = useState<IPickedExercises[]>();
+  const [saveWorkout, setSaveWorkout] = useState<IWorkoutInDatabase>();
   const { refreshDatabase, triggerRefreshDatabase } =
     useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] =
     React.useState<ICreateCustomExercise>({
-      userID: firebaseUser!.uid, // Standardwerte
+      userID: firebaseUser!.uid,
       name: "",
       description: "",
       primaryMuscle: [],
@@ -58,6 +60,7 @@ export const AddTrainingModal = ({
   const [custmoWorkout, setCustomWorkout] = React.useState<IWorkoutInfrmations>(
     {
       name: "",
+      description: "",
       primaryMuscle: [],
       mainGroup: null,
       exercises: null,
@@ -146,6 +149,7 @@ export const AddTrainingModal = ({
   const deleteWorkoutData = () => {
     setCustomWorkout({
       name: "",
+      description: "",
       primaryMuscle: [],
       mainGroup: null,
       exercises: null,
@@ -159,7 +163,23 @@ export const AddTrainingModal = ({
       const usersCollection = collection(firestoreDB, "User");
       const userRef = doc(usersCollection, firebaseUser?.uid);
       const workoutRef = collection(userRef, "Workouts");
-      await setDoc(doc(workoutRef, custmoWorkout.name), { workout });
+
+      const formattedExercises =
+        workout?.map((exercise) => ({
+          id: exercise.id || "",
+          name: exercise.name || "",
+        })) || [];
+
+      const workoutData = {
+        name: custmoWorkout.name || "",
+        description: custmoWorkout.description || "",
+        primaryMuscle: custmoWorkout.primaryMuscle || [],
+        mainGroup: custmoWorkout.mainGroup || [],
+        exercises: formattedExercises,
+        createdAt: new Date().toISOString(),
+      };
+
+      await setDoc(doc(workoutRef, workoutData.name), workoutData);
 
       deleteWorkoutData();
       setOpen(false);
