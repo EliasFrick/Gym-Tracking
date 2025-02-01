@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StyleSheet, Dimensions, View } from "react-native";
+import { StyleSheet, Dimensions, View, Text } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { ExerciseCard } from "@/components/ui/ExerciseCard";
+import ExerciseCard from "@/components/ui/ExerciseCard";
 import { ScrollView } from "tamagui";
 import { IExerciseCard } from "@/types/interfaces";
 import { AddTrainingModal } from "@/components/ui/CreateTrainingsplan/AddTrainingModal";
@@ -136,15 +136,26 @@ export default function indexScreen() {
         items={workoutTypes}
         addWorkout={true}
       />
-      {workout?.map((value, index) => (
+      {/* {workout?.map((value, index) => (
         <ExerciseCard
           key={index}
-          exerciseCard={{
-            ...value,
-            rotation: index % 2 === 0 ? "5deg" : "-5deg",
-          }}
+          {...value}
+          rotation={index % 2 === 0 ? "5deg" : "-5deg"}
         />
-      ))}
+      ))} */}
+      {workout && workout.length > 0 ? (
+        workout.map((value, index) => (
+          <ExerciseCard
+            key={index}
+            {...value}
+            rotation={index % 2 === 0 ? "5deg" : "-5deg"}
+          />
+        ))
+      ) : (
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ fontSize: 18, color: "black" }}></Text>
+        </View>
+      )}
     </ScrollView>
   );
 }

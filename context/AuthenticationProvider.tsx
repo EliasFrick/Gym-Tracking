@@ -4,7 +4,7 @@ import {
   IUserRegisterCredentials,
 } from "@/types/interfaces";
 import { useRouter, useSegments } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, memo } from "react";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -19,20 +19,45 @@ export function useAuth() {
   return React.useContext(AuthenticationContext);
 }
 
+// Optimiere LoadingScreen mit memo
+const LoadingScreen = memo(() => {
+  return (
+    <View style={styles.container}>
+      <Image
+        source={require("@/assets/Logo Design Preview.png")}
+        style={styles.image}
+        resizeMode="contain"
+      />
+    </View>
+  );
+});
+
 export function AuthenticationProvider({ children }: React.PropsWithChildren) {
   const rootSegments = useSegments()[0];
   const router = useRouter();
   const [user, setUser] = useState<IUser | null>();
   const [loading, setLoading] = useState(true);
 
+  // Memoize den Context-Wert
+  const contextValue = useMemo(
+    () => ({
+      user: user,
+    }),
+    [user]
+  );
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
-        setUser((prevUser: any) => ({
-          ...prevUser,
-          uId: firebaseUser.uid,
-          email: firebaseUser.email,
-        }));
+        setUser((prevUser: any) => {
+          // Vermeide unnötige State-Updates
+          if (prevUser?.uId === firebaseUser.uid) return prevUser;
+          return {
+            ...prevUser,
+            uId: firebaseUser.uid,
+            email: firebaseUser.email,
+          };
+        });
       } else {
         setUser(null);
       }
@@ -45,14 +70,10 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (loading) return;
 
-    if (user) {
-      if (rootSegments !== "(app)") {
-        router.replace("/");
-      }
-    } else {
-      if (rootSegments !== "(auth)") {
-        router.replace("/(auth)/login");
-      }
+    if (user && rootSegments !== "(app)") {
+      router.replace("/");
+    } else if (!user && rootSegments !== "(auth)") {
+      router.replace("/(auth)/login");
     }
   }, [user, loading, rootSegments]);
 
@@ -60,24 +81,8 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
     return <LoadingScreen />;
   }
 
-  function LoadingScreen() {
-    return (
-      <View style={styles.container}>
-        <Image
-          source={require("@/assets/Logo Design Preview.png")}
-          style={styles.image}
-          resizeMode="contain"
-        />
-      </View>
-    );
-  }
-
   return (
-    <AuthenticationContext.Provider
-      value={{
-        user: user,
-      }}
-    >
+    <AuthenticationContext.Provider value={contextValue}>
       {children}
     </AuthenticationContext.Provider>
   );

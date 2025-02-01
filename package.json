@@ -37,6 +37,7 @@
     "expo-updates": "~0.26.15",
     "expo-web-browser": "~14.0.2",
     "firebase": "^11.1.0",
+    "loadash": "^1.0.0",
     "native": "^0.3.3",
     "react": "18.3.1",
     "react-native": "0.76.6",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@types/lodash": "^4.17.15",
     "@types/react": "^18.3.16",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.2"

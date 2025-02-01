@@ -3,7 +3,7 @@ import {
   IEditCardPopover,
   IExerciseCard,
 } from "@/types/interfaces";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, memo, useCallback } from "react";
 import { Dimensions, View } from "react-native";
 import type { CardProps } from "tamagui";
 import { Card, H2, Image, Paragraph, YStack } from "tamagui";
@@ -29,10 +29,67 @@ interface ExerciseCardProps extends CardProps {
   exerciseCard: IExerciseCard & { rotation?: string };
 }
 
-export function ExerciseCard({
-  exerciseCard,
-  ...cardProps
-}: ExerciseCardProps) {
+const AlertDialogDemo = memo(
+  ({
+    title,
+    description,
+    acceptButtonText,
+    cancelButtonText,
+    showAlertDialog,
+    setShowAlertDialog,
+  }: IDeleteAlertDialog) => {
+    const handleDelete = useCallback(() => {
+      EventEmitter.emit("finallyDeleteWorkout");
+      setShowAlertDialog(false);
+    }, [setShowAlertDialog]);
+
+    return (
+      <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay
+            key="overlay"
+            animation="quick"
+            opacity={0.5}
+            enterStyle={{ opacity: 0 }}
+            exitStyle={{ opacity: 0 }}
+          />
+          <AlertDialog.Content
+            elevate
+            key="content"
+            animation={[
+              "quick",
+              {
+                opacity: {
+                  overshootClamping: true,
+                },
+              },
+            ]}
+            enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
+            exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
+            style={{ maxWidth: "80%" }}
+          >
+            <YStack space>
+              <AlertDialog.Title>{title}</AlertDialog.Title>
+              <AlertDialog.Description>{description}</AlertDialog.Description>
+              <XStack justifyContent="space-between" width="100%">
+                <AlertDialog.Cancel asChild>
+                  <Button backgroundColor={"red"} onPress={handleDelete}>
+                    {acceptButtonText}
+                  </Button>
+                </AlertDialog.Cancel>
+                <AlertDialog.Action asChild>
+                  <Button theme="active">{cancelButtonText}</Button>
+                </AlertDialog.Action>
+              </XStack>
+            </YStack>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog>
+    );
+  }
+);
+
+const ExerciseCard = memo((props: IExerciseCard) => {
   const defaultRotation = "0deg";
   const [showDeletePopover, setShowDeletePopover] = useState(false);
   const [exercises, setExercises] = useState<string[]>();
@@ -40,14 +97,14 @@ export function ExerciseCard({
   return (
     <View
       style={[
-        exerciseCard?.style,
-        { transform: [{ rotate: exerciseCard?.rotation || defaultRotation }] },
+        props?.style,
+        { transform: [{ rotate: props?.rotation || defaultRotation }] },
       ]}
     >
       {showDeletePopover && (
         <DeletePopover
-          title={exerciseCard?.id}
-          lastTrained={exerciseCard.lastDone}
+          title={props?.id}
+          lastTrained={props?.lastDone}
           exercisesInPlan={exercises}
           setShowDeletePopover={setShowDeletePopover}
           showDeletePopover={showDeletePopover}
@@ -65,16 +122,14 @@ export function ExerciseCard({
         onLongPress={() => setShowDeletePopover(true)}
       >
         <Card.Header padded>
-          <H2>{exerciseCard?.id}</H2>
-          <Paragraph theme="alt2">
-            Last Trained: {exerciseCard?.lastDone}
-          </Paragraph>
+          <H2>{props?.id}</H2>
+          <Paragraph theme="alt2">Last Trained: {props?.lastDone}</Paragraph>
         </Card.Header>
         <Card.Background></Card.Background>
       </Card>
     </View>
   );
-}
+});
 
 const DeletePopover = (props: IEditCardPopover) => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
@@ -212,58 +267,4 @@ const DeletePopover = (props: IEditCardPopover) => {
   );
 };
 
-function AlertDialogDemo({
-  title,
-  description,
-  acceptButtonText,
-  cancelButtonText,
-  showAlertDialog,
-  setShowAlertDialog,
-}: IDeleteAlertDialog) {
-  const deleteWorkout = () => {
-    EventEmitter.emit("finallyDeleteWorkout");
-    setShowAlertDialog(false);
-  };
-
-  return (
-    <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
-      <AlertDialog.Portal>
-        <AlertDialog.Overlay
-          key="overlay"
-          animation="quick"
-          opacity={0.5}
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
-        <AlertDialog.Content
-          elevate
-          key="content"
-          animation={[
-            "quick",
-            {
-              opacity: {
-                overshootClamping: true,
-              },
-            },
-          ]}
-          enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
-          exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-          style={{ maxWidth: "80%" }}
-        >
-          <YStack space>
-            <AlertDialog.Title>{title}</AlertDialog.Title>
-            <AlertDialog.Description>{description} </AlertDialog.Description>
-            <XStack justifyContent="space-between" width="100%">
-              <AlertDialog.Cancel asChild onPress={deleteWorkout}>
-                <Button backgroundColor={"red"}>{acceptButtonText} </Button>
-              </AlertDialog.Cancel>
-              <AlertDialog.Action asChild>
-                <Button theme="active">{cancelButtonText}</Button>
-              </AlertDialog.Action>
-            </XStack>
-          </YStack>
-        </AlertDialog.Content>
-      </AlertDialog.Portal>
-    </AlertDialog>
-  );
-}
+export default ExerciseCard;
