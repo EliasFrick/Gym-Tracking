@@ -1,10 +1,6 @@
-import {
-  IExerciseListProps,
-  IPickedExercises,
-  IPickeExerciseModal,
-} from "@/types/interfaces";
+import { IExerciseListProps, IPickeExerciseModal } from "@/types/interfaces";
 import { Sheet } from "@tamagui/sheet";
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -15,6 +11,7 @@ import { Text, View } from "tamagui";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ExerciseList } from "./ExerciseList";
 import { ListWithAddedExercises } from "./ListWithAddedExercises";
+import AntDesign from "@expo/vector-icons/AntDesign";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,42 +19,50 @@ export const PickExerciseModal = (props: IPickeExerciseModal) => {
   const [position, setPosition] = React.useState(0);
 
   return (
-    <>
-      <Sheet
-        forceRemoveScrollEnabled={props.open}
-        modal={true}
-        open={props.open}
-        onOpenChange={props.setOpen}
-        snapPoints={[80]}
-        snapPointsMode="percent"
-        dismissOnSnapToBottom
-        position={position}
-        onPositionChange={setPosition}
-        zIndex={100_000}
-        animation="medium"
-      >
-        <Sheet.Overlay
-          animation="lazy"
-          enterStyle={{ opacity: 0 }}
-          exitStyle={{ opacity: 0 }}
-        />
+    <Sheet
+      forceRemoveScrollEnabled={props.open}
+      modal={true}
+      open={props.open}
+      onOpenChange={props.setOpen}
+      snapPoints={[90]}
+      snapPointsMode="percent"
+      position={position}
+      onPositionChange={setPosition}
+      zIndex={100_000}
+      animation="medium"
+    >
+      <Sheet.Overlay
+        animation="lazy"
+        enterStyle={{ opacity: 0 }}
+        exitStyle={{ opacity: 0 }}
+      />
 
-        <Sheet.Handle />
-        <Sheet.Frame padding="$4" gap="$5">
-          <SheetContents
-            pickedExercises={props.pickedExercises}
-            setPickedExercises={props.setPickedExercises}
-          />
-        </Sheet.Frame>
-      </Sheet>
-    </>
+      <Sheet.Handle />
+      <Sheet.Frame padding="$4" gap="$5">
+        <SheetContents
+          pickedExercises={props.pickedExercises}
+          setPickedExercises={props.setPickedExercises}
+          setOpen={props.setOpen}
+        />
+      </Sheet.Frame>
+    </Sheet>
   );
 };
 
 const SheetContents = memo(
-  ({ pickedExercises, setPickedExercises }: IExerciseListProps) => {
+  ({
+    pickedExercises,
+    setPickedExercises,
+    setOpen,
+  }: IExerciseListProps & { setOpen: (open: boolean) => void }) => {
+    const closeSheet = () => {
+      setOpen(false);
+    };
     return (
       <View style={styles.sheetContentContainer}>
+        <TouchableOpacity onPress={() => closeSheet()} activeOpacity={1}>
+          <AntDesign name="close" size={30} color="black" />
+        </TouchableOpacity>
         <View style={styles.addedExercisesContainer}>
           {pickedExercises?.map((value, index) => (
             <ListWithAddedExercises key={index} exercise={value} />

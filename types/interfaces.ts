@@ -31,6 +31,7 @@ export interface ICreateCustomExercise {
 
 export interface IWorkoutInfrmations {
   name: string;
+  description: string;
   primaryMuscle: string[];
   mainGroup: string[] | null;
   exercises: {} | null;
@@ -85,9 +86,8 @@ export interface IEditCardPopover {
   title: string;
   lastTrained: string | undefined;
   exercisesInPlan: string[] | undefined;
-  showDeletePopover: boolean
+  showDeletePopover: boolean;
   setShowDeletePopover: React.Dispatch<React.SetStateAction<boolean>>;
-
 }
 
 export interface IUser {
@@ -156,6 +156,7 @@ export interface IExerciseListProps {
   setPickedExercises: React.Dispatch<
     React.SetStateAction<IPickedExercises[] | undefined>
   >;
+  exercises?: any;
 }
 
 export interface IAppConfigContextType {
@@ -172,4 +173,12 @@ export interface IDeleteAlertDialog {
   cancelButtonText: string | null;
   showAlertDialog: boolean;
   setShowAlertDialog: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export interface IWorkoutInDatabase {
+  id: string;
+  name: string;
+  description: string;
+  workoutType: string;
+  exercises: string[];
 }
