@@ -6,7 +6,7 @@ import {
   View,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useMemo } from "react";
 import { IExerciseListProps } from "@/types/interfaces";
 import { DocumentData } from "firebase/firestore";
 import { fetchDataFromFirestore } from "@/database/FetchDataFromFirestore";
@@ -63,11 +63,17 @@ export function ExerciseList({
     setpaddingBottom((prev) => prev + height * 0.05);
   };
 
-  const combinedExercises = [...defaultExercises, ...customExercises];
+  const combinedExercises = useMemo(
+    () => [...defaultExercises, ...customExercises],
+    [defaultExercises, customExercises]
+  );
 
   return (
     <View style={{ width: width * 0.9 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: paddingBottom }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: paddingBottom }}
+        removeClippedSubviews={true}
+      >
         {combinedExercises.length === 0 ? (
           <Text style={{ textAlign: "center", marginTop: height * 0.2 }}>
             Keine Übungen gefunden.
@@ -90,15 +96,17 @@ export function ExerciseList({
               }}
             >
               <View
-                style={{
-                  height: "100%",
-                  backgroundColor: "lightgrey",
-                  borderRadius: 8,
-                  paddingVertical: 8,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
+                style={[
+                  {
+                    height: "100%",
+                    backgroundColor: "lightgrey",
+                    borderRadius: 8,
+                    paddingVertical: 8,
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  },
+                ]}
               >
                 <Text
                   style={{

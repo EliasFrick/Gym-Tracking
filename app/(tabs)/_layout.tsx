@@ -15,10 +15,10 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: true,
         tabBarStyle: {
-          backgroundColor: "#F86E51",
+          backgroundColor: "rgb(48, 48, 49)",
         },
         headerStyle: {
-          backgroundColor: "#F86E51",
+          backgroundColor: "rgb(48, 48, 49)",
         },
       }}
     >
@@ -27,7 +27,7 @@ export default function TabLayout() {
         options={{
           title: "",
           tabBarIcon: ({ focused }) => (
-            <Ionicons name="home" size={focused ? 35 : 29} color="black" />
+            <Ionicons name="home" size={focused ? 30 : 25} color="white" />
           ),
           headerTitle: "Training",
         }}
@@ -62,8 +62,8 @@ export default function TabLayout() {
             <View style={[styles.settingsIcon]}>
               <FeatherIcons
                 name="settings"
-                size={focused ? 33 : 29}
-                color={"black"}
+                size={focused ? 30 : 25}
+                color={"white"}
               />
             </View>
           ),
@@ -80,13 +80,17 @@ const styles = StyleSheet.create({
     height: 60,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 35, // Macht den Hintergrund rund
-    backgroundColor: "#F86E51", // Roter Hintergrund, wenn aktiv
+    borderRadius: 35,
+    backgroundColor: "white",
   },
   iconContainerFocused: {
     width: 70,
     height: 70,
-    backgroundColor: "#F86E51", // Roter Hintergrund, wenn aktiv
+    backgroundColor: "white",
+    /*     backgroundColor: "rgb(22, 22, 22)",
+     */
+    borderWidth: 1,
+    borderColor: "white",
   },
   settingsIcon: {
     width: 60,

@@ -1,6 +1,12 @@
 import { IExerciseListProps, IPickeExerciseModal } from "@/types/interfaces";
 import { Sheet } from "@tamagui/sheet";
-import React, { memo, useContext, useEffect, useState } from "react";
+import React, {
+  memo,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+} from "react";
 import {
   Dimensions,
   StyleSheet,
@@ -15,7 +21,7 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 
 const { width, height } = Dimensions.get("window");
 
-export const PickExerciseModal = (props: IPickeExerciseModal) => {
+export const PickExerciseModal = memo((props: IPickeExerciseModal) => {
   const [position, setPosition] = React.useState(0);
 
   return (
@@ -30,15 +36,33 @@ export const PickExerciseModal = (props: IPickeExerciseModal) => {
       onPositionChange={setPosition}
       zIndex={100_000}
       animation="medium"
+      animationConfig={{
+        mass: 1,
+        damping: 25,
+        stiffness: 200,
+        overshootClamping: true,
+        restDisplacementThreshold: 0.01,
+        restSpeedThreshold: 0.01,
+      }}
+      dismissOnSnapToBottom
+      disableBackdropAnimation={true}
+      disableHideBottomOverflow={true}
+      moveOnKeyboardChange={false}
     >
       <Sheet.Overlay
         animation="lazy"
         enterStyle={{ opacity: 0 }}
         exitStyle={{ opacity: 0 }}
+        opacity={0.5}
+        backgroundColor="rgba(0,0,0,0.5)"
       />
 
-      <Sheet.Handle />
-      <Sheet.Frame padding="$4" gap="$5">
+      <Sheet.Frame
+        padding="$4"
+        gap="$5"
+        backgroundColor="$background"
+        style={{ height: "100%" }}
+      >
         <SheetContents
           pickedExercises={props.pickedExercises}
           setPickedExercises={props.setPickedExercises}
@@ -47,7 +71,7 @@ export const PickExerciseModal = (props: IPickeExerciseModal) => {
       </Sheet.Frame>
     </Sheet>
   );
-};
+});
 
 const SheetContents = memo(
   ({
@@ -55,17 +79,18 @@ const SheetContents = memo(
     setPickedExercises,
     setOpen,
   }: IExerciseListProps & { setOpen: (open: boolean) => void }) => {
-    const closeSheet = () => {
+    const closeSheet = useCallback(() => {
       setOpen(false);
-    };
+    }, [setOpen]);
+
     return (
       <View style={styles.sheetContentContainer}>
-        <TouchableOpacity onPress={() => closeSheet()} activeOpacity={1}>
+        <TouchableOpacity onPress={closeSheet} activeOpacity={1}>
           <AntDesign name="close" size={30} color="black" />
         </TouchableOpacity>
         <View style={styles.addedExercisesContainer}>
           {pickedExercises?.map((value, index) => (
-            <ListWithAddedExercises key={index} exercise={value} />
+            <ListWithAddedExercises key={value.id || index} exercise={value} />
           ))}
         </View>
         <View style={styles.inputContainer}>
@@ -96,6 +121,7 @@ const SheetContents = memo(
 
 const styles = StyleSheet.create({
   sheetContentContainer: {
+    flex: 1,
     width: "100%",
   },
 

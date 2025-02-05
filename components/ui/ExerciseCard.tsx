@@ -22,6 +22,7 @@ import { collection, doc, deleteDoc, setDoc } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { getAuth } from "firebase/auth";
 import { AppConfigContext } from "@/context/AppConfigProvider";
+import { Animated } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
@@ -89,47 +90,64 @@ const AlertDialogDemo = memo(
   }
 );
 
-const ExerciseCard = memo((props: IExerciseCard) => {
-  const defaultRotation = "0deg";
-  const [showDeletePopover, setShowDeletePopover] = useState(false);
-  const [exercises, setExercises] = useState<string[]>();
+const ExerciseCard = memo(
+  (props: IExerciseCard) => {
+    const defaultRotation = "0deg";
+    const [showDeletePopover, setShowDeletePopover] = useState(false);
+    const [exercises, setExercises] = useState<string[]>();
 
-  return (
-    <View
-      style={[
-        props?.style,
-        { transform: [{ rotate: props?.rotation || defaultRotation }] },
-      ]}
-    >
-      {showDeletePopover && (
-        <DeletePopover
-          title={props?.id}
-          lastTrained={props?.lastDone}
-          exercisesInPlan={exercises}
-          setShowDeletePopover={setShowDeletePopover}
-          showDeletePopover={showDeletePopover}
-        />
-      )}
-      <Card
-        elevate
-        size="$4"
-        animation="bouncy"
-        width={width * 0.8}
-        height={height * 0.2}
-        scale={0.9}
-        hoverStyle={{ scale: 0.925 }}
-        pressStyle={{ scale: 0.875 }}
-        onLongPress={() => setShowDeletePopover(true)}
+    const handleLongPress = useCallback(() => {
+      setShowDeletePopover(true);
+    }, [props.id]);
+
+    return (
+      <View
+        style={[
+          props?.style,
+          {
+            transform: [{ rotate: props?.rotation || defaultRotation }],
+            backgroundColor: "#F86E51",
+          },
+        ]}
       >
-        <Card.Header padded>
-          <H2>{props?.id}</H2>
-          <Paragraph theme="alt2">Last Trained: {props?.lastDone}</Paragraph>
-        </Card.Header>
-        <Card.Background></Card.Background>
-      </Card>
-    </View>
-  );
-});
+        {showDeletePopover && (
+          <DeletePopover
+            title={props?.id}
+            lastTrained={props?.lastDone}
+            exercisesInPlan={exercises}
+            setShowDeletePopover={setShowDeletePopover}
+            showDeletePopover={showDeletePopover}
+          />
+        )}
+        <Card
+          elevate
+          size="$4"
+          animation="bouncy"
+          width={width * 0.8}
+          height={height * 0.2}
+          scale={0.9}
+          hoverStyle={{ scale: 0.925 }}
+          pressStyle={{ scale: 0.875 }}
+          onLongPress={handleLongPress}
+          backgroundColor={"white"}
+        >
+          <Card.Header padded>
+            <H2>{props?.id}</H2>
+            <Paragraph theme="alt2">Last Trained: {props?.lastDone}</Paragraph>
+          </Card.Header>
+          <Card.Background></Card.Background>
+        </Card>
+      </View>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.id === nextProps.id &&
+      prevProps.lastDone === nextProps.lastDone &&
+      prevProps.rotation === nextProps.rotation
+    );
+  }
+);
 
 const DeletePopover = (props: IEditCardPopover) => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
