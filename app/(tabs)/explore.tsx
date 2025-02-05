@@ -2,8 +2,10 @@ import { StyleSheet, Text, View, Button } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 
 export default function TabTwoScreen() {
+  const auth = getAuth();
+  const firebaseUser = auth.currentUser;
+
   const logout = async () => {
-    const auth = getAuth();
     signOut(auth)
       .then(() => {
         // Sign-out successful.
@@ -14,22 +16,20 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <View>
-      <Text>Explore</Text>
+    <View style={styles.container}>
+      <Text style={styles.text}>{firebaseUser?.uid}</Text>
+
       <Button title="Logout" onPress={logout} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: "#808080",
-    bottom: -90,
-    left: -35,
-    position: "absolute",
+  container: {
+    flex: 1,
+    backgroundColor: "rgb(22, 22, 22)",
   },
-  titleContainer: {
-    flexDirection: "row",
-    gap: 8,
+  text: {
+    color: "white",
   },
 });

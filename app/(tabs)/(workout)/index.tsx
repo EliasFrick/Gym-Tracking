@@ -33,9 +33,9 @@ export default function indexScreen() {
         </View>
       ),
       headerStyle: {
-        backgroundColor: "#F86E51",
+        backgroundColor: "rgb(48, 48, 49)",
       },
-      headerTintColor: "black",
+      headerTintColor: "white",
     });
   }, [navigation]);
 
@@ -136,13 +136,6 @@ export default function indexScreen() {
         items={workoutTypes}
         addWorkout={true}
       />
-      {/* {workout?.map((value, index) => (
-        <ExerciseCard
-          key={index}
-          {...value}
-          rotation={index % 2 === 0 ? "5deg" : "-5deg"}
-        />
-      ))} */}
       {workout && workout.length > 0 ? (
         workout.map((value, index) => (
           <ExerciseCard
@@ -153,7 +146,9 @@ export default function indexScreen() {
         ))
       ) : (
         <View style={{ marginTop: 20 }}>
-          <Text style={{ fontSize: 18, color: "black" }}></Text>
+          <Text style={{ fontSize: 18, color: "black" }}>
+            Create your first workout{" "}
+          </Text>
         </View>
       )}
     </ScrollView>
@@ -162,7 +157,8 @@ export default function indexScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "#F86E51",
+    /*     backgroundColor: "#F86E51",
+     */ backgroundColor: "rgb(22, 22, 22)",
   },
   scrollViewContent: {
     alignItems: "center",

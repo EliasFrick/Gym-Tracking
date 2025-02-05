@@ -1,20 +1,19 @@
-import { Image, StyleSheet, Text, View } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { StyleSheet, Text, View } from "react-native";
 
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-     <Text>Testwadawdaw</Text>
-    </View> 
+      <Text style={styles.text}>Welcome Back</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F86E51",
-  },});
+    backgroundColor: "rgb(22, 22, 22)",
+  },
+  text: {
+    color: "white",
+  },
+});

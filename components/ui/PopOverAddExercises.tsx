@@ -35,19 +35,19 @@ export function PopOverAddExercises() {
     {
       label: "Add Workout",
       navigation: "createOwnPlan",
-      icon: <Ionicons name="create" size={width * 0.07} color="black" />,
+      icon: <Ionicons name="create" size={width * 0.07} color="white" />,
       action: "addWorkout",
     },
     {
       label: "Add Exercises",
       navigation: "createOwnPlan",
-      icon: <Ionicons name="barbell" size={width * 0.07} color="black" />,
+      icon: <Ionicons name="barbell" size={width * 0.07} color="white" />,
       action: "addExercise",
     },
     {
       label: "Create with AI",
       navigation: "createWithAI",
-      icon: <Ionicons name="hardware-chip" size={width * 0.07} color="black" />,
+      icon: <Ionicons name="hardware-chip" size={width * 0.07} color="white" />,
       action: "createWithAi",
     },
   ];
@@ -100,11 +100,15 @@ export function PopOverAddExercises() {
       onRequestClose={() => setShowPopover(false)}
       from={
         <TouchableOpacity onPress={() => setShowPopover(true)}>
-          <Feather name="plus" size={width * 0.08} color="black" />
+          <Feather name="plus" size={width * 0.08} color="white" />
         </TouchableOpacity>
       }
     >
-      <View backgroundColor={"#F86E51"} borderWidth={1} borderColor="#F86E51">
+      <View
+        backgroundColor={"rgb(48, 48, 49)"}
+        borderWidth={1}
+        borderColor="rgb(48, 48, 49)"
+      >
         <YStack gap={height * 0.02}>
           <View
             style={{
@@ -128,7 +132,11 @@ export function PopOverAddExercises() {
                     onPress={() => handleCliedPopover(option.action)}
                   >
                     <Text
-                      style={{ fontSize: width * 0.04, margin: width * 0.02 }}
+                      style={{
+                        fontSize: width * 0.04,
+                        margin: width * 0.02,
+                        color: "white",
+                      }}
                     >
                       {option.label}
                     </Text>
