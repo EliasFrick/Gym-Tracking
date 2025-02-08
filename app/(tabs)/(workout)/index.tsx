@@ -15,12 +15,9 @@ import { AddTrainingModal } from "@/components/ui/CreateTrainingsplan/AddTrainin
 import EventEmitter from "@/components/EventListener";
 import { fetchUserWorkouts } from "@/database/fetchWorkouts";
 import { AppConfigContext } from "@/context/AppConfigProvider";
-import { PopOverAddExercises } from "@/components/ui/PopOverAddExercises";
 import { SheetManager } from "react-native-actions-sheet";
 import { TamaguiPopOver } from "@/components/ui/TamaguiPopOver";
-import PopOver from "@/components/ui/PopOver";
-import PlusPopover from "@/components/ui/PopOver";
-import { ScaledSheet, scale } from "react-native-size-matters";
+import { scale } from "react-native-size-matters";
 
 const { width, height } = Dimensions.get("window");
 
@@ -89,12 +86,6 @@ export default function indexScreen() {
     { name: "Obliques" },
   ];
 
-  const test = () => {
-    SheetManager.show("add-exercise-modal-sheet", {
-      payload: { value: items },
-    });
-  };
-
   return (
     // Der Wrapper fängt jeden Touch außerhalb der Kinder auf.
     <TouchableWithoutFeedback
@@ -103,35 +94,24 @@ export default function indexScreen() {
       }}
     >
       <View style={styles.mainContainer}>
-        {/* Header */}
         <View style={styles.header}>
           <XStack style={styles.headerCenter}>
             <Text style={styles.headerTitle}>Start Training</Text>
           </XStack>
-          {/* Um zu verhindern, dass ein Klick auf das Popover den Wrapper auslöst, 
-              wird der Popover-Bereich in einen eigenen TouchableWithoutFeedback gehüllt,
-              der event.stopPropagation() aufruft */}
           <TouchableWithoutFeedback
             onPress={(e) => {
               e.stopPropagation();
             }}
           >
             <View style={styles.headerRight}>
-              {/* Annahme: TamaguiPopOver akzeptiert isOpen und onOpenChange */}
-              <TamaguiPopOver
-                isOpen={isPopoverOpen}
-                onOpenChange={setIsPopoverOpen}
-              />
+              <TamaguiPopOver />
             </View>
           </TouchableWithoutFeedback>
         </View>
-
-        {/* Restlicher Inhalt */}
         <ScrollView
           contentContainerStyle={styles.scrollViewContent}
           style={styles.container}
         >
-          <Button title="Test" onPress={test} />
           {workout && workout.length > 0 ? (
             workout.map((value, index) => (
               <ExerciseCard

@@ -1,8 +1,15 @@
 import { Portal } from "@tamagui/portal";
 import { Button, Input, Label, Popover, XStack, YStack } from "tamagui";
-import { Dimensions, TouchableOpacity, View, Text } from "react-native";
+import {
+  Dimensions,
+  TouchableOpacity,
+  View,
+  Text,
+  StyleSheet,
+} from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { useState } from "react";
+import { SheetManager } from "react-native-actions-sheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -13,13 +20,23 @@ export function TamaguiPopOver() {
     setOpen(!open);
   };
 
+  const openExerciseActionSheet = () => {
+    SheetManager.show("add-exercise-modal-sheet");
+    setOpen(false);
+  };
+
+  const openWorkoutActionSheet = () => {
+    SheetManager.show("add-workout-modal-sheet");
+    setOpen(false);
+  };
+
   return (
     <Popover
       size="$5"
       allowFlip
       placement="bottom"
       open={open}
-      // onOpenChange sorgt dafür, dass der Popover-Zustand auch durch Klicken außerhalb geändert wird
+      // Schaltet den Popover-Zustand um, wenn z.B. außerhalb geklickt wird
       onOpenChange={setOpen}
     >
       <Popover.Trigger asChild>
@@ -43,18 +60,18 @@ export function TamaguiPopOver() {
         <YStack gap="$3" padding="$3">
           <TouchableOpacity
             onPress={() => {
-              // Logik für "Create Exercise"
-              console.log("Create Exercise pressed");
-              setOpen(false); // Optional: Popover schließen
+              openExerciseActionSheet();
             }}
           >
             <Text>Create Exercise</Text>
           </TouchableOpacity>
+
+          {/* Trenner */}
+          <View style={styles.divider} />
+
           <TouchableOpacity
             onPress={() => {
-              // Logik für "Create Workout"
-              console.log("Create Workout pressed");
-              setOpen(false); // Optional: Popover schließen
+              openWorkoutActionSheet();
             }}
           >
             <Text>Create Workout</Text>
@@ -64,3 +81,12 @@ export function TamaguiPopOver() {
     </Popover>
   );
 }
+
+const styles = StyleSheet.create({
+  divider: {
+    height: 1,
+    backgroundColor: "#ccc",
+    width: "100%",
+    marginVertical: 8,
+  },
+});

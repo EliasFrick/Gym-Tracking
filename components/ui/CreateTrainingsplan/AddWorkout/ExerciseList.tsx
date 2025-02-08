@@ -69,10 +69,11 @@ export function ExerciseList({
   );
 
   return (
-    <View style={{ width: width * 0.9 }}>
+    <View style={{ width: width * 0.9, height: height * 0.92 }}>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: paddingBottom }}
-        removeClippedSubviews={true}
+        /* contentContainerStyle={{ paddingBottom: paddingBottom }}
+        removeClippedSubviews={true} */
+        style={{ marginBottom: height * 0.15 }}
       >
         {combinedExercises.length === 0 ? (
           <Text style={{ textAlign: "center", marginTop: height * 0.2 }}>

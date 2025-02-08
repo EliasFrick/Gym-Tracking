@@ -32,14 +32,6 @@ import { XStack } from "tamagui";
 
 const { width, height } = Dimensions.get("window");
 
-/* export const AddExerciseActionSheet = ({
-  open,
-  setOpen,
-  position,
-  setPosition,
-  addExercise = false,
-  addWorkout = false,
-}: IAddTrainingModal) => { */
 export const AddExerciseActionSheet = (
   props: SheetProps<"add-exercise-modal-sheet">
 ) => {
@@ -93,11 +85,8 @@ export const AddExerciseActionSheet = (
 
   const saveExercise = async () => {
     try {
-      if (addExercise) {
-        await saveCustomExercise();
-      } else if (addWorkout) {
-        await saveCustomWorkout();
-      }
+      await saveCustomExercise();
+
       triggerRefreshDatabase();
     } catch (err) {
       console.error("Error adding document: ", err);
@@ -150,54 +139,6 @@ export const AddExerciseActionSheet = (
       mainGroup: null,
       image: null,
     });
-  };
-
-  const deleteWorkoutData = () => {
-    setCustomWorkout({
-      name: "",
-      description: "",
-      primaryMuscle: [],
-      mainGroup: null,
-      exercises: null,
-    });
-
-    setWorkout([]);
-  };
-
-  const saveCustomWorkout = async () => {
-    try {
-      const usersCollection = collection(firestoreDB, "User");
-      const userRef = doc(usersCollection, firebaseUser?.uid);
-      const workoutRef = collection(userRef, "Workouts");
-
-      const formattedExercises =
-        workout?.map((exercise) => ({
-          id: exercise.id || "",
-          name: exercise.name || "",
-        })) || [];
-
-      const workoutData = {
-        name: custmoWorkout.name || "",
-        description: custmoWorkout.description || "",
-        primaryMuscle: custmoWorkout.primaryMuscle || [],
-        mainGroup: custmoWorkout.mainGroup || [],
-        exercises: formattedExercises,
-        createdAt: new Date().toISOString(),
-      };
-
-      await setDoc(doc(workoutRef, workoutData.name), workoutData);
-
-      deleteWorkoutData();
-      SheetManager.hide("add-exercise-modal-sheet");
-      alert("Workout saved successfully!");
-    } catch (error: any) {
-      console.error("Error adding document: ", error);
-      if (error.code === "permission-denied") {
-        alert("You don't have permission to save workouts.");
-      } else {
-        alert("An error occurred while saving the workout. Please try again.");
-      }
-    }
   };
 
   const items = [
