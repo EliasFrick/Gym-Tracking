@@ -106,7 +106,6 @@ const ExerciseCard = memo(
           props?.style,
           {
             transform: [{ rotate: props?.rotation || defaultRotation }],
-            backgroundColor: "#F86E51",
           },
         ]}
       >

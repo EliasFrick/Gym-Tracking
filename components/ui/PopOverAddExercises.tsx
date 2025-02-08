@@ -13,6 +13,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { getAuth } from "firebase/auth";
 import { ICreateCustomExercise } from "@/types/interfaces";
 import EventEmitter from "@/components/EventListener";
+import { SheetManager } from "react-native-actions-sheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,15 +23,14 @@ export function PopOverAddExercises() {
 
   const router = useRouter();
   const [showPopover, setShowPopover] = useState(false);
-  const [customExercise, setCustomExercise] =
-    React.useState<ICreateCustomExercise>({
-      userID: firebaseUser!.uid, // Standardwerte
-      name: "",
-      description: "",
-      primaryMuscle: [],
-      mainGroup: null,
-      image: null,
-    });
+  React.useState<ICreateCustomExercise>({
+    userID: firebaseUser!.uid, // Standardwerte
+    name: "",
+    description: "",
+    primaryMuscle: [],
+    mainGroup: null,
+    image: null,
+  });
   const options = [
     {
       label: "Add Workout",
@@ -44,12 +44,12 @@ export function PopOverAddExercises() {
       icon: <Ionicons name="barbell" size={width * 0.07} color="white" />,
       action: "addExercise",
     },
-    {
+    /*  {
       label: "Create with AI",
       navigation: "createWithAI",
       icon: <Ionicons name="hardware-chip" size={width * 0.07} color="white" />,
       action: "createWithAi",
-    },
+    }, */
   ];
 
   const items = [
@@ -71,25 +71,25 @@ export function PopOverAddExercises() {
     { name: "Obliques" },
   ];
 
-  const toggleAddExerciseBoolean = () => {
-    const currentValue = EventEmitter.getState("addExerciseBoolean") || false;
-    EventEmitter.setState("addExerciseBoolean", !currentValue);
+  const openExerciseSheet = () => {
+    SheetManager.show("add-exercise-modal-sheet");
   };
 
-  const toggleAddWorkoutBoolean = () => {
-    const currentValue = EventEmitter.getState("addWorkoutBoolean") || false;
-    EventEmitter.setState("addWorkoutBoolean", !currentValue);
+  const openWorkoutSheet = () => {
+    SheetManager.show("add-workout-modal-sheet");
   };
 
-  const handleCliedPopover = (index: string) => {
+  const handleCliedPopover = (action: string) => {
     setShowPopover(false);
-    if (index === "addExercise") {
-      toggleAddExerciseBoolean();
-    } else if (index === "addWorkout") {
-      toggleAddWorkoutBoolean();
-    } else if (index === "createWithAi") {
-      alert("Create With AI");
-    }
+    setTimeout(() => {
+      if (action === "addExercise") {
+        openExerciseSheet();
+      } else if (action === "addWorkout") {
+        openWorkoutSheet();
+      } else if (action === "createWithAi") {
+        alert("Create With AI");
+      }
+    }, 500); // 300ms Delay – ggf. anpassen
   };
 
   return (
@@ -118,9 +118,19 @@ export function PopOverAddExercises() {
               gap: height * 0.02,
             }}
           >
-            {options.map((option, index) => (
-              <View asChild key={index} style={{ width: width * 0.45 }}>
-                <Link href={option.navigation}>
+            {options.map((option, index) => {
+              // Falls du nur bei bestimmten Optionen navigieren möchtest,
+              // kannst du das auch bedingt steuern:
+              const onPressHandler = () => {
+                handleCliedPopover(option.action);
+                // Falls du zusätzlich navigieren willst, könntest du hier:
+                // if (option.navigation && option.action !== "addExercise") {
+                //   router.push(option.navigation);
+                // }
+              };
+
+              return (
+                <View key={index} style={{ width: width * 0.45 }}>
                   <TouchableOpacity
                     style={{
                       flexDirection: "row",
@@ -129,7 +139,7 @@ export function PopOverAddExercises() {
                       width: "100%",
                       paddingHorizontal: width * 0.01,
                     }}
-                    onPress={() => handleCliedPopover(option.action)}
+                    onPress={onPressHandler}
                   >
                     <Text
                       style={{
@@ -142,9 +152,9 @@ export function PopOverAddExercises() {
                     </Text>
                     {option.icon}
                   </TouchableOpacity>
-                </Link>
-              </View>
-            ))}
+                </View>
+              );
+            })}
           </View>
         </YStack>
       </View>

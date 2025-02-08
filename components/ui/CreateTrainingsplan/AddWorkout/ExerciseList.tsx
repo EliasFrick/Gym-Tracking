@@ -96,17 +96,15 @@ export function ExerciseList({
               }}
             >
               <View
-                style={[
-                  {
-                    height: "100%",
-                    backgroundColor: "lightgrey",
-                    borderRadius: 8,
-                    paddingVertical: 8,
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  },
-                ]}
+                style={{
+                  height: "100%",
+                  backgroundColor: "lightgrey",
+                  borderRadius: 8,
+                  paddingVertical: 8,
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
               >
                 <Text
                   style={{
