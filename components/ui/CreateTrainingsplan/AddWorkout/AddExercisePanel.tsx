@@ -1,9 +1,9 @@
 import { Dimensions, Text, TouchableOpacity } from "react-native";
 import { Card, XStack } from "tamagui";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { PickExerciseModal } from "./PickExerciseModal";
 import { useState } from "react";
 import { IExerciseListProps, IExercisesToPicker } from "@/types/interfaces";
+import { SheetManager } from "react-native-actions-sheet";
 
 const { width, height } = Dimensions.get("window");
 
@@ -12,8 +12,14 @@ export function AddExercisePanel(props: IExerciseListProps) {
     useState<boolean>(false);
 
   const toggleShowPickExerciseModal = () => {
-    setOpenPickExerciseModal(!openPickExerciseModal);
+    SheetManager.show("add-exercise-for-Workout-modal-sheet", {
+      payload: {
+        pickedExercises: props.pickedExercises,
+        setPickedExercises: props.setPickedExercises,
+      },
+    });
   };
+
   return (
     <Card
       elevate
@@ -25,12 +31,6 @@ export function AddExercisePanel(props: IExerciseListProps) {
       hoverStyle={{ scale: 0.925 }}
       pressStyle={{ scale: 0.875 }}
     >
-      <PickExerciseModal
-        open={openPickExerciseModal}
-        setOpen={setOpenPickExerciseModal}
-        pickedExercises={props.pickedExercises}
-        setPickedExercises={props.setPickedExercises}
-      />
       <TouchableOpacity onPress={toggleShowPickExerciseModal}>
         <XStack
           justifyContent="space-between"

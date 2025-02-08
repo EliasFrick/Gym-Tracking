@@ -16,18 +16,16 @@ import {
 } from "@/types/interfaces";
 import { CustomDropDown } from "../CustomDropDown";
 import { AddExercisePanel } from "./AddExercisePanel";
-import { PickExerciseModal } from "./PickExerciseModal";
+import { PickExerciseModal } from "./PickExerciseActionSheet";
 import { useEffect, useState, memo } from "react";
 import { SavedExercisePanel } from "./SavedExercisePanel";
 import EventEmitter from "@/components/EventListener";
+import { SheetManager } from "react-native-actions-sheet";
 
 const { width, height } = Dimensions.get("window");
 
 export const AddWorkoutComponent = memo(
   ({
-    items,
-    bodyPart,
-    setBodyPart,
     title,
     setTitle,
     description,
@@ -41,10 +39,9 @@ export const AddWorkoutComponent = memo(
     const [openPickExerciseModal, setOpenPickExerciseModal] =
       useState<boolean>(false);
 
-    const toggleShowPickExerciseModal = () => {
-      setOpenPickExerciseModal(!openPickExerciseModal);
+    const toggleShowPickExerciseModal = async () => {
+      console.log("toggleShowPickExerciseModal");
     };
-
     useEffect(() => {
       const deleteExerciseFromList = (exerciseID: string) => {
         setInformations((prev) =>
@@ -73,19 +70,8 @@ export const AddWorkoutComponent = memo(
             onChangeText={(text) => setTitle(text)}
           />
         </View>
-        <View style={styles.inputContainer}>
-          <Text style={styles.title}>Workout type:</Text>
-          <View
-            style={{
-              width: width * 0.9,
-            }}
-          >
-            <CustomDropDown items={items} val={bodyPart} setVal={setBodyPart} />
-          </View>
-        </View>
 
         <View style={styles.inputContainer}>
-          <Text style={styles.title}>Add Exercises:</Text>
           <View
             style={{
               width: width * 0.9,
@@ -102,10 +88,8 @@ export const AddWorkoutComponent = memo(
                 setPickedExercises={setInformations}
               />
             ))}
-            <TouchableOpacity
-              onPress={toggleShowPickExerciseModal}
-              style={{ marginTop: height * 0.03 }} // Abstand oben
-            >
+            <Text style={styles.title}>Add Exercises:</Text>
+            <TouchableOpacity onPress={() => toggleShowPickExerciseModal()}>
               <AddExercisePanel
                 pickedExercises={informations}
                 setPickedExercises={setInformations}
@@ -149,5 +133,6 @@ const styles = StyleSheet.create({
   },
   title: {
     height: height * 0.03,
+    marginBottom: 20,
   },
 });
