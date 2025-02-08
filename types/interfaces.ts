@@ -38,11 +38,8 @@ export interface IWorkoutInfrmations {
 }
 
 export interface ExerciseComponentProps {
-  items: { name: string }[];
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
-  bodyPart: string[];
-  setBodyPart: React.Dispatch<React.SetStateAction<string[]>>;
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   image: string | null;

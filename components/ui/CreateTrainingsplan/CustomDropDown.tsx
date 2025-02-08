@@ -38,7 +38,7 @@ export const CustomDropDown = memo(
         <Select.Trigger width={"100%"} iconAfter={ChevronDown}>
           <Select.Value placeholder="Choose..." />
         </Select.Trigger>
-        <Adapt when="sm" platform="touch">
+        <Adapt platform="touch">
           <Sheet
             native={!!props.native}
             modal
@@ -154,28 +154,3 @@ export const CustomDropDown = memo(
     );
   }
 );
-
-const items = [
-  { name: "Apple" },
-  { name: "Pear" },
-  { name: "Blackberry" },
-  { name: "Peach" },
-  { name: "Apricot" },
-  { name: "Melon" },
-  { name: "Honeydew" },
-  { name: "Starfruit" },
-  { name: "Blueberry" },
-  { name: "Raspberry" },
-  { name: "Strawberry" },
-  { name: "Mango" },
-  { name: "Pineapple" },
-  { name: "Lime" },
-  { name: "Lemon" },
-  { name: "Coconut" },
-  { name: "Guava" },
-  { name: "Papaya" },
-  { name: "Orange" },
-  { name: "Grape" },
-  { name: "Jackfruit" },
-  { name: "Durian" },
-];

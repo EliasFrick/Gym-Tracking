@@ -10,14 +10,11 @@ import { Button, Input, TextArea } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
 import { ExerciseComponentProps } from "@/types/interfaces";
-import { CustomDropDown } from "../CustomDropDown";
 
 const { width, height } = Dimensions.get("window");
 
 export function AddExerciseComponent({
   items,
-  bodyPart,
-  setBodyPart,
   title,
   setTitle,
   description,
@@ -53,16 +50,6 @@ export function AddExerciseComponent({
           value={title}
           onChangeText={(text) => setTitle(text)}
         />
-      </View>
-      <View style={styles.inputContainer}>
-        <Text>Body part:</Text>
-        <View
-          style={{
-            width: width * 0.9,
-          }}
-        >
-          <CustomDropDown items={items} val={bodyPart} setVal={setBodyPart} />
-        </View>
       </View>
       <View style={styles.inputContainer}>
         <Text style={{ marginBottom: 8 }}>Description:</Text>

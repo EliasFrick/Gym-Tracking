@@ -5,6 +5,7 @@ import FeatherIcons from "@expo/vector-icons/Feather";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { scale } from "react-native-size-matters";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -26,6 +27,7 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "",
+          headerTitleStyle: { fontSize: scale(18), color: "white" },
           tabBarIcon: ({ focused }) => (
             <Ionicons name="home" size={focused ? 30 : 25} color="white" />
           ),
@@ -58,6 +60,7 @@ export default function TabLayout() {
         name="explore"
         options={{
           title: "Explore",
+          headerTitleStyle: { fontSize: scale(18), color: "white" },
           tabBarIcon: ({ focused }) => (
             <View style={[styles.settingsIcon]}>
               <FeatherIcons
