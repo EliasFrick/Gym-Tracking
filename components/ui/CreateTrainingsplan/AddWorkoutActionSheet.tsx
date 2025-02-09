@@ -1,5 +1,4 @@
 import {
-  IAddTrainingModal,
   ICreateCustomExercise,
   IPickedExercises,
   IWorkoutInDatabase,
@@ -39,8 +38,7 @@ export const AddWorkoutActionSheet = (
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
   const [workout, setWorkout] = useState<IPickedExercises[]>();
-  const { refreshDatabase, triggerRefreshDatabase } =
-    useContext(AppConfigContext);
+  const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] =
     React.useState<ICreateCustomExercise>({
@@ -75,8 +73,6 @@ export const AddWorkoutActionSheet = (
   const saveWorkoutInDB = async () => {
     try {
       await saveCustomWorkout();
-
-      triggerRefreshDatabase();
     } catch (err) {
       console.error("Error adding document: ", err);
     }
@@ -128,10 +124,12 @@ export const AddWorkoutActionSheet = (
       };
 
       await setDoc(doc(workoutRef, workoutData.name), workoutData);
+      triggerRefreshDatabase();
 
       deleteWorkoutData();
-      SheetManager.hide("add-workout-modal-sheet");
       alert("Workout saved successfully!");
+
+      SheetManager.hide("add-workout-modal-sheet");
     } catch (error: any) {
       console.error("Error adding document: ", error);
       if (error.code === "permission-denied") {

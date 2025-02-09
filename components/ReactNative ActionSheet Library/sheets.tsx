@@ -12,7 +12,7 @@ registerSheet("add-exercise-for-Workout-modal-sheet", PickExercisActionSheet);
 // across the app for all registered sheets.
 declare module "react-native-actions-sheet" {
   interface Sheets {
-    "add-training-modal-sheet": {
+    "add-exercise-modal-sheet": {
       payload?: any;
       returnValue?: any;
     };
