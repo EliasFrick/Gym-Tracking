@@ -4,32 +4,22 @@ import {
   Dimensions,
   View,
   Text,
-  Button,
   TouchableWithoutFeedback,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ExerciseCard from "@/components/ui/ExerciseCard";
 import { ScrollView, XStack } from "tamagui";
 import { IExerciseCard } from "@/types/interfaces";
-import { AddTrainingModal } from "@/components/ui/CreateTrainingsplan/AddTrainingModal";
-import EventEmitter from "@/components/EventListener";
 import { fetchUserWorkouts } from "@/database/fetchWorkouts";
 import { AppConfigContext } from "@/context/AppConfigProvider";
-import { SheetManager } from "react-native-actions-sheet";
 import { TamaguiPopOver } from "@/components/ui/TamaguiPopOver";
 import { scale } from "react-native-size-matters";
 
 const { width, height } = Dimensions.get("window");
 
 export default function indexScreen() {
-  const [openAddExerciseModal, setOpenAddExerciseModal] = useState(
-    EventEmitter.getState("addExerciseBoolean") || false
-  );
-  const [openAddWorkoutModal, setOpenAddWorkoutModal] = useState(
-    EventEmitter.getState("addWorkoutBoolean") || false
-  );
   const [workout, setWorkout] = useState<IExerciseCard[]>();
-  const { isConnected, refreshDatabase } = useContext(AppConfigContext);
+  const { refreshDatabase } = useContext(AppConfigContext);
   const navigation = useNavigation();
 
   // Neuen Zustand für den Popover hinzufügen:
@@ -42,30 +32,23 @@ export default function indexScreen() {
   }, [navigation]);
 
   useEffect(() => {
-    const listenerforAddExercise = (newValue: boolean) => {
-      setOpenAddExerciseModal(newValue);
-    };
-
-    const listenerforAddWorkout = (newValue: boolean) => {
-      setOpenAddWorkoutModal(newValue);
-    };
-
-    EventEmitter.on("addExerciseBoolean", listenerforAddExercise);
-    EventEmitter.on("addWorkoutBoolean", listenerforAddWorkout);
-
-    return () => {
-      EventEmitter.off("addExerciseBoolean", listenerforAddExercise);
-      EventEmitter.off("addWorkoutBoolean", listenerforAddWorkout);
-    };
-  }, []);
-
-  useEffect(() => {
     const fetchWorkouts = async () => {
       const result = await fetchUserWorkouts();
       setWorkout(result);
     };
     fetchWorkouts();
   }, [refreshDatabase]);
+
+  /* useFocusEffect(
+    React.useCallback(() => {
+      console.log("Test");
+      const fetchWorkouts = async () => {
+        const result = await fetchUserWorkouts();
+        setWorkout(result);
+      };
+      fetchWorkouts();
+    }, [refreshDatabase])
+  ); */
 
   const items = [
     { name: "Chest" },
@@ -122,7 +105,7 @@ export default function indexScreen() {
             ))
           ) : (
             <View style={{ marginTop: 20 }}>
-              <Text style={{ fontSize: 18, color: "black" }}>
+              <Text style={{ fontSize: 18, color: "white" }}>
                 Create your first workout
               </Text>
             </View>

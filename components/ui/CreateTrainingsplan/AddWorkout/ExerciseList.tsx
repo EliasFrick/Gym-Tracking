@@ -33,6 +33,7 @@ export function ExerciseList({
 
     const fetchCustomUserExercises = async () => {
       const result = await fetchCustomExercises();
+      //@ts-ignore
       setCustomExercises(result);
     };
 
@@ -49,7 +50,7 @@ export function ExerciseList({
     // Wenn die Übung bereits ausgewählt ist, entferne sie
     if (pickedExercises?.some((exercise) => exercise.id === id)) {
       setPickedExercises((prev) =>
-        prev.filter((exercise) => exercise.id !== id)
+        prev!.filter((exercise) => exercise.id !== id)
       );
       return;
     }

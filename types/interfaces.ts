@@ -96,15 +96,7 @@ export interface IUser {
   birthDate: string;
 }
 
-export interface IAddTrainingModal {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  position: number;
-  setPosition: React.Dispatch<React.SetStateAction<number>>;
-  items: { name: string }[];
-  addExercise?: boolean;
-  addWorkout?: boolean;
-}
+
 
 export interface IAddedExercisePanel {
   title: string;

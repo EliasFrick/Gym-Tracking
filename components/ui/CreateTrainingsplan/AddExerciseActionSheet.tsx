@@ -1,5 +1,4 @@
 import {
-  IAddTrainingModal,
   ICreateCustomExercise,
   IPickedExercises,
   IWorkoutInDatabase,
@@ -37,11 +36,8 @@ export const AddExerciseActionSheet = (
 ) => {
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
-  const [workout, setWorkout] = useState<IPickedExercises[]>();
   const [exercise, setExercise] = useState<IPickedExercises[]>();
-  const [saveWorkout, setSaveWorkout] = useState<IWorkoutInDatabase>();
-  const { refreshDatabase, triggerRefreshDatabase } =
-    useContext(AppConfigContext);
+  const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] =
     React.useState<ICreateCustomExercise>({
@@ -53,31 +49,11 @@ export const AddExerciseActionSheet = (
       image: null,
     });
 
-  const [custmoWorkout, setCustomWorkout] = React.useState<IWorkoutInfrmations>(
-    {
-      name: "",
-      description: "",
-      primaryMuscle: [],
-      mainGroup: null,
-      exercises: null,
-    }
-  );
-
   const updateCustomExercise = (
     key: keyof ICreateCustomExercise,
     value: any
   ) => {
     setCustomExercise((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
-  };
-
-  const updateCustomWorkout = (
-    key: keyof ICreateCustomExercise,
-    value: any
-  ) => {
-    setCustomWorkout((prev) => ({
       ...prev,
       [key]: value,
     }));
@@ -140,25 +116,6 @@ export const AddExerciseActionSheet = (
       image: null,
     });
   };
-
-  const items = [
-    { name: "Chest" },
-    { name: "Uppcer Chest" },
-    { name: "Lower Chest" },
-    { name: "Biceps" },
-    { name: "Back" },
-    { name: "Lats" },
-    { name: "Traps" },
-    { name: "Leg" },
-    { name: "Glutes" },
-    { name: "Shoulder" },
-    { name: "Triceps" },
-    { name: "Abs" },
-    { name: "Forearms" },
-    { name: "Calves" },
-    { name: "Neck" },
-    { name: "Obliques" },
-  ];
 
   return (
     <ActionSheet

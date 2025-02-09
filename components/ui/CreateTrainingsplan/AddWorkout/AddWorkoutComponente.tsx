@@ -1,27 +1,16 @@
 import {
   View,
-  Image,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
   Text,
 } from "react-native";
-import { Button, Input, ScrollView, TextArea } from "tamagui";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import * as ImagePicker from "expo-image-picker";
-import {
-  ExerciseComponentProps,
-  IExercisesToPicker,
-  IPickedExercises,
-} from "@/types/interfaces";
-import { CustomDropDown } from "../CustomDropDown";
+import { Input, ScrollView, TextArea } from "tamagui";
+import { ExerciseComponentProps } from "@/types/interfaces";
 import { AddExercisePanel } from "./AddExercisePanel";
-import { PickExerciseModal } from "./PickExerciseActionSheet";
 import { useEffect, useState, memo } from "react";
 import { SavedExercisePanel } from "./SavedExercisePanel";
 import EventEmitter from "@/components/EventListener";
-import { SheetManager } from "react-native-actions-sheet";
-import { Scroll } from "@tamagui/lucide-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -37,8 +26,6 @@ export const AddWorkoutComponent = memo(
     setInformations,
     ...props
   }: ExerciseComponentProps) => {
-    const [openPickExerciseModal, setOpenPickExerciseModal] =
-      useState<boolean>(false);
 
     const toggleShowPickExerciseModal = async () => {
       console.log("toggleShowPickExerciseModal");

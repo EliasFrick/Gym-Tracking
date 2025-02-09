@@ -5,8 +5,8 @@ import { IAppConfigContextType } from "@/types/interfaces";
 export const AppConfigContext = createContext<IAppConfigContextType>({
   isConnected: false,
   setIsConnected: () => {},
-  refreshDatabase: 0, // Initialer Trigger-Wert
-  triggerRefreshDatabase: () => {}, // Neue Funktion zum Triggern
+  refreshDatabase: 0,
+  triggerRefreshDatabase: () => {},
 });
 
 interface AppConfigProviderProps {
@@ -17,7 +17,7 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = ({
   children,
 }) => {
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [refreshDatabase, setRefreshDatabase] = useState<number>(0); // Numerischer Trigger
+  const [refreshDatabase, setRefreshDatabase] = useState<number>(0);
 
   useEffect(() => {
     const checkInitialConnection = async () => {
@@ -38,9 +38,9 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = ({
     };
   }, [isConnected]);
 
-  // Neue Funktion zum Triggern von Refreshes
   const triggerRefreshDatabase = () => {
-    setRefreshDatabase((prev) => prev + 1); // Erhöht den Trigger-Wert
+    console.log("DAE");
+    setRefreshDatabase((prev) => prev + 1);
   };
 
   useEffect(() => {
