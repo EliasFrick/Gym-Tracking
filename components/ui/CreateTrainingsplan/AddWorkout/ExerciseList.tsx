@@ -21,8 +21,6 @@ export function ExerciseList({
 }: IExerciseListProps) {
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
-  const [paddingBottom, setpaddingBottom] = useState<number>(height * 0.14);
-
   const { refreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
@@ -48,19 +46,17 @@ export function ExerciseList({
     primaryMuscle: string[],
     mainGroup: string[]
   ) => {
-    const newExercise = { id, name, primaryMuscle, mainGroup };
-    setPickedExercises((prev) => {
-      if (prev?.some((exercise) => exercise.id === id)) {
-        alert("Übung bereits ausgewählt");
-        return prev;
-      }
-      return [...(prev || []), newExercise];
-    });
-    extendPaddingBottom();
-  };
+    // Wenn die Übung bereits ausgewählt ist, entferne sie
+    if (pickedExercises?.some((exercise) => exercise.id === id)) {
+      setPickedExercises((prev) =>
+        prev.filter((exercise) => exercise.id !== id)
+      );
+      return;
+    }
 
-  const extendPaddingBottom = () => {
-    setpaddingBottom((prev) => prev + height * 0.05);
+    // Ansonsten füge die Übung hinzu
+    const newExercise = { id, name, primaryMuscle, mainGroup };
+    setPickedExercises((prev) => [...(prev || []), newExercise]);
   };
 
   const combinedExercises = useMemo(
@@ -70,13 +66,15 @@ export function ExerciseList({
 
   return (
     <View style={{ width: width * 0.9, height: height * 0.92 }}>
-      <ScrollView
-        /* contentContainerStyle={{ paddingBottom: paddingBottom }}
-        removeClippedSubviews={true} */
-        style={{ marginBottom: height * 0.15 }}
-      >
+      <ScrollView style={{ marginBottom: height * 0.15 }}>
         {combinedExercises.length === 0 ? (
-          <Text style={{ textAlign: "center", marginTop: height * 0.2 }}>
+          <Text
+            style={{
+              textAlign: "center",
+              marginTop: height * 0.2,
+              color: "white",
+            }}
+          >
             Keine Übungen gefunden.
           </Text>
         ) : (
@@ -99,7 +97,11 @@ export function ExerciseList({
               <View
                 style={{
                   height: "100%",
-                  backgroundColor: "lightgrey",
+                  backgroundColor: pickedExercises?.some(
+                    (exercise) => exercise.id === value.id
+                  )
+                    ? "green"
+                    : "lightgrey",
                   borderRadius: 8,
                   paddingVertical: 8,
                   flexDirection: "row",

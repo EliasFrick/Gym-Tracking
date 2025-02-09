@@ -21,6 +21,7 @@ import { useEffect, useState, memo } from "react";
 import { SavedExercisePanel } from "./SavedExercisePanel";
 import EventEmitter from "@/components/EventListener";
 import { SheetManager } from "react-native-actions-sheet";
+import { Scroll } from "@tamagui/lucide-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -77,24 +78,29 @@ export const AddWorkoutComponent = memo(
               width: width * 0.9,
             }}
           >
-            {informations?.map((value, index) => (
-              <SavedExercisePanel
-                key={index}
-                name={value.name}
-                id={value.id}
-                primaryMuscle={value.primaryMuscle}
-                mainGroup={value.mainGroup}
-                pickedExercises={informations}
-                setPickedExercises={setInformations}
-              />
-            ))}
             <Text style={styles.title}>Add Exercises:</Text>
-            <TouchableOpacity onPress={() => toggleShowPickExerciseModal()}>
+            <TouchableOpacity
+              onPress={() => toggleShowPickExerciseModal()}
+              style={{ marginBottom: height * 0.03 }}
+            >
               <AddExercisePanel
                 pickedExercises={informations}
                 setPickedExercises={setInformations}
               />
             </TouchableOpacity>
+            <ScrollView style={{ marginBottom: 20000 }}>
+              {informations?.map((value, index) => (
+                <SavedExercisePanel
+                  key={index}
+                  name={value.name}
+                  id={value.id}
+                  primaryMuscle={value.primaryMuscle}
+                  mainGroup={value.mainGroup}
+                  pickedExercises={informations}
+                  setPickedExercises={setInformations}
+                />
+              ))}
+            </ScrollView>
           </View>
         </View>
       </View>
@@ -122,10 +128,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   inputContainer: {
-    width: "100%", // Nimmt die volle Breite des übergeordneten Containers
+    width: "100%",
     marginVertical: height * 0.02,
     paddingHorizontal: width * 0.05,
-    alignItems: "flex-start", // Text linksbündig
+    alignItems: "flex-start",
   },
   image: {
     width: width * 0.3,
@@ -133,6 +139,6 @@ const styles = StyleSheet.create({
   },
   title: {
     height: height * 0.03,
-    marginBottom: 20,
+    marginBottom: height * 0.002,
   },
 });
