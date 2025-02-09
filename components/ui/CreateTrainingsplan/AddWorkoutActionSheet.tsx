@@ -162,10 +162,10 @@ export const AddWorkoutActionSheet = (
           onPress={() => closeWorkoutActionSheet()}
           activeOpacity={1}
         >
-          <AntDesign name="close" size={width * 0.1} color="black" />
+          <AntDesign name="close" size={width * 0.1} color="white" />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => saveWorkoutInDB()} activeOpacity={1}>
-          <AntDesign name="save" size={width * 0.1} color="black" />
+          <AntDesign name="save" size={width * 0.1} color="white" />
         </TouchableOpacity>
       </XStack>
       <View>
