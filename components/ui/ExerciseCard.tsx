@@ -18,11 +18,13 @@ import {
   AlertDialog,
 } from "tamagui";
 import EventEmitter from "@/components/EventListener";
-import { collection, doc, deleteDoc, setDoc } from "firebase/firestore";
+import { collection, doc, deleteDoc, setDoc, getDoc } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { getAuth } from "firebase/auth";
 import { AppConfigContext } from "@/context/AppConfigProvider";
 import { Animated } from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
+import { AppplicationContext } from "@/context/ApplicationProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -95,10 +97,54 @@ const ExerciseCard = memo(
     const defaultRotation = "0deg";
     const [showDeletePopover, setShowDeletePopover] = useState(false);
     const [exercises, setExercises] = useState<string[]>();
+    const { currentWorkout, setCurrentWorkout } =
+      useContext(AppplicationContext);
+    const auth = getAuth();
+    const firebaseUser = auth.currentUser;
 
     const handleLongPress = useCallback(() => {
       setShowDeletePopover(true);
     }, [props.id]);
+
+    const handlePress = useCallback(async () => {
+      try {
+        const exercises = await findWorkoutWithID();
+        if (exercises) {
+          SheetManager.show("workout-exercise-sheet", {
+            payload: {
+              workoutId: props.id,
+              currentWorkout: exercises,
+            },
+          });
+        }
+      } catch (error) {
+        console.error("Error in handlePress:", error);
+      }
+    }, [props.id, currentWorkout]);
+
+    const findWorkoutWithID = async () => {
+      try {
+        const workoutRef = collection(firestoreDB, "User");
+        const workoutUserRef = doc(workoutRef, firebaseUser?.uid);
+        const workoutCollectionRef = collection(workoutUserRef, "Workouts");
+        const workoutDocRef = doc(workoutCollectionRef, props.id);
+        const workoutDoc = await getDoc(workoutDocRef);
+
+        if (workoutDoc.exists()) {
+          const workoutData = workoutDoc.data();
+
+          if (Array.isArray(workoutData?.exercises)) {
+            setCurrentWorkout(workoutData.exercises);
+            return workoutData.exercises;
+          }
+        } else {
+          console.log("Workout not found!");
+        }
+      } catch (error) {
+        console.error("Error fetching workout: ", error);
+        throw error;
+      }
+    };
 
     return (
       <View
@@ -128,6 +174,7 @@ const ExerciseCard = memo(
           hoverStyle={{ scale: 0.925 }}
           pressStyle={{ scale: 0.875 }}
           onLongPress={handleLongPress}
+          onPress={handlePress}
           backgroundColor={"white"}
         >
           <Card.Header padded>

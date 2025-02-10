@@ -6,6 +6,7 @@ import { PortalProvider } from "@tamagui/portal";
 import { AppConfigProvider } from "@/context/AppConfigProvider";
 import { SheetProvider } from "react-native-actions-sheet";
 import "@/components/ReactNative ActionSheet Library/sheets";
+import { ApplicationProvider } from "@/context/ApplicationProvider";
 
 const config = createTamagui(defaultConfig);
 
@@ -15,28 +16,30 @@ export default function Layout() {
       <PortalProvider>
         <SheetProvider>
           <AppConfigProvider>
-            <AuthenticationProvider>
-              <Stack
-                screenOptions={{
-                  headerShown: false,
-                  headerStyle: {
-                    backgroundColor: "#f4511e",
-                  },
-                  headerTintColor: "#fff",
-                  headerTitleStyle: {
-                    fontWeight: "bold",
-                  },
-                }}
-              >
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="(auth)"
-                  options={{
+            <ApplicationProvider>
+              <AuthenticationProvider>
+                <Stack
+                  screenOptions={{
                     headerShown: false,
+                    headerStyle: {
+                      backgroundColor: "#f4511e",
+                    },
+                    headerTintColor: "#fff",
+                    headerTitleStyle: {
+                      fontWeight: "bold",
+                    },
                   }}
-                />
-              </Stack>
-            </AuthenticationProvider>
+                >
+                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(auth)"
+                    options={{
+                      headerShown: false,
+                    }}
+                  />
+                </Stack>
+              </AuthenticationProvider>
+            </ApplicationProvider>
           </AppConfigProvider>
         </SheetProvider>
       </PortalProvider>

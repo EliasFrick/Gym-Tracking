@@ -70,7 +70,6 @@ export default function indexScreen() {
   ];
 
   return (
-    // Der Wrapper fängt jeden Touch außerhalb der Kinder auf.
     <TouchableWithoutFeedback
       onPress={() => {
         if (isPopoverOpen) setIsPopoverOpen(false);
