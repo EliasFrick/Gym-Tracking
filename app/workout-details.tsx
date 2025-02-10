@@ -5,11 +5,22 @@ import { useLocalSearchParams } from "expo-router";
 
 const { width } = Dimensions.get("window");
 
-export default function WorkoutDetailsScreen() {
-  const { workoutData } = useLocalSearchParams();
-  const workout = JSON.parse(workoutData as string);
+interface ExerciseSet {
+  reps: string;
+  weight: string;
+}
 
-  const renderExerciseCard = (exerciseId: string, sets: any[]) => {
+interface WorkoutExercises {
+  [key: string]: ExerciseSet[];
+}
+
+export default function WorkoutDetailsScreen() {
+  const params = useLocalSearchParams();
+  // Decode the exercises parameter before parsing it
+  const decodedExercises = decodeURIComponent(params.exercises as string);
+  const workoutExercises: WorkoutExercises = JSON.parse(decodedExercises);
+
+  const renderExerciseCard = (exerciseId: string, sets: ExerciseSet[]) => {
     return (
       <Card
         key={exerciseId}
@@ -51,9 +62,9 @@ export default function WorkoutDetailsScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>{workout.workoutId}</Text>
+        <Text style={styles.title}>{params.workoutId}</Text>
         <Text style={styles.date}>
-          {new Date(workout.date).toLocaleDateString("de-DE", {
+          {new Date(params.date as string).toLocaleDateString("de-DE", {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
@@ -61,7 +72,7 @@ export default function WorkoutDetailsScreen() {
             minute: "2-digit",
           })}
         </Text>
-        {Object.entries(workout.exercises).map(([exerciseId, sets]) =>
+        {Object.entries(workoutExercises).map(([exerciseId, sets]) =>
           renderExerciseCard(exerciseId, sets)
         )}
       </ScrollView>

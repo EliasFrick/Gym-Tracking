@@ -70,7 +70,11 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
   useEffect(() => {
     if (loading) return;
 
-    if (user && rootSegments !== "(app)") {
+    if (
+      user &&
+      rootSegments !== "(app)" &&
+      rootSegments !== "workout-details"
+    ) {
       router.replace("/");
     } else if (!user && rootSegments !== "(auth)") {
       router.replace("/(auth)/login");
