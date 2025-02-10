@@ -1,34 +1,25 @@
+import React, { useContext, useState } from "react";
+import {
+  Dimensions,
+  Keyboard,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
+import { SheetManager } from "react-native-actions-sheet";
+import ActionSheet, { SheetProps } from "react-native-actions-sheet";
+import { XStack } from "tamagui";
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { AddWorkoutComponent } from "./AddWorkout/AddWorkoutComponente";
+import { AppConfigContext } from "@/context/AppConfigProvider";
 import {
   ICreateCustomExercise,
   IPickedExercises,
-  IWorkoutInDatabase,
   IWorkoutInfrmations,
 } from "@/types/interfaces";
-import { Sheet } from "@tamagui/sheet";
-import {
-  Dimensions,
-  ScrollView,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from "react-native";
-import { AddExerciseComponent } from "@/components/ui/CreateTrainingsplan/AddExercises/AddExerciseComponente";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import React, { useContext, useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
-import {
-  doc,
-  setDoc as firebaseSetDoc,
-  collection,
-  addDoc,
-} from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
-import EventEmitter from "@/components/EventListener";
-import { AddWorkoutComponent } from "./AddWorkout/AddWorkoutComponente";
-import { AppConfigContext } from "@/context/AppConfigProvider";
-import ActionSheet, { SheetProps } from "react-native-actions-sheet";
-import { SheetManager } from "react-native-actions-sheet";
-import { XStack } from "tamagui";
+import { collection, doc, setDoc as firebaseSetDoc } from "firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,25 +31,22 @@ export const AddWorkoutActionSheet = (
   const [workout, setWorkout] = useState<IPickedExercises[]>();
   const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
-  const [customExercise, setCustomExercise] =
-    React.useState<ICreateCustomExercise>({
-      userID: firebaseUser!.uid,
-      name: "",
-      description: "",
-      primaryMuscle: [],
-      mainGroup: null,
-      image: null,
-    });
+  const [customExercise, setCustomExercise] = useState<ICreateCustomExercise>({
+    userID: firebaseUser!.uid,
+    name: "",
+    description: "",
+    primaryMuscle: [],
+    mainGroup: null,
+    image: null,
+  });
 
-  const [custmoWorkout, setCustomWorkout] = React.useState<IWorkoutInfrmations>(
-    {
-      name: "",
-      description: "",
-      primaryMuscle: [],
-      mainGroup: null,
-      exercises: null,
-    }
-  );
+  const [custmoWorkout, setCustomWorkout] = useState<IWorkoutInfrmations>({
+    name: "",
+    description: "",
+    primaryMuscle: [],
+    mainGroup: null,
+    exercises: null,
+  });
 
   const updateCustomWorkout = (
     key: keyof ICreateCustomExercise,
@@ -98,7 +86,6 @@ export const AddWorkoutActionSheet = (
       mainGroup: null,
       exercises: null,
     });
-
     setWorkout([]);
   };
 
@@ -128,7 +115,6 @@ export const AddWorkoutActionSheet = (
 
       deleteWorkoutData();
       alert("Workout saved successfully!");
-
       SheetManager.hide("add-workout-modal-sheet");
     } catch (error: any) {
       console.error("Error adding document: ", error);
@@ -141,44 +127,45 @@ export const AddWorkoutActionSheet = (
   };
 
   return (
-    <ActionSheet
-      containerStyle={{
-        height: height * 0.89,
-        backgroundColor: "rgb(48, 48, 49)",
-      }}
-      gestureEnabled={false}
-      indicatorStyle={{
-        backgroundColor: "white",
-      }}
-    >
-      <XStack
-        justifyContent="space-between"
-        width="100%"
-        paddingHorizontal={10}
+    // Um die Tastatur zu schließen, wenn irgendwo getippt wird,
+    // wird der Inhalt in TouchableWithoutFeedback gewrappt.
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ActionSheet
+        containerStyle={{
+          height: height * 0.85,
+          backgroundColor: "rgb(48, 48, 49)",
+        }}
+        gestureEnabled={false}
+        indicatorStyle={{
+          backgroundColor: "white",
+        }}
       >
-        <TouchableOpacity
-          onPress={() => closeWorkoutActionSheet()}
-          activeOpacity={1}
+        <XStack
+          justifyContent="space-between"
+          width="100%"
+          paddingHorizontal={10}
         >
-          <AntDesign name="close" size={width * 0.1} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => saveWorkoutInDB()} activeOpacity={1}>
-          <AntDesign name="save" size={width * 0.1} color="white" />
-        </TouchableOpacity>
-      </XStack>
-      <View>
-        <AddWorkoutComponent
-          title={custmoWorkout.name}
-          setTitle={(title) => updateCustomWorkout("name", title)}
-          description={customExercise.description}
-          setDescription={(desc) => updateCustomWorkout("description", desc)}
-          image={customExercise.image}
-          setImage={(img) => updateCustomWorkout("image", img)}
-          informations={workout}
-          setInformations={setWorkout}
-        />
-      </View>
-    </ActionSheet>
+          <TouchableWithoutFeedback onPress={closeWorkoutActionSheet}>
+            <AntDesign name="close" size={width * 0.1} color="white" />
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={saveWorkoutInDB}>
+            <AntDesign name="save" size={width * 0.1} color="white" />
+          </TouchableWithoutFeedback>
+        </XStack>
+        <View>
+          <AddWorkoutComponent
+            title={custmoWorkout.name}
+            setTitle={(title) => updateCustomWorkout("name", title)}
+            description={customExercise.description}
+            setDescription={(desc) => updateCustomWorkout("description", desc)}
+            image={customExercise.image}
+            setImage={(img) => updateCustomWorkout("image", img)}
+            informations={workout}
+            setInformations={setWorkout}
+          />
+        </View>
+      </ActionSheet>
+    </TouchableWithoutFeedback>
   );
 };
 

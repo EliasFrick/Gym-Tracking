@@ -31,7 +31,7 @@ export default function TabLayout() {
           tabBarIcon: ({ focused }) => (
             <Ionicons name="home" size={focused ? 30 : 25} color="white" />
           ),
-          headerTitle: "Training",
+          headerTitle: "Workout History",
         }}
       />
       <Tabs.Screen

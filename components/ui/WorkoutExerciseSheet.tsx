@@ -230,7 +230,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     <ActionSheet
       containerStyle={styles.container}
       gestureEnabled={false}
-      closeOnTouchBackdrop={false}
+      closeOnTouchBackdrop={true}
       keyboardShouldPersistTaps="handled"
       onTouchEnd={() => Keyboard.dismiss()}
       {...props}
@@ -374,9 +374,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 10,
   },
-  buttonsContainer: {
-    marginTop: 10,
-  },
+  buttonsContainer: {},
   navigationContainer: {
     width: "100%",
     marginBottom: 10,
