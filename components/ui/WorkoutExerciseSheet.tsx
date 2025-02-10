@@ -5,16 +5,23 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
+  Alert,
 } from "react-native";
 import ActionSheet, {
   SheetProps,
   ActionSheetProps,
+  SheetManager,
 } from "react-native-actions-sheet";
 import { Dimensions } from "react-native";
 import { XStack, Button } from "tamagui";
 import { ChevronLeft, ChevronRight, Plus } from "@tamagui/lucide-icons";
 import { AppplicationContext } from "@/context/ApplicationProvider";
 import { WorkoutExercise } from "@/types/interfaces";
+import {
+  saveWorkoutProgress,
+  getWorkoutProgress,
+  removeWorkoutProgress,
+} from "@/utils/storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -43,6 +50,34 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     [key: string]: ExerciseSet[];
   }>({});
 
+  // Lade gespeicherten Fortschritt beim Öffnen
+  useEffect(() => {
+    const loadSavedProgress = async () => {
+      if (!props.payload?.workoutId) return;
+
+      const savedProgress = await getWorkoutProgress(props.payload.workoutId);
+      if (savedProgress) {
+        setWorkoutLog(savedProgress.workoutLog);
+        setCurrentExerciseIndex(savedProgress.currentExerciseIndex);
+      }
+    };
+
+    loadSavedProgress();
+  }, [props.payload?.workoutId]);
+
+  // Speichere Fortschritt bei Änderungen
+  useEffect(() => {
+    if (!props.payload?.workoutId || Object.keys(workoutLog).length === 0)
+      return;
+
+    saveWorkoutProgress(props.payload.workoutId, {
+      workoutLog,
+      currentExerciseIndex,
+      lastUpdated: new Date().toISOString(),
+    });
+  }, [workoutLog, currentExerciseIndex, props.payload?.workoutId]);
+
+  // Initialisiere Übungen
   useEffect(() => {
     if (!props.payload?.currentWorkout) {
       console.log("No workout data available");
@@ -57,12 +92,14 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       }));
       setExercises(exercisesList);
 
-      // Initialize workout log
-      const initialLog = exercisesList.reduce((acc, exercise) => {
-        acc[exercise.id] = [{ reps: "", weight: "" }];
-        return acc;
-      }, {} as { [key: string]: ExerciseSet[] });
-      setWorkoutLog(initialLog);
+      // Prüfe ob es gespeicherte Daten gibt, sonst initialisiere neu
+      if (Object.keys(workoutLog).length === 0) {
+        const initialLog = exercisesList.reduce((acc, exercise) => {
+          acc[exercise.id] = [{ reps: "", weight: "" }];
+          return acc;
+        }, {} as { [key: string]: ExerciseSet[] });
+        setWorkoutLog(initialLog);
+      }
     } catch (error) {
       console.error("Error processing exercises:", error);
     }
@@ -102,13 +139,39 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     }));
   };
 
-  const saveWorkout = () => {
+  const saveWorkout = async () => {
     const workoutData = {
       workoutId: props.payload?.workoutId,
       date: new Date().toISOString(),
       exercises: workoutLog,
     };
     console.log("Workout Data:", workoutData);
+    // Lösche gespeicherten Fortschritt nach erfolgreichem Speichern
+    if (props.payload?.workoutId) {
+      await removeWorkoutProgress(props.payload.workoutId);
+    }
+  };
+
+  const handleReset = () => {
+    Alert.alert(
+      "End Workout",
+      "Are you sure you want to end this workout? All progress will be lost.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "End Workout",
+          style: "destructive",
+          onPress: async () => {
+            if (!props.payload?.workoutId) return;
+            await removeWorkoutProgress(props.payload.workoutId);
+            SheetManager.hide("workout-exercise-sheet");
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -182,6 +245,10 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
         <Button theme="active" onPress={saveWorkout} style={styles.saveButton}>
           Save Workout
         </Button>
+        {/* Reset Button */}
+        <Button theme="danger" onPress={handleReset} style={styles.resetButton}>
+          Delete Current Workout
+        </Button>
       </View>
     </ActionSheet>
   );
@@ -194,6 +261,7 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 16,
+    paddingBottom: 32,
   },
   exerciseTitle: {
     fontSize: 20,
@@ -222,6 +290,11 @@ const styles = StyleSheet.create({
   },
   addSetButton: {
     marginTop: 16,
+  },
+  resetButton: {
+    marginTop: 32,
+    backgroundColor: "red",
+    color: "white",
   },
   saveButton: {
     marginTop: 24,
