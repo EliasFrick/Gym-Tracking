@@ -153,15 +153,9 @@ export interface IAppConfigContextType {
   triggerRefreshDatabase: () => void;
 }
 
-export interface WorkoutExercise {
-  id: string;
-  name: string;
-  // Füge hier weitere Eigenschaften hinzu, die ein Exercise haben kann
-}
-
 export interface IAppplicationContextType {
-  currentWorkout: WorkoutExercise[] | undefined;
-  setCurrentWorkout: React.Dispatch<React.SetStateAction<WorkoutExercise[] | undefined>>;
+  currentWorkout: any[] | undefined;
+  setCurrentWorkout: React.Dispatch<React.SetStateAction<any[] | undefined>>;
 }
 
 export interface IDeleteAlertDialog {
