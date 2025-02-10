@@ -1,7 +1,10 @@
-import React from "react";
+// WorkoutDetailsScreen.tsx
+import React, { useEffect, useState } from "react";
 import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Text, Card, XStack } from "tamagui";
 import { useLocalSearchParams } from "expo-router";
+import { query, collection, where, getDocs } from "firebase/firestore";
+import { firestoreDB } from "@/database/Firebaseconfig";
 
 const { width } = Dimensions.get("window");
 
@@ -14,11 +17,54 @@ interface WorkoutExercises {
   [key: string]: ExerciseSet[];
 }
 
+/**
+ * Given an exercise id, this function queries the DefaultExercises
+ * collection to find a document where the "id" field matches.
+ * It returns the document's "name" field if found,
+ * otherwise it returns "name not found".
+ */
+async function getExerciseName(exerciseId: string): Promise<string> {
+  try {
+    const q = query(
+      collection(firestoreDB, "DefaultExercises"),
+      where("id", "==", exerciseId)
+    );
+    const querySnapshot = await getDocs(q);
+    if (!querySnapshot.empty) {
+      const docSnapshot = querySnapshot.docs[0];
+      const data = docSnapshot.data();
+      return data?.name || "name not found";
+    }
+    return "name not found";
+  } catch (error) {
+    console.error("Error fetching exercise name for id", exerciseId, error);
+    return "name not found";
+  }
+}
+
 export default function WorkoutDetailsScreen() {
   const params = useLocalSearchParams();
-  // Decode the exercises parameter before parsing it
   const decodedExercises = decodeURIComponent(params.exercises as string);
   const workoutExercises: WorkoutExercises = JSON.parse(decodedExercises);
+  const [exerciseNames, setExerciseNames] = useState<{ [key: string]: string }>(
+    {}
+  );
+
+  // Fetch exercise names from DefaultExercises collection based on the exercise ids
+  useEffect(() => {
+    async function fetchExerciseNames() {
+      const exerciseIds = Object.keys(workoutExercises);
+      const names: { [key: string]: string } = {};
+      await Promise.all(
+        exerciseIds.map(async (exerciseId) => {
+          const name = await getExerciseName(exerciseId);
+          names[exerciseId] = name;
+        })
+      );
+      setExerciseNames(names);
+    }
+    fetchExerciseNames();
+  }, [workoutExercises]);
 
   const renderExerciseCard = (exerciseId: string, sets: ExerciseSet[]) => {
     return (
@@ -37,7 +83,7 @@ export default function WorkoutDetailsScreen() {
             fontWeight="bold"
             marginBottom={10}
           >
-            {exerciseId}
+            {exerciseNames[exerciseId] || exerciseId}
           </Text>
           {sets.map((set, index) => (
             <View key={index} style={styles.setContainer}>
