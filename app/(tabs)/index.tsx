@@ -53,20 +53,25 @@ export default function TabOneScreen() {
     }
   };
 
+  useEffect(() => {
+    fetchWorkoutHistory();
+  }, []);
+
   const onRefresh = async () => {
     setRefreshing(true);
     await fetchWorkoutHistory();
     setRefreshing(false);
   };
 
-  useEffect(() => {
-    fetchWorkoutHistory();
-  }, []);
-
   const handleWorkoutPress = (workout: WorkoutHistoryItem) => {
     router.push({
       pathname: "/workout-details",
-      params: { workoutData: JSON.stringify(workout) },
+      params: {
+        id: workout.id,
+        date: workout.date,
+        workoutId: workout.workoutId,
+        exercises: encodeURIComponent(JSON.stringify(workout.exercises)),
+      },
     });
   };
 
@@ -76,13 +81,6 @@ export default function TabOneScreen() {
       (acc, sets) => acc + sets.length,
       0
     );
-    const formattedDate = new Date(item.date).toLocaleDateString("de-DE", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
 
     return (
       <Card
@@ -102,7 +100,7 @@ export default function TabOneScreen() {
             {item.workoutId}
           </Text>
           <Text color="$color12" fontSize={14}>
-            {formattedDate}
+            {new Date(item.date).toLocaleDateString()}
           </Text>
           <Text color="$color12" fontSize={14}>
             {exerciseCount} Exercises • {totalSets} Sets
@@ -135,6 +133,6 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     alignItems: "center",
-    paddingBottom: 20,
+    paddingVertical: 20,
   },
 });

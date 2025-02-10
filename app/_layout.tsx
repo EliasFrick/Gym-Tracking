@@ -8,10 +8,14 @@ import { SheetProvider } from "react-native-actions-sheet";
 import "@/components/ReactNative ActionSheet Library/sheets";
 import { ApplicationProvider } from "@/context/ApplicationProvider";
 import React from "react";
+import { AntDesign } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 
 const config = createTamagui(defaultConfig);
 
 export default function RootLayout() {
+  const router = useRouter();
+
   return (
     <TamaguiProvider config={config}>
       <PortalProvider>
@@ -31,7 +35,10 @@ export default function RootLayout() {
                     },
                   }}
                 >
-                  <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                  <Stack.Screen
+                    name="(tabs)"
+                    options={{ headerShown: false }}
+                  />
                   <Stack.Screen
                     name="(auth)"
                     options={{
@@ -47,6 +54,18 @@ export default function RootLayout() {
                       },
                       headerTintColor: "white",
                       headerTitle: "Workout Details",
+                      headerShown: true,
+                      gestureEnabled: true,
+                      gestureDirection: "horizontal",
+                      headerRight: () => (
+                        <AntDesign
+                          name="close"
+                          size={24}
+                          color="white"
+                          style={{ marginLeft: 10 }}
+                          onPress={() => router.back()}
+                        />
+                      ),
                     }}
                   />
                 </Stack>
