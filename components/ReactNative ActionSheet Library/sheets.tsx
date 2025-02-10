@@ -2,11 +2,13 @@ import { registerSheet } from "react-native-actions-sheet";
 import { AddWorkoutActionSheet } from "../ui/CreateTrainingsplan/AddWorkoutActionSheet";
 import { AddExerciseActionSheet } from "../ui/CreateTrainingsplan/AddExerciseActionSheet";
 import { PickExercisActionSheet } from "../ui/CreateTrainingsplan/AddWorkout/PickExerciseActionSheet";
-import { IPickedExercises } from "@/types/interfaces";
+import { IPickedExercises, WorkoutExercise } from "@/types/interfaces";
+import { WorkoutExerciseSheet } from "../ui/WorkoutExerciseSheet";
 
 registerSheet("add-workout-modal-sheet", AddWorkoutActionSheet);
 registerSheet("add-exercise-modal-sheet", AddExerciseActionSheet);
 registerSheet("add-exercise-for-Workout-modal-sheet", PickExercisActionSheet);
+registerSheet("workout-exercise-sheet", WorkoutExerciseSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -26,6 +28,13 @@ declare module "react-native-actions-sheet" {
         setPickedExercises: React.Dispatch<
           React.SetStateAction<IPickedExercises[] | undefined>
         >;
+      };
+      returnValue?: any;
+    };
+    "workout-exercise-sheet": {
+      payload: {
+        workoutId: string;
+        currentWorkout: WorkoutExercise[];
       };
       returnValue?: any;
     };

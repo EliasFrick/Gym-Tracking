@@ -39,7 +39,6 @@ export const AppConfigProvider: React.FC<AppConfigProviderProps> = ({
   }, [isConnected]);
 
   const triggerRefreshDatabase = () => {
-    console.log("DAE");
     setRefreshDatabase((prev) => prev + 1);
   };
 

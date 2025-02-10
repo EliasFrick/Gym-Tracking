@@ -96,8 +96,6 @@ export interface IUser {
   birthDate: string;
 }
 
-
-
 export interface IAddedExercisePanel {
   title: string;
 }
@@ -153,6 +151,17 @@ export interface IAppConfigContextType {
   setIsConnected: React.Dispatch<React.SetStateAction<boolean | null>>;
   refreshDatabase: number;
   triggerRefreshDatabase: () => void;
+}
+
+export interface WorkoutExercise {
+  id: string;
+  name: string;
+  // Füge hier weitere Eigenschaften hinzu, die ein Exercise haben kann
+}
+
+export interface IAppplicationContextType {
+  currentWorkout: WorkoutExercise[] | undefined;
+  setCurrentWorkout: React.Dispatch<React.SetStateAction<WorkoutExercise[] | undefined>>;
 }
 
 export interface IDeleteAlertDialog {
