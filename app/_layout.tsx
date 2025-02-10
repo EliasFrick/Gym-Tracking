@@ -7,10 +7,11 @@ import { AppConfigProvider } from "@/context/AppConfigProvider";
 import { SheetProvider } from "react-native-actions-sheet";
 import "@/components/ReactNative ActionSheet Library/sheets";
 import { ApplicationProvider } from "@/context/ApplicationProvider";
+import React from "react";
 
 const config = createTamagui(defaultConfig);
 
-export default function Layout() {
+export default function RootLayout() {
   return (
     <TamaguiProvider config={config}>
       <PortalProvider>
@@ -35,6 +36,17 @@ export default function Layout() {
                     name="(auth)"
                     options={{
                       headerShown: false,
+                    }}
+                  />
+                  <Stack.Screen
+                    name="workout-details"
+                    options={{
+                      presentation: "modal",
+                      headerStyle: {
+                        backgroundColor: "rgb(48, 48, 49)",
+                      },
+                      headerTintColor: "white",
+                      headerTitle: "Workout Details",
                     }}
                   />
                 </Stack>

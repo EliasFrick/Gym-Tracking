@@ -47,8 +47,6 @@ export default function TabOneScreen() {
       querySnapshot.forEach((doc) => {
         history.push({ id: doc.id, ...doc.data() } as WorkoutHistoryItem);
       });
-
-      console.log(user.uid);
       setWorkoutHistory(history);
     } catch (error) {
       console.error("Error fetching workout history:", error);
