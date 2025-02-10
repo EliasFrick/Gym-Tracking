@@ -13,8 +13,8 @@ import ActionSheet, {
   SheetManager,
 } from "react-native-actions-sheet";
 import { Dimensions } from "react-native";
-import { XStack, Button } from "tamagui";
-import { ChevronLeft, ChevronRight, Plus } from "@tamagui/lucide-icons";
+import { XStack, Button, ScrollView } from "tamagui";
+import { ChevronLeft, ChevronRight, Plus, Trash2 } from "@tamagui/lucide-icons";
 import { AppplicationContext } from "@/context/ApplicationProvider";
 import { WorkoutExercise } from "@/types/interfaces";
 import {
@@ -85,11 +85,15 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     }
 
     try {
-      const exercisesList = props.payload.currentWorkout.map((exercise) => ({
-        id: exercise.id,
-        name: exercise.name,
-        sets: [{ reps: "", weight: "" }],
-      }));
+      const exercisesList = props.payload.currentWorkout.map((exercise) => {
+        console.log("Exercise being processed:", exercise); // Debug log
+        return {
+          id: exercise.id,
+          name: exercise.name,
+          sets: [{ reps: "", weight: "" }],
+        };
+      });
+      console.log("Exercises list:", exercisesList); // Debug log
       setExercises(exercisesList);
 
       // Prüfe ob es gespeicherte Daten gibt, sonst initialisiere neu
@@ -139,6 +143,13 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     }));
   };
 
+  const deleteSet = (exerciseId: string, setIndex: number) => {
+    setWorkoutLog((prev) => ({
+      ...prev,
+      [exerciseId]: prev[exerciseId].filter((_, idx) => idx !== setIndex),
+    }));
+  };
+
   const saveWorkout = async () => {
     const workoutData = {
       workoutId: props.payload?.workoutId,
@@ -177,78 +188,122 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   return (
     <ActionSheet
       containerStyle={styles.container}
-      gestureEnabled={true}
+      gestureEnabled={false}
       {...props}
     >
       <View style={styles.content}>
         {/* Navigation */}
-        <XStack justifyContent="space-between" alignItems="center" padding="$4">
+        <XStack
+          justifyContent="space-between"
+          alignItems="center"
+          padding="$4"
+          style={styles.navigationContainer}
+        >
           <Button
             icon={ChevronLeft}
             disabled={currentExerciseIndex === 0}
             onPress={() => handleNavigate("prev")}
           />
-          <Text style={styles.exerciseTitle}>{currentExercise?.name}</Text>
+          <View style={styles.titleContainer}>
+            <Text style={styles.exerciseTitle}>
+              {currentExercise?.name ?? "Loading..."}
+            </Text>
+          </View>
           <Button
             icon={ChevronRight}
             disabled={currentExerciseIndex === exercises.length - 1}
             onPress={() => handleNavigate("next")}
           />
         </XStack>
-        {/*         <Text>Test {currentWorkout.name}</Text>
-         */}
-        {/* Sets */}
-        {currentExercise &&
-          workoutLog[currentExercise.id]?.map((set, index) => (
-            <View key={index} style={styles.setContainer}>
-              <Text style={styles.setLabel}>Set {index + 1}</Text>
-              <XStack gap="$4">
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Reps</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={set.reps}
-                    onChangeText={(value) =>
-                      handleSetChange(currentExercise.id, index, "reps", value)
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-                <View style={styles.inputContainer}>
-                  <Text style={styles.inputLabel}>Weight (kg)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={set.weight}
-                    onChangeText={(value) =>
-                      handleSetChange(
-                        currentExercise.id,
-                        index,
-                        "weight",
-                        value
-                      )
-                    }
-                    keyboardType="numeric"
-                  />
-                </View>
-              </XStack>
-            </View>
-          ))}
-        {/* Add Set Button */}
-        <Button
-          icon={Plus}
-          onPress={() => currentExercise && addSet(currentExercise.id)}
-          style={styles.addSetButton}
-        >
-          Add Set
-        </Button>
-        {/* Save Button */}
-        <Button theme="active" onPress={saveWorkout} style={styles.saveButton}>
-          Save Workout
-        </Button>
-        {/* Reset Button */}
-        <Button theme="danger" onPress={handleReset} style={styles.resetButton}>
-          Delete Current Workout
-        </Button>
+
+        {/* Scrollable Area */}
+        <View style={styles.scrollableWrapper}>
+          <ScrollView contentContainerStyle={styles.scrollContent}>
+            {currentExercise &&
+              workoutLog[currentExercise.id]?.map((set, index) => {
+                const isLastSet =
+                  index === workoutLog[currentExercise.id].length - 1;
+                return (
+                  <View key={index} style={styles.setContainer}>
+                    <Text style={styles.setLabel}>Set {index + 1}</Text>
+                    <XStack gap="$4" alignItems="center">
+                      <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Reps</Text>
+                        <TextInput
+                          style={styles.input}
+                          value={set.reps}
+                          onChangeText={(value) =>
+                            handleSetChange(
+                              currentExercise.id,
+                              index,
+                              "reps",
+                              value
+                            )
+                          }
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      <View style={styles.inputContainer}>
+                        <Text style={styles.inputLabel}>Weight (kg)</Text>
+                        <TextInput
+                          style={styles.input}
+                          value={set.weight}
+                          onChangeText={(value) =>
+                            handleSetChange(
+                              currentExercise.id,
+                              index,
+                              "weight",
+                              value
+                            )
+                          }
+                          keyboardType="numeric"
+                        />
+                      </View>
+                      {isLastSet && (
+                        <Button
+                          icon={Trash2}
+                          onPress={() => deleteSet(currentExercise.id, index)}
+                          style={styles.deleteSetButton}
+                          size="$2"
+                          chromeless
+                        />
+                      )}
+                    </XStack>
+                  </View>
+                );
+              })}
+          </ScrollView>
+        </View>
+
+        {/* Buttons Section */}
+        <View style={styles.buttonsContainer}>
+          {/* Add Set Button */}
+          <Button
+            icon={Plus}
+            onPress={() => currentExercise && addSet(currentExercise.id)}
+            style={styles.addSetButton}
+          >
+            Add Set
+          </Button>
+
+          {/* Save Button */}
+          <Button
+            theme="active"
+            onPress={saveWorkout}
+            style={styles.saveButton}
+          >
+            Save Workout
+          </Button>
+
+          {/* Reset Button */}
+          <Button
+            theme="danger"
+            onPress={handleReset}
+            style={styles.resetButton}
+          >
+            Delete Current Workout
+          </Button>
+        </View>
       </View>
     </ActionSheet>
   );
@@ -260,16 +315,43 @@ const styles = StyleSheet.create({
     height: height * 0.8,
   },
   content: {
+    flex: 1,
     padding: 16,
-    paddingBottom: 32,
+  },
+  scrollableWrapper: {
+    height: height * 0.45,
+    borderRadius: 8,
+    marginVertical: 10,
+  },
+  scrollContent: {
+    padding: 10,
+  },
+  buttonsContainer: {
+    marginTop: 10,
+  },
+  navigationContainer: {
+    width: "100%",
+    marginBottom: 10,
+    minHeight: 50, // Mindesthöhe hinzufügen
+  },
+  titleContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingHorizontal: 10,
+    minHeight: 30, // Mindesthöhe hinzufügen
+    justifyContent: "center", // Vertikale Zentrierung
   },
   exerciseTitle: {
     fontSize: 20,
     color: "white",
     fontWeight: "bold",
+    textAlign: "center",
+    width: "100%", // Volle Breite
+    zIndex: 1, // Höherer z-index
   },
   setContainer: {
     marginVertical: 12,
+    paddingHorizontal: 10,
   },
   setLabel: {
     color: "white",
@@ -294,9 +376,15 @@ const styles = StyleSheet.create({
   resetButton: {
     marginTop: 32,
     backgroundColor: "red",
-    color: "white",
   },
   saveButton: {
     marginTop: 24,
+  },
+  deleteSetButton: {
+    padding: 0,
+    color: "red",
+    marginLeft: 8,
+    alignSelf: "flex-end",
+    marginBottom: 4,
   },
 });
