@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
 import ActionSheet, {
   SheetProps,
@@ -23,6 +25,10 @@ import {
   removeWorkoutProgress,
 } from "@/utils/storage";
 
+// Import Firestore functions and firebase services
+import { doc, setDoc } from "firebase/firestore";
+
+import { auth, firestoreDB } from "@/database/Firebaseconfig";
 const { width, height } = Dimensions.get("window");
 
 interface ExerciseSet {
@@ -50,7 +56,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     [key: string]: ExerciseSet[];
   }>({});
 
-  // Lade gespeicherten Fortschritt beim Öffnen
+  // Load saved progress when opening
   useEffect(() => {
     const loadSavedProgress = async () => {
       if (!props.payload?.workoutId) return;
@@ -65,7 +71,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     loadSavedProgress();
   }, [props.payload?.workoutId]);
 
-  // Speichere Fortschritt bei Änderungen
+  // Save progress on changes
   useEffect(() => {
     if (!props.payload?.workoutId || Object.keys(workoutLog).length === 0)
       return;
@@ -77,7 +83,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     });
   }, [workoutLog, currentExerciseIndex, props.payload?.workoutId]);
 
-  // Initialisiere Übungen
+  // Initialize exercises
   useEffect(() => {
     if (!props.payload?.currentWorkout) {
       console.log("No workout data available");
@@ -96,7 +102,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       console.log("Exercises list:", exercisesList); // Debug log
       setExercises(exercisesList);
 
-      // Prüfe ob es gespeicherte Daten gibt, sonst initialisiere neu
+      // If there's no saved data, initialize new workout log
       if (Object.keys(workoutLog).length === 0) {
         const initialLog = exercisesList.reduce((acc, exercise) => {
           acc[exercise.id] = [{ reps: "", weight: "" }];
@@ -157,9 +163,44 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       exercises: workoutLog,
     };
     console.log("Workout Data:", workoutData);
-    // Lösche gespeicherten Fortschritt nach erfolgreichem Speichern
-    if (props.payload?.workoutId) {
-      await removeWorkoutProgress(props.payload.workoutId);
+
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        Alert.alert(
+          "Error",
+          "No user is signed in. Please sign in to save your workout."
+        );
+        return;
+      }
+      // Create document ID: workoutId (trimmed) + '-' + current ISO date/time
+      const docId = `${workoutData.workoutId.trim()}-${workoutData.date}`;
+      const workoutDocRef = doc(
+        firestoreDB,
+        "User",
+        user.uid,
+        "WorkoutHistory",
+        docId
+      );
+      await setDoc(workoutDocRef, workoutData);
+
+      // Remove saved progress
+      if (props.payload?.workoutId) {
+        await removeWorkoutProgress(props.payload.workoutId);
+      }
+      // Clear local workout data so that text inputs are empty
+      setWorkoutLog({});
+      setExercises([]);
+      setCurrentExerciseIndex(0);
+      // Alert the user and close the Action Sheet
+      Alert.alert("Success", "Workout saved successfully!");
+      SheetManager.hide("workout-exercise-sheet");
+    } catch (error) {
+      console.error("Error saving workout:", error);
+      Alert.alert(
+        "Error",
+        "There was an error saving your workout. Please try again."
+      );
     }
   };
 
@@ -189,6 +230,9 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     <ActionSheet
       containerStyle={styles.container}
       gestureEnabled={false}
+      closeOnTouchBackdrop={false}
+      keyboardShouldPersistTaps="handled"
+      onTouchEnd={() => Keyboard.dismiss()}
       {...props}
     >
       <View style={styles.content}>
@@ -218,7 +262,11 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
 
         {/* Scrollable Area */}
         <View style={styles.scrollableWrapper}>
-          <ScrollView contentContainerStyle={styles.scrollContent}>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            keyboardShouldPersistTaps="handled"
+            onScrollBeginDrag={Keyboard.dismiss}
+          >
             {currentExercise &&
               workoutLog[currentExercise.id]?.map((set, index) => {
                 const isLastSet =
@@ -332,22 +380,22 @@ const styles = StyleSheet.create({
   navigationContainer: {
     width: "100%",
     marginBottom: 10,
-    minHeight: 50, // Mindesthöhe hinzufügen
+    minHeight: 50, // Minimum height added
   },
   titleContainer: {
     flex: 1,
     alignItems: "center",
     paddingHorizontal: 10,
-    minHeight: 30, // Mindesthöhe hinzufügen
-    justifyContent: "center", // Vertikale Zentrierung
+    minHeight: 30, // Minimum height added
+    justifyContent: "center", // Vertical centering
   },
   exerciseTitle: {
     fontSize: 20,
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-    width: "100%", // Volle Breite
-    zIndex: 1, // Höherer z-index
+    width: "100%", // Full width
+    zIndex: 1, // Higher z-index
   },
   setContainer: {
     marginVertical: 12,

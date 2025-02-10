@@ -174,3 +174,19 @@ export interface IWorkoutInDatabase {
   workoutType: string;
   exercises: string[];
 }
+
+export interface WorkoutExercise {
+  id: string;
+  name: string;
+  primaryMuscle?: string[];
+  mainGroup?: string[];
+}
+
+export interface WorkoutProgress {
+  workoutId: string;
+  workoutLog: {
+    [key: string]: { reps: string; weight: string }[];
+  };
+  currentExerciseIndex: number;
+  lastUpdated: string;
+}

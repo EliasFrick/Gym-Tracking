@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { WorkoutProgress } from '@/types/interfaces';
 
 export const StorageKeys = {
   WORKOUT_PROGRESS: 'workout_progress_',
@@ -15,7 +16,7 @@ export const saveWorkoutProgress = async (workoutId: string, data: any) => {
   }
 };
 
-export const getWorkoutProgress = async (workoutId: string) => {
+export const getWorkoutProgress = async (workoutId: string): Promise<WorkoutProgress | null> => {
   try {
     const data = await AsyncStorage.getItem(
       `${StorageKeys.WORKOUT_PROGRESS}${workoutId}`
