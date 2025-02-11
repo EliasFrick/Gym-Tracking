@@ -37,7 +37,6 @@ export const AddExerciseActionSheet = (
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
   const [exercise, setExercise] = useState<IPickedExercises[]>();
-  const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] =
     React.useState<ICreateCustomExercise>({
@@ -63,7 +62,6 @@ export const AddExerciseActionSheet = (
     try {
       await saveCustomExercise();
 
-      triggerRefreshDatabase();
     } catch (err) {
       console.error("Error adding document: ", err);
     }
