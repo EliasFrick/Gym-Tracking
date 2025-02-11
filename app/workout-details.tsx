@@ -4,7 +4,7 @@ import { View, StyleSheet, ScrollView, Dimensions } from "react-native";
 import { Text, Card, XStack } from "tamagui";
 import { useLocalSearchParams } from "expo-router";
 import { query, collection, where, getDocs } from "firebase/firestore";
-import { firestoreDB } from "@/database/Firebaseconfig";
+import { firestoreDB, auth } from "@/database/Firebaseconfig";
 
 const { width } = Dimensions.get("window");
 
@@ -18,23 +18,40 @@ interface WorkoutExercises {
 }
 
 /**
- * Given an exercise id, this function queries the DefaultExercises
- * collection to find a document where the "id" field matches.
- * It returns the document's "name" field if found,
- * otherwise it returns "name not found".
+ * Given an exercise id, this function first queries the DefaultExercises
+ * collection and then falls back to the user's custom exercises if not found.
  */
 async function getExerciseName(exerciseId: string): Promise<string> {
   try {
-    const q = query(
+    // First try DefaultExercises collection
+    const defaultQuery = query(
       collection(firestoreDB, "DefaultExercises"),
       where("id", "==", exerciseId)
     );
-    const querySnapshot = await getDocs(q);
-    if (!querySnapshot.empty) {
-      const docSnapshot = querySnapshot.docs[0];
+    const defaultSnapshot = await getDocs(defaultQuery);
+
+    if (!defaultSnapshot.empty) {
+      const docSnapshot = defaultSnapshot.docs[0];
       const data = docSnapshot.data();
       return data?.name || "name not found";
     }
+
+    // If not found in DefaultExercises, try user's custom exercises
+    const user = auth.currentUser;
+    if (!user) return "name not found";
+
+    const userExerciseDoc = await getDocs(
+      collection(firestoreDB, "User", user.uid, "Exercises")
+    );
+
+    const customExercise = userExerciseDoc.docs.find(
+      (doc) => doc.id === exerciseId
+    );
+    if (customExercise) {
+      const data = customExercise.data();
+      return data?.name || "name not found";
+    }
+
     return "name not found";
   } catch (error) {
     console.error("Error fetching exercise name for id", exerciseId, error);
