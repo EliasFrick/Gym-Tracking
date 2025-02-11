@@ -10,6 +10,8 @@ import { Text, Card } from "tamagui";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
+import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
+import { useAppConfig } from "@/context/AppConfigProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,6 +26,7 @@ interface WorkoutHistoryItem {
 
 export default function TabOneScreen() {
   const router = useRouter();
+  const { isOnline } = useAppConfig();
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutHistoryItem[]>(
     []
   );
@@ -31,23 +34,28 @@ export default function TabOneScreen() {
 
   const fetchWorkoutHistory = async () => {
     try {
-      const user = auth.currentUser;
-      if (!user) return;
+      if (isOnline) {
+        const user = auth.currentUser;
+        if (!user) return;
 
-      const historyRef = collection(
-        firestoreDB,
-        "User",
-        user.uid,
-        "WorkoutHistory"
-      );
-      const q = query(historyRef, orderBy("date", "desc"));
-      const querySnapshot = await getDocs(q);
+        const historyRef = collection(
+          firestoreDB,
+          "User",
+          user.uid,
+          "WorkoutHistory"
+        );
+        const q = query(historyRef, orderBy("date", "desc"));
+        const querySnapshot = await getDocs(q);
 
-      const history: WorkoutHistoryItem[] = [];
-      querySnapshot.forEach((doc) => {
-        history.push({ id: doc.id, ...doc.data() } as WorkoutHistoryItem);
-      });
-      setWorkoutHistory(history);
+        const history: WorkoutHistoryItem[] = [];
+        querySnapshot.forEach((doc) => {
+          history.push({ id: doc.id, ...doc.data() } as WorkoutHistoryItem);
+        });
+        setWorkoutHistory(history);
+      } else {
+        const history = await getOfflineWorkoutHistory();
+        setWorkoutHistory(history);
+      }
     } catch (error) {
       console.error("Error fetching workout history:", error);
     }

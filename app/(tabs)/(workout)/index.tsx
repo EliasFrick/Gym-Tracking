@@ -19,7 +19,6 @@ const { width, height } = Dimensions.get("window");
 
 export default function indexScreen() {
   const [workout, setWorkout] = useState<IExerciseCard[]>();
-  const { refreshDatabase } = useContext(AppConfigContext);
   const navigation = useNavigation();
 
   // Neuen Zustand für den Popover hinzufügen:
@@ -30,25 +29,6 @@ export default function indexScreen() {
       headerShown: false, // Wir bauen den Header selbst im Render-Bereich
     });
   }, [navigation]);
-
-  useEffect(() => {
-    const fetchWorkouts = async () => {
-      const result = await fetchUserWorkouts();
-      setWorkout(result);
-    };
-    fetchWorkouts();
-  }, [refreshDatabase]);
-
-  /* useFocusEffect(
-    React.useCallback(() => {
-      console.log("Test");
-      const fetchWorkouts = async () => {
-        const result = await fetchUserWorkouts();
-        setWorkout(result);
-      };
-      fetchWorkouts();
-    }, [refreshDatabase])
-  ); */
 
   const items = [
     { name: "Chest" },
