@@ -1,61 +1,52 @@
-import React, { createContext, ReactNode, useEffect, useState } from "react";
-import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
-import { IAppConfigContextType } from "@/types/interfaces";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import NetInfo from "@react-native-community/netinfo";
+import { syncData } from "@/utils/offlineStorage";
 
-export const AppConfigContext = createContext<IAppConfigContextType>({
-  isConnected: false,
-  setIsConnected: () => {},
-  refreshDatabase: 0,
-  triggerRefreshDatabase: () => {},
-});
-
-interface AppConfigProviderProps {
-  children: ReactNode;
+interface AppConfigContextType {
+  isOnline: boolean;
+  lastSync: Date | null;
+  syncDataNow: () => Promise<void>;
 }
 
-export const AppConfigProvider: React.FC<AppConfigProviderProps> = ({
-  children,
-}) => {
-  const [isConnected, setIsConnected] = useState<boolean | null>(null);
-  const [refreshDatabase, setRefreshDatabase] = useState<number>(0);
+export const AppConfigContext = createContext<AppConfigContextType | undefined>(
+  undefined
+);
+
+export function AppConfigProvider({ children }: { children: React.ReactNode }) {
+  const [isOnline, setIsOnline] = useState(true);
+  const [lastSync, setLastSync] = useState<Date | null>(null);
 
   useEffect(() => {
-    const checkInitialConnection = async () => {
-      const state = await NetInfo.fetch();
-      setIsConnected(state.isConnected);
-    };
+    // Initial sync on app start
+    syncData().then(() => setLastSync(new Date()));
 
-    checkInitialConnection();
-
-    const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
-      if (state.isConnected !== isConnected) {
-        setIsConnected(state.isConnected);
+    // Subscribe to network state changes
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOnline(state.isConnected ?? false);
+      if (state.isConnected) {
+        syncData().then(() => setLastSync(new Date()));
       }
     });
 
-    return () => {
-      unsubscribe();
-    };
-  }, [isConnected]);
+    return () => unsubscribe();
+  }, []);
 
-  const triggerRefreshDatabase = () => {
-    setRefreshDatabase((prev) => prev + 1);
+  const syncDataNow = async () => {
+    await syncData();
+    setLastSync(new Date());
   };
 
-  useEffect(() => {
-    triggerRefreshDatabase();
-  }, [isConnected]);
-
   return (
-    <AppConfigContext.Provider
-      value={{
-        isConnected,
-        setIsConnected,
-        refreshDatabase,
-        triggerRefreshDatabase,
-      }}
-    >
+    <AppConfigContext.Provider value={{ isOnline, lastSync, syncDataNow }}>
       {children}
     </AppConfigContext.Provider>
   );
-};
+}
+
+export function useAppConfig() {
+  const context = useContext(AppConfigContext);
+  if (context === undefined) {
+    throw new Error("useAppConfig must be used within an AppConfigProvider");
+  }
+  return context;
+}

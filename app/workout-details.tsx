@@ -5,6 +5,8 @@ import { Text, Card, XStack } from "tamagui";
 import { useLocalSearchParams } from "expo-router";
 import { query, collection, where, getDocs } from "firebase/firestore";
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
+import { getOfflineExerciseName } from "@/utils/offlineStorage";
+import { useAppConfig } from "@/context/AppConfigProvider";
 
 const { width } = Dimensions.get("window");
 
@@ -21,42 +23,51 @@ interface WorkoutExercises {
  * Given an exercise id, this function first queries the DefaultExercises
  * collection and then falls back to the user's custom exercises if not found.
  */
-async function getExerciseName(exerciseId: string): Promise<string> {
-  try {
-    // First try DefaultExercises collection
-    const defaultQuery = query(
-      collection(firestoreDB, "DefaultExercises"),
-      where("id", "==", exerciseId)
-    );
-    const defaultSnapshot = await getDocs(defaultQuery);
+async function getExerciseName(
+  exerciseId: string,
+  isOnline: boolean
+): Promise<string> {
+  if (isOnline) {
+    try {
+      // First try DefaultExercises collection
+      const defaultQuery = query(
+        collection(firestoreDB, "DefaultExercises"),
+        where("id", "==", exerciseId)
+      );
+      const defaultSnapshot = await getDocs(defaultQuery);
 
-    if (!defaultSnapshot.empty) {
-      const docSnapshot = defaultSnapshot.docs[0];
-      const data = docSnapshot.data();
-      return data?.name || "name not found";
+      if (!defaultSnapshot.empty) {
+        const docSnapshot = defaultSnapshot.docs[0];
+        const data = docSnapshot.data();
+        return data?.name || "name not found";
+      }
+
+      // If not found in DefaultExercises, try user's custom exercises
+      const user = auth.currentUser;
+      if (!user) return "name not found";
+
+      const userExerciseDoc = await getDocs(
+        collection(firestoreDB, "User", user.uid, "Exercises")
+      );
+
+      const customExercise = userExerciseDoc.docs.find(
+        (doc) => doc.id === exerciseId
+      );
+      if (customExercise) {
+        const data = customExercise.data();
+        return data?.name || "name not found";
+      }
+
+      return "name not found";
+    } catch (error) {
+      console.error("Error fetching online exercise name:", error);
+      // Fallback to offline data if online fetch fails
+      return getOfflineExerciseName(exerciseId);
     }
-
-    // If not found in DefaultExercises, try user's custom exercises
-    const user = auth.currentUser;
-    if (!user) return "name not found";
-
-    const userExerciseDoc = await getDocs(
-      collection(firestoreDB, "User", user.uid, "Exercises")
-    );
-
-    const customExercise = userExerciseDoc.docs.find(
-      (doc) => doc.id === exerciseId
-    );
-    if (customExercise) {
-      const data = customExercise.data();
-      return data?.name || "name not found";
-    }
-
-    return "name not found";
-  } catch (error) {
-    console.error("Error fetching exercise name for id", exerciseId, error);
-    return "name not found";
   }
+
+  // Use offline data
+  return getOfflineExerciseName(exerciseId);
 }
 
 export default function WorkoutDetailsScreen() {
@@ -66,6 +77,7 @@ export default function WorkoutDetailsScreen() {
   const [exerciseNames, setExerciseNames] = useState<{ [key: string]: string }>(
     {}
   );
+  const { isOnline } = useAppConfig();
 
   // Fetch exercise names from DefaultExercises collection based on the exercise ids
   useEffect(() => {
@@ -74,14 +86,14 @@ export default function WorkoutDetailsScreen() {
       const names: { [key: string]: string } = {};
       await Promise.all(
         exerciseIds.map(async (exerciseId) => {
-          const name = await getExerciseName(exerciseId);
+          const name = await getExerciseName(exerciseId, isOnline);
           names[exerciseId] = name;
         })
       );
       setExerciseNames(names);
     }
     fetchExerciseNames();
-  }, [workoutExercises]);
+  }, [workoutExercises, isOnline]);
 
   const renderExerciseCard = (exerciseId: string, sets: ExerciseSet[]) => {
     return (

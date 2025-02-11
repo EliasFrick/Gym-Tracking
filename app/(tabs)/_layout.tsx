@@ -57,18 +57,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="profile"
         options={{
-          title: "Explore",
+          title: "Profile",
           headerTitleStyle: { fontSize: scale(18), color: "white" },
           tabBarIcon: ({ focused }) => (
-            <View style={[styles.settingsIcon]}>
-              <FeatherIcons
-                name="settings"
-                size={focused ? 30 : 25}
-                color={"white"}
-              />
-            </View>
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={focused ? 30 : 25}
+              color="white"
+            />
           ),
           tabBarLabel: "",
         }}
