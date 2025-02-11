@@ -1,16 +1,13 @@
-import React from "react";
-import { View, StyleSheet, TouchableOpacity, Image } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
 import { Text, YStack, XStack } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
 import { auth } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
+import * as ImagePicker from "expo-image-picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const menuItems = [
-  {
-    icon: "time-outline",
-    title: "Workout History",
-    route: "/(tabs)/index",
-  },
   {
     icon: "person-outline",
     title: "Personal Data",
@@ -21,16 +18,59 @@ const menuItems = [
     title: "Settings",
     route: "/settings",
   },
-  {
-    icon: "shield-outline",
-    title: "Privacy Policy",
-    route: "/privacy",
-  },
 ];
 
 export default function ProfileScreen() {
   const router = useRouter();
   const user = auth.currentUser;
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadProfileImage();
+  }, []);
+
+  const loadProfileImage = async () => {
+    try {
+      const savedImage = await AsyncStorage.getItem("profileImage");
+      if (savedImage) {
+        setProfileImage(savedImage);
+      }
+    } catch (error) {
+      console.error("Error loading profile image:", error);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      // Frage nach Erlaubnis
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "Please grant permission to access your photos"
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const imageUri = result.assets[0].uri;
+        setProfileImage(imageUri);
+        await AsyncStorage.setItem("profileImage", imageUri);
+      }
+    } catch (error) {
+      console.error("Error picking image:", error);
+      Alert.alert("Error", "Failed to pick image");
+    }
+  };
 
   const handleLogout = async () => {
     try {
@@ -48,17 +88,24 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <YStack space="$4" padding="$4">
-        {/* Profile Header */}
         <View style={styles.profileHeader}>
-          <Image
-            source={require("@/assets/Avatar.jpeg")}
-            style={styles.avatar}
-          />
+          <TouchableOpacity onPress={pickImage} style={styles.avatarContainer}>
+            <Image
+              source={
+                profileImage
+                  ? { uri: profileImage }
+                  : require("@/assets/Avatar.jpeg")
+              }
+              style={styles.avatar}
+            />
+            <View style={styles.editIconContainer}>
+              <Ionicons name="camera" size={20} color="white" />
+            </View>
+          </TouchableOpacity>
           <Text style={styles.name}>{user?.displayName || "User"}</Text>
           <Text style={styles.email}>{user?.email}</Text>
         </View>
 
-        {/* Menu Items */}
         <YStack space="$3" style={styles.menuContainer}>
           {menuItems.map((item, index) => (
             <TouchableOpacity
@@ -76,7 +123,6 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           ))}
 
-          {/* Logout Button */}
           <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
             <XStack space="$3" alignItems="center">
               <View style={styles.iconContainer}>
@@ -101,11 +147,27 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 20,
   },
+  avatarContainer: {
+    position: "relative",
+    marginBottom: 10,
+  },
   avatar: {
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginBottom: 10,
+  },
+  editIconContainer: {
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    backgroundColor: "#FF6B6B",
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#1A1A1A",
   },
   name: {
     fontSize: 24,
