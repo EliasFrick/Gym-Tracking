@@ -29,7 +29,6 @@ export const AddWorkoutActionSheet = (
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
   const [workout, setWorkout] = useState<IPickedExercises[]>();
-  const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] = useState<ICreateCustomExercise>({
     userID: firebaseUser!.uid,
@@ -111,7 +110,6 @@ export const AddWorkoutActionSheet = (
       };
 
       await setDoc(doc(workoutRef, workoutData.name), workoutData);
-      triggerRefreshDatabase();
 
       deleteWorkoutData();
       alert("Workout saved successfully!");

@@ -123,7 +123,7 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           ))}
 
-          <TouchableOpacity style={styles.menuItem} onPress={handleLogout}>
+          <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
             <XStack space="$3" alignItems="center">
               <View style={styles.iconContainer}>
                 <Ionicons name="log-out-outline" size={24} color="#FF6B6B" />
@@ -204,5 +204,13 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
     color: "white",
+  },
+  logoutItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderBottomColor: "#333",
   },
 });

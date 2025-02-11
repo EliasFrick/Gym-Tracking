@@ -21,7 +21,6 @@ export function ExerciseList({
 }: IExerciseListProps) {
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
-  const { refreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
     const fetchDefaultExercises = async () => {
@@ -39,7 +38,7 @@ export function ExerciseList({
 
     fetchDefaultExercises();
     fetchCustomUserExercises();
-  }, [refreshDatabase]);
+  });
 
   const selectExercise = (
     id: string,

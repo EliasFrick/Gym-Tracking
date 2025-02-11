@@ -199,7 +199,6 @@ const DeletePopover = (props: IEditCardPopover) => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
-  const { triggerRefreshDatabase } = useContext(AppConfigContext);
 
   useEffect(() => {
     const handleDeleteWorkout = () => {
@@ -223,7 +222,6 @@ const DeletePopover = (props: IEditCardPopover) => {
       await deleteDoc(workoutDocRef);
 
       alert("Workout deleted successfully!");
-      triggerRefreshDatabase();
       setShowAlertDialog(false);
       props.setShowDeletePopover(false);
     } catch (error) {
