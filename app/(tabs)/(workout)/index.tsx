@@ -14,15 +14,33 @@ import { fetchUserWorkouts } from "@/database/fetchWorkouts";
 import { AppConfigContext } from "@/context/AppConfigProvider";
 import { TamaguiPopOver } from "@/components/ui/TamaguiPopOver";
 import { scale } from "react-native-size-matters";
+import { firestoreDB, auth } from "@/database/Firebaseconfig";
 
 const { width, height } = Dimensions.get("window");
 
 export default function indexScreen() {
   const [workout, setWorkout] = useState<IExerciseCard[]>();
   const navigation = useNavigation();
+  const user = auth.currentUser;
 
   // Neuen Zustand für den Popover hinzufügen:
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+
+  // Workouts beim Laden der Komponente abrufen
+  useEffect(() => {
+    const loadWorkouts = async () => {
+      if (user) {
+        try {
+          const userWorkouts = await fetchUserWorkouts();
+          setWorkout(userWorkouts);
+        } catch (error) {
+          console.error("Fehler beim Laden der Workouts:", error);
+        }
+      }
+    };
+
+    loadWorkouts();
+  }, [user]); // Abhängigkeit von user hinzugefügt
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
