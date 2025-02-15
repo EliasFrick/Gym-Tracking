@@ -8,27 +8,30 @@ interface AppConfigContextType {
   syncDataNow: () => Promise<void>;
 }
 
-export const AppConfigContext = createContext<AppConfigContextType | undefined>(
-  undefined
-);
+export const AppConfigContext = createContext<AppConfigContextType>({
+  isOnline: false,
+  lastSync: null,
+  syncDataNow: async () => {},
+});
 
 export function AppConfigProvider({ children }: { children: React.ReactNode }) {
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
 
   useEffect(() => {
-    // Initial sync on app start
-    syncData().then(() => setLastSync(new Date()));
-
-    // Subscribe to network state changes
-    const unsubscribe = NetInfo.addEventListener((state) => {
-      setIsOnline(state.isConnected ?? false);
-      if (state.isConnected) {
-        syncData().then(() => setLastSync(new Date()));
-      }
+    // Initial check
+    NetInfo.fetch().then((state) => {
+      setIsOnline(!!state.isConnected);
     });
 
-    return () => unsubscribe();
+    // Subscribe to network state updates
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      setIsOnline(!!state.isConnected);
+    });
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const syncDataNow = async () => {

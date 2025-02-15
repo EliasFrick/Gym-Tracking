@@ -15,6 +15,7 @@ import { AppConfigContext } from "@/context/AppConfigProvider";
 import { TamaguiPopOver } from "@/components/ui/TamaguiPopOver";
 import { scale } from "react-native-size-matters";
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
+import { getLocalWorkouts, syncWorkouts } from "../../database/localWorkouts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,6 +23,7 @@ export default function indexScreen() {
   const [workout, setWorkout] = useState<IExerciseCard[]>();
   const navigation = useNavigation();
   const user = auth.currentUser;
+  const { isOnline, syncDataNow } = useContext(AppConfigContext);
 
   // Neuen Zustand für den Popover hinzufügen:
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
@@ -29,43 +31,31 @@ export default function indexScreen() {
   // Workouts beim Laden der Komponente abrufen
   useEffect(() => {
     const loadWorkouts = async () => {
-      if (user) {
-        try {
-          const userWorkouts = await fetchUserWorkouts();
-          setWorkout(userWorkouts);
-        } catch (error) {
-          console.error("Fehler beim Laden der Workouts:", error);
+      try {
+        // Erst lokale Workouts laden
+        const localWorkouts = await getLocalWorkouts();
+        setWorkout(localWorkouts);
+
+        // Wenn online, dann mit Server synchronisieren
+        if (user && isOnline) {
+          const serverWorkouts = await fetchUserWorkouts();
+          await syncWorkouts(serverWorkouts);
+          setWorkout(serverWorkouts);
+          await syncDataNow();
         }
+      } catch (error) {
+        console.error("Fehler beim Laden der Workouts:", error);
       }
     };
 
     loadWorkouts();
-  }, [user]); // Abhängigkeit von user hinzugefügt
+  }, [user, isOnline]);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false, // Wir bauen den Header selbst im Render-Bereich
     });
   }, [navigation]);
-
-  const items = [
-    { name: "Chest" },
-    { name: "Upper Chest" },
-    { name: "Lower Chest" },
-    { name: "Biceps" },
-    { name: "Back" },
-    { name: "Lats" },
-    { name: "Traps" },
-    { name: "Leg" },
-    { name: "Glutes" },
-    { name: "Shoulder" },
-    { name: "Triceps" },
-    { name: "Abs" },
-    { name: "Forearms" },
-    { name: "Calves" },
-    { name: "Neck" },
-    { name: "Obliques" },
-  ];
 
   return (
     <TouchableWithoutFeedback

@@ -58,6 +58,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
 
   // Load saved progress when opening
   useEffect(() => {
+    console.log("props", props);
     const loadSavedProgress = async () => {
       if (!props.payload?.workoutId) return;
 
@@ -92,14 +93,12 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
 
     try {
       const exercisesList = props.payload.currentWorkout.map((exercise) => {
-        console.log("Exercise being processed:", exercise); // Debug log
         return {
           id: exercise.id,
           name: exercise.name,
           sets: [{ reps: "", weight: "" }],
         };
       });
-      console.log("Exercises list:", exercisesList); // Debug log
       setExercises(exercisesList);
 
       // If there's no saved data, initialize new workout log
@@ -320,20 +319,20 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                   </View>
                 );
               })}
+            {/* Add Set Button */}
+
+            <Button
+              icon={Plus}
+              onPress={() => currentExercise && addSet(currentExercise.id)}
+              style={styles.addSetButton}
+            >
+              Add Set
+            </Button>
           </ScrollView>
         </View>
 
         {/* Buttons Section */}
         <View style={styles.buttonsContainer}>
-          {/* Add Set Button */}
-          <Button
-            icon={Plus}
-            onPress={() => currentExercise && addSet(currentExercise.id)}
-            style={styles.addSetButton}
-          >
-            Add Set
-          </Button>
-
           {/* Save Button */}
           <Button
             theme="active"
@@ -349,7 +348,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
             onPress={handleReset}
             style={styles.resetButton}
           >
-            Delete Current Workout
+            Cancel Current Workout
           </Button>
         </View>
       </View>
