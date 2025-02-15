@@ -140,8 +140,6 @@ export async function getOfflineUserWorkoutWithId(workoutId: string) {
       (workout: { id: string }) => workout.id === workoutId
     );
 
-    console.log("filteredWorkouts", filteredWorkouts[0].exercises);
-
     return filteredWorkouts;
   } catch (error) {
     console.error("Error getting offline user workouts:", error);

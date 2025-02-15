@@ -15,7 +15,7 @@ import { AppConfigContext } from "@/context/AppConfigProvider";
 import { TamaguiPopOver } from "@/components/ui/TamaguiPopOver";
 import { scale } from "react-native-size-matters";
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
-import { getLocalWorkouts, syncWorkouts } from "../../database/localWorkouts";
+import { getLocalWorkouts, syncWorkouts } from "../../../utils/localWorkouts";
 
 const { width, height } = Dimensions.get("window");
 
