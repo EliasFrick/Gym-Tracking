@@ -21,10 +21,14 @@ import EventEmitter from "@/components/EventListener";
 import { collection, doc, deleteDoc, setDoc, getDoc } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { getAuth } from "firebase/auth";
-import { AppConfigContext } from "@/context/AppConfigProvider";
+import { AppConfigContext, useAppConfig } from "@/context/AppConfigProvider";
 import { Animated } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { AppplicationContext } from "@/context/ApplicationProvider";
+import {
+  getOfflineUserWorkouts,
+  getOfflineUserWorkoutWithId,
+} from "@/utils/offlineStorage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -101,6 +105,7 @@ const ExerciseCard = memo(
       useContext(AppplicationContext);
     const auth = getAuth();
     const firebaseUser = auth.currentUser;
+    const { isOnline } = useAppConfig();
 
     const handleLongPress = useCallback(() => {
       setShowDeletePopover(true);
@@ -124,27 +129,37 @@ const ExerciseCard = memo(
 
     const findWorkoutWithID = async () => {
       try {
-        const workoutRef = collection(firestoreDB, "User");
-        const workoutUserRef = doc(workoutRef, firebaseUser?.uid);
-        const workoutCollectionRef = collection(workoutUserRef, "Workouts");
-        const workoutDocRef = doc(workoutCollectionRef, props.id);
-        const workoutDoc = await getDoc(workoutDocRef);
+        if (isOnline) {
+          const workoutRef = collection(firestoreDB, "User");
+          const workoutUserRef = doc(workoutRef, firebaseUser?.uid);
+          const workoutCollectionRef = collection(workoutUserRef, "Workouts");
+          const workoutDocRef = doc(workoutCollectionRef, props.id);
+          const workoutDoc = await getDoc(workoutDocRef);
 
-        if (workoutDoc.exists()) {
-          const workoutData = workoutDoc.data();
+          if (workoutDoc.exists()) {
+            const workoutData = workoutDoc.data();
 
-          if (Array.isArray(workoutData?.exercises)) {
-            setCurrentWorkout(workoutData.exercises);
-            return workoutData.exercises;
+            if (Array.isArray(workoutData?.exercises)) {
+              setCurrentWorkout(workoutData.exercises);
+              return workoutData.exercises;
+            }
+          } else {
+            console.log("Workout not found!");
           }
         } else {
-          console.log("Workout not found!");
+          const offlineWorkout = await getOfflineUserWorkoutWithId(props.id);
+          setCurrentWorkout(offlineWorkout);
+          return offlineWorkout;
         }
       } catch (error) {
         console.error("Error fetching workout: ", error);
         throw error;
       }
     };
+
+    /*  const findOfflineWorkouts = async () => {
+      return await getOfflineUserWorkouts();
+    }; */
 
     return (
       <View
