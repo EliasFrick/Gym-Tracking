@@ -25,10 +25,7 @@ import { AppConfigContext, useAppConfig } from "@/context/AppConfigProvider";
 import { Animated } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import { AppplicationContext } from "@/context/ApplicationProvider";
-import {
-  getOfflineUserWorkouts,
-  getOfflineUserWorkoutWithId,
-} from "@/utils/offlineStorage";
+import { getOfflineUserWorkoutWithId } from "@/utils/offlineStorage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -141,6 +138,7 @@ const ExerciseCard = memo(
 
             if (Array.isArray(workoutData?.exercises)) {
               setCurrentWorkout(workoutData.exercises);
+              console.log("workoutData.exercises", workoutData.exercises);
               return workoutData.exercises;
             }
           } else {
@@ -149,17 +147,14 @@ const ExerciseCard = memo(
         } else {
           const offlineWorkout = await getOfflineUserWorkoutWithId(props.id);
           setCurrentWorkout(offlineWorkout);
-          return offlineWorkout;
+          console.log("offlineWorkout", offlineWorkout[0].exercises);
+          return offlineWorkout[0].exercises;
         }
       } catch (error) {
         console.error("Error fetching workout: ", error);
         throw error;
       }
     };
-
-    /*  const findOfflineWorkouts = async () => {
-      return await getOfflineUserWorkouts();
-    }; */
 
     return (
       <View

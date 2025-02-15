@@ -58,8 +58,8 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
 
   // Load saved progress when opening
   useEffect(() => {
-    console.log("props", props);
-    const loadSavedProgress = async () => {
+    /*     console.log("props", props);
+     */ const loadSavedProgress = async () => {
       if (!props.payload?.workoutId) return;
 
       const savedProgress = await getWorkoutProgress(props.payload.workoutId);
