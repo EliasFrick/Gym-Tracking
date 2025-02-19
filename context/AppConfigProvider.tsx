@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { syncData } from "@/utils/offlineStorage";
+import { processPendingWorkouts } from "@/utils/localWorkouts";
 
 interface AppConfigContextType {
   isOnline: boolean;
@@ -34,9 +35,21 @@ export function AppConfigProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    // Wenn wir wieder online gehen, synchronisieren wir die Daten
+    if (isOnline) {
+      syncDataNow();
+    }
+  }, [isOnline]);
+
   const syncDataNow = async () => {
-    await syncData();
-    setLastSync(new Date());
+    try {
+      await processPendingWorkouts(); // Sync pending workouts first
+      await syncData(); // Your existing sync logic
+      setLastSync(new Date());
+    } catch (error) {
+      console.error("Sync failed:", error);
+    }
   };
 
   return (

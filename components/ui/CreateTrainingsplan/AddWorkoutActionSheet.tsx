@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
   View,
+  ScrollView,
 } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
@@ -16,10 +17,12 @@ import {
   ICreateCustomExercise,
   IPickedExercises,
   IWorkoutInfrmations,
+  IExerciseCard,
 } from "@/types/interfaces";
 import { getAuth } from "firebase/auth";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { collection, doc, setDoc as firebaseSetDoc } from "firebase/firestore";
+import { addWorkoutToQueue } from "@/utils/localWorkouts";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,6 +32,7 @@ export const AddWorkoutActionSheet = (
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
   const [workout, setWorkout] = useState<IPickedExercises[]>();
+  const { isOnline } = useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] = useState<ICreateCustomExercise>({
     userID: firebaseUser!.uid,
@@ -125,45 +129,47 @@ export const AddWorkoutActionSheet = (
   };
 
   return (
-    // Um die Tastatur zu schließen, wenn irgendwo getippt wird,
-    // wird der Inhalt in TouchableWithoutFeedback gewrappt.
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ActionSheet
-        containerStyle={{
-          height: height * 0.85,
-          backgroundColor: "rgb(48, 48, 49)",
-        }}
-        gestureEnabled={false}
-        indicatorStyle={{
-          backgroundColor: "white",
-        }}
-      >
-        <XStack
-          justifyContent="space-between"
-          width="100%"
-          paddingHorizontal={10}
-        >
-          <TouchableWithoutFeedback onPress={closeWorkoutActionSheet}>
-            <AntDesign name="close" size={width * 0.1} color="white" />
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={saveWorkoutInDB}>
-            <AntDesign name="save" size={width * 0.1} color="white" />
-          </TouchableWithoutFeedback>
-        </XStack>
-        <View>
-          <AddWorkoutComponent
-            title={custmoWorkout.name}
-            setTitle={(title) => updateCustomWorkout("name", title)}
-            description={customExercise.description}
-            setDescription={(desc) => updateCustomWorkout("description", desc)}
-            image={customExercise.image}
-            setImage={(img) => updateCustomWorkout("image", img)}
-            informations={workout}
-            setInformations={setWorkout}
-          />
-        </View>
-      </ActionSheet>
-    </TouchableWithoutFeedback>
+    <ActionSheet
+      containerStyle={{
+        height: height * 0.85,
+        backgroundColor: "rgb(48, 48, 49)",
+      }}
+      gestureEnabled={false}
+      indicatorStyle={{
+        backgroundColor: "white",
+      }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+        <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }}>
+          <XStack
+            justifyContent="space-between"
+            width="100%"
+            paddingHorizontal={10}
+          >
+            <TouchableWithoutFeedback onPress={closeWorkoutActionSheet}>
+              <AntDesign name="close" size={width * 0.1} color="white" />
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={saveWorkoutInDB}>
+              <AntDesign name="save" size={width * 0.1} color="white" />
+            </TouchableWithoutFeedback>
+          </XStack>
+          <View>
+            <AddWorkoutComponent
+              title={custmoWorkout.name}
+              setTitle={(title) => updateCustomWorkout("name", title)}
+              description={customExercise.description}
+              setDescription={(desc) =>
+                updateCustomWorkout("description", desc)
+              }
+              image={customExercise.image}
+              setImage={(img) => updateCustomWorkout("image", img)}
+              informations={workout}
+              setInformations={setWorkout}
+            />
+          </View>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </ActionSheet>
   );
 };
 
