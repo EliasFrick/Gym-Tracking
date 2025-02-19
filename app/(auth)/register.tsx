@@ -16,7 +16,7 @@ import { IUser, IUserRegisterCredentials } from "@/types/interfaces";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig";
 import { firestoreDB } from "@/database/Firebaseconfig";
-import { doc, setDoc as firebaseSetDoc } from "firebase/firestore";
+import { doc, setDoc as firebaseSetDoc, collection, getDocs, query, where } from "firebase/firestore";
 import { CustomDropDown } from "@/components/ui/CreateTrainingsplan/CustomDropDown";
 import { Button } from "react-native";
 import DatePicker from "react-native-date-picker";
@@ -60,6 +60,19 @@ const RegisterScreen = () => {
     return emailRegex.test(email);
   };
 
+  const checkUsernameExists = async (username: string) => {
+    try {
+      const usersRef = collection(firestoreDB, "User");
+      const q = query(usersRef, where("userName", "==", username));
+      const querySnapshot = await getDocs(q);
+      
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error("Error checking username:", error);
+      throw error;
+    }
+  };
+
   const tryRegister = async () => {
     if (!isValidEmail(userCredentials.email)) {
       alert("Please enter a valid email address");
@@ -71,46 +84,47 @@ const RegisterScreen = () => {
       return;
     }
 
-    if (
-      userCredentials.password === "" ||
-      userCredentials.password !== userCredentials.passwordConfirm
-    ) {
-      alert("Passworts are not the same");
-    } else {
-      try {
-        const auth = getAuth(app);
-        await createUserWithEmailAndPassword(
-          auth,
-          userCredentials.email,
-          userCredentials.password
-        )
-          .then((userCredential) => {
-            // Signed up
-            const user = userCredential.user;
-            saveUserInformations(user.uid, {
-              email: userCredentials.email,
-              firstname: userCredentials.firstname,
-              lastname: userCredentials.lastname,
-              uId: user.uid,
-              birthDate: userCredentials.birthDate,
-              userName: userCredentials.userName,
-            });
-            router.replace("/");
-          })
-          .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.error(
-              "Error Code: ",
-              errorCode,
-              " Error Message: ",
-              errorMessage
-            );
-            alert(errorMessage.substring(9));
-            // ..
-          });
-      } catch (error) {
-        console.error("Error: ", error);
+    try {
+      // Prüfe ob Username bereits existiert
+      const usernameExists = await checkUsernameExists(userCredentials.userName);
+      if (usernameExists) {
+        alert("This username is already taken. Please choose another one.");
+        return;
+      }
+
+      if (
+        userCredentials.password === "" ||
+        userCredentials.password !== userCredentials.passwordConfirm
+      ) {
+        alert("Passwords are not the same");
+        return;
+      }
+
+      const auth = getAuth(app);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        userCredentials.email,
+        userCredentials.password
+      );
+
+      // Wenn die Registrierung erfolgreich war
+      const user = userCredential.user;
+      await saveUserInformations(user.uid, {
+        email: userCredentials.email,
+        firstname: userCredentials.firstname,
+        lastname: userCredentials.lastname,
+        uId: user.uid,
+        birthDate: userCredentials.birthDate,
+        userName: userCredentials.userName,
+      });
+      
+      router.replace("/");
+    } catch (error: any) {
+      console.error("Error: ", error);
+      if (error.code === "auth/email-already-in-use") {
+        alert("This email is already registered");
+      } else {
+        alert(error.message.substring(9));
       }
     }
   };

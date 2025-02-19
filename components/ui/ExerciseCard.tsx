@@ -29,10 +29,6 @@ import { getOfflineUserWorkoutWithId } from "@/utils/offlineStorage";
 
 const { width, height } = Dimensions.get("window");
 
-interface ExerciseCardProps extends CardProps {
-  exerciseCard: IExerciseCard & { rotation?: string };
-}
-
 const AlertDialogDemo = memo(
   ({
     title,
@@ -138,7 +134,6 @@ const ExerciseCard = memo(
 
             if (Array.isArray(workoutData?.exercises)) {
               setCurrentWorkout(workoutData.exercises);
-              console.log("workoutData.exercises", workoutData.exercises);
               return workoutData.exercises;
             }
           } else {
@@ -147,7 +142,6 @@ const ExerciseCard = memo(
         } else {
           const offlineWorkout = await getOfflineUserWorkoutWithId(props.id);
           setCurrentWorkout(offlineWorkout);
-          console.log("offlineWorkout", offlineWorkout[0].exercises);
           return offlineWorkout[0].exercises;
         }
       } catch (error) {
