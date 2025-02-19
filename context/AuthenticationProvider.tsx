@@ -71,8 +71,9 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
     if (loading) return;
 
     if (
-      user &&
-      rootSegments !== "(app)" &&
+      user && 
+      rootSegments !== "(app)" && 
+      rootSegments !== "(modals)" &&  // Füge (modals) als erlaubten Pfad hinzu
       rootSegments !== "workout-details"
     ) {
       router.replace("/");

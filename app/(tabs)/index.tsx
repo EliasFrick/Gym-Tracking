@@ -5,6 +5,7 @@ import {
   Dimensions,
   FlatList,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import { Text, Card } from "tamagui";
 import { collection, query, orderBy, getDocs } from "firebase/firestore";
@@ -12,13 +13,18 @@ import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
 import { useAppConfig } from "@/context/AppConfigProvider";
-
+import { Ionicons } from "@expo/vector-icons";
+import { SheetManager } from "react-native-actions-sheet";
+/* import { gemini15Flash, googleAI } from "@genkit-ai/googleai";
+import { genkit } from "genkit";
+ */
 const { width, height } = Dimensions.get("window");
 
 interface WorkoutHistoryItem {
   id: string;
   date: string;
   workoutId: string;
+  workoutName: string;
   exercises: {
     [key: string]: { reps: string; weight: string }[];
   };
@@ -83,6 +89,14 @@ export default function TabOneScreen() {
     });
   };
 
+  const openAnalysisSheet = () => {
+    SheetManager.show("workout-analysis-sheet", {
+      payload: {
+        workoutHistory: workoutHistory,
+      },
+    });
+  };
+
   const renderWorkoutCard = ({ item }: { item: WorkoutHistoryItem }) => {
     const exerciseCount = Object.keys(item.exercises).length;
     const totalSets = Object.values(item.exercises).reduce(
@@ -120,6 +134,12 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.analyzeButton}
+        onPress={openAnalysisSheet}
+      >
+        <Text style={styles.analyzeButtonText}>Analyze with AI</Text>
+      </TouchableOpacity>
       <FlatList
         data={workoutHistory}
         renderItem={renderWorkoutCard}
@@ -142,5 +162,29 @@ const styles = StyleSheet.create({
   listContainer: {
     alignItems: "center",
     paddingVertical: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 15,
+    backgroundColor: "#242424",
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "white",
+  },
+  analyzeButton: {
+    backgroundColor: "red",
+    padding: 12,
+    borderRadius: 8,
+    margin: 16,
+    alignItems: "center",
+  },
+  analyzeButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
