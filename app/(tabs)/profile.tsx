@@ -1,14 +1,30 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Button,
+} from "react-native";
 import { Text, YStack, XStack } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
-import { auth } from "@/database/Firebaseconfig";
-import { useRouter } from "expo-router";
+import { auth, storage } from "@/database/Firebaseconfig";
+import { router, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { firestoreDB } from "@/database/Firebaseconfig";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { updateDoc, doc, getDoc } from "firebase/firestore"; // updateDoc falls du auch Firestore updaten möchtest
+import { LineGraph } from "react-native-graph";
 
 const menuItems = [
   {
+    icon: "analytics-outline",
+    title: "AI Results",
+    onPress: () => router.push("/(modals)/ai-results"),
+  },
+  /* {
     icon: "person-outline",
     title: "Personal Data",
     route: "/personal-data",
@@ -17,35 +33,56 @@ const menuItems = [
     icon: "settings-outline",
     title: "Settings",
     route: "/settings",
-  },
+  }, */
 ];
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const user = auth.currentUser;
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [username, setUsername] = useState<string>("");
+  const user = auth.currentUser;
+  const [inputText, setInputText] = useState("Hey Gemini mein name ist Elias");
+  const [responseText, setResponseText] = useState("gg");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadProfileImage();
-  }, []);
+    const loadUserData = async () => {
+      try {
+        // Lade gespeichertes Profilbild
+        const savedImage = await AsyncStorage.getItem("profileImage");
+        if (savedImage) {
+          setProfileImage(savedImage);
+        }
 
-  const loadProfileImage = async () => {
-    try {
-      const savedImage = await AsyncStorage.getItem("profileImage");
-      if (savedImage) {
-        setProfileImage(savedImage);
+        // Versuche zuerst den Username aus dem LocalStorage zu laden
+        const cachedUsername = await AsyncStorage.getItem("userName");
+        if (cachedUsername) {
+          setUsername(cachedUsername);
+        }
+
+        // Wenn online, aktualisiere den Username aus Firestore
+        if (user) {
+          const userDoc = await getDoc(doc(firestoreDB, "User", user.uid));
+          if (userDoc.exists()) {
+            const firestoreUsername = userDoc.data().userName;
+            setUsername(firestoreUsername);
+            // Speichere den aktuellen Username im LocalStorage
+            await AsyncStorage.setItem("userName", firestoreUsername);
+          }
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
       }
-    } catch (error) {
-      console.error("Error loading profile image:", error);
-    }
-  };
+    };
+
+    loadUserData();
+  }, [user]);
 
   const pickImage = async () => {
     try {
       // Frage nach Erlaubnis
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-
       if (status !== "granted") {
         Alert.alert(
           "Permission needed",
@@ -54,6 +91,7 @@ export default function ProfileScreen() {
         return;
       }
 
+      // Starte den ImagePicker
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -62,9 +100,24 @@ export default function ProfileScreen() {
       });
 
       if (!result.canceled) {
-        const imageUri = result.assets[0].uri;
-        setProfileImage(imageUri);
-        await AsyncStorage.setItem("profileImage", imageUri);
+        const localUri = result.assets[0].uri;
+
+        // Lade das Bild in Firebase Storage hoch und hole die URL
+        const firebaseUrl = await uploadImageToFirebase(localUri);
+
+        if (firebaseUrl) {
+          setProfileImage(firebaseUrl);
+          await AsyncStorage.setItem("profileImage", firebaseUrl);
+
+          // Optional: Aktualisiere das User-Dokument in Firestore mit der neuen Profilbild-URL
+          if (user) {
+            await updateDoc(doc(firestoreDB, "User", user.uid), {
+              profileImage: firebaseUrl,
+            });
+          }
+        } else {
+          Alert.alert("Upload Error", "Failed to upload image to Firebase");
+        }
       }
     } catch (error) {
       console.error("Error picking image:", error);
@@ -85,6 +138,30 @@ export default function ProfileScreen() {
     router.push(route);
   };
 
+  const uploadImageToFirebase = async (uri: string): Promise<string | null> => {
+    if (!user) return null;
+    try {
+      // Hole den Blob aus dem URI
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      // Erstelle einen Storage-Ref, z.B. unter "profilePhotos/{userId}.jpg"
+      const storageRef = ref(storage, `profilePhotos/${user.uid}.jpg`);
+
+      // Lade den Blob hoch
+      await uploadBytes(storageRef, blob);
+
+      // Hole die Download-URL
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (error) {
+      console.error("Fehler beim Upload des Bildes:", error);
+      return null;
+    }
+  };
+
+ 
+
   return (
     <View style={styles.container}>
       <YStack space="$4" padding="$4">
@@ -98,20 +175,19 @@ export default function ProfileScreen() {
               }
               style={styles.avatar}
             />
+
             <View style={styles.editIconContainer}>
               <Ionicons name="camera" size={20} color="white" />
             </View>
           </TouchableOpacity>
-          <Text style={styles.name}>{user?.displayName || "User"}</Text>
-          <Text style={styles.email}>{user?.email}</Text>
+          <Text style={styles.name}>{username || "Loading..."}</Text>
         </View>
-
         <YStack space="$3" style={styles.menuContainer}>
           {menuItems.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={styles.menuItem}
-              onPress={() => handleMenuItemPress(item.route)}
+              onPress={item.onPress}
             >
               <XStack space="$3" alignItems="center">
                 <View style={styles.iconContainer}>
