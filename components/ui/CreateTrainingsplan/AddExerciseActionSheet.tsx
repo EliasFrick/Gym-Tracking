@@ -61,7 +61,6 @@ export const AddExerciseActionSheet = (
   const saveExercise = async () => {
     try {
       await saveCustomExercise();
-
     } catch (err) {
       console.error("Error adding document: ", err);
     }
@@ -136,11 +135,16 @@ export const AddExerciseActionSheet = (
           <TouchableOpacity
             onPress={() => closeExerciseActionSheet()}
             activeOpacity={1}
+            style={{ padding: 10 }}
           >
-            <AntDesign name="close" size={width * 0.1} color="black" />
+            <AntDesign name="close" size={width * 0.1} color="grey" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={saveExercise} activeOpacity={1}>
-            <AntDesign name="save" size={width * 0.1} color="black" />
+          <TouchableOpacity
+            onPress={saveExercise}
+            activeOpacity={1}
+            style={{ padding: 10 }}
+          >
+            <AntDesign name="save" size={width * 0.1} color="grey" />
           </TouchableOpacity>
         </XStack>
         <AddExerciseComponent

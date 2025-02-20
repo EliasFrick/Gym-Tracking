@@ -5,6 +5,8 @@ import {
   Dimensions,
   ScrollView,
   ActivityIndicator,
+  Modal,
+  TouchableOpacity,
 } from "react-native";
 import { Text, Card } from "tamagui";
 import { Stack, useRouter } from "expo-router";
@@ -12,7 +14,8 @@ import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { AntDesign } from "@expo/vector-icons";
 import { LineGraph } from "react-native-graph";
-const { width } = Dimensions.get("window");
+
+const { width, height } = Dimensions.get("window");
 
 interface AIResult {
   id: string;
@@ -31,6 +34,7 @@ interface AIResult {
 export default function AIResultsScreen() {
   const [results, setResults] = useState<AIResult[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedResult, setSelectedResult] = useState<AIResult | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -62,10 +66,6 @@ export default function AIResultsScreen() {
     }
   };
 
-  const handleClose = () => {
-    router.push("/(tabs)/profile");
-  };
-
   const testData = [
     {
       value: 1,
@@ -93,24 +93,12 @@ export default function AIResultsScreen() {
     },
   ];
 
-  const renderResultCard = (result: AIResult) => {
-    const graphPoints = result.workoutData.analyzedWorkouts.map(
-      (workout, index) => ({
-        date: new Date(workout.date),
-        value: parseFloat(workout.weight) || 0,
-      })
-    );
-
-    return (
+  const renderCompactCard = (result: AIResult) => (
+    <TouchableOpacity key={result.id} onPress={() => setSelectedResult(result)}>
       <Card
-        key={result.id}
         elevate
         size="$4"
-        animation="bouncy"
         width={width * 0.9}
-        scale={0.9}
-        hoverStyle={{ scale: 0.925 }}
-        pressStyle={{ scale: 0.875 }}
         margin={10}
         backgroundColor="#242424"
       >
@@ -118,14 +106,6 @@ export default function AIResultsScreen() {
           <Text color="white" fontSize={16} fontWeight="bold">
             Analysis from {result.timestamp.toDate().toLocaleDateString()}
           </Text>
-          {graphPoints.length > 0 && (
-            <LineGraph
-              points={testData}
-              color="#4484B2"
-              animated={false}
-              style={{ height: 200 }}
-            />
-          )}
           <Text color="#888" fontSize={14} marginTop={5}>
             Weight: {result.workoutData.weight}kg • Height:{" "}
             {result.workoutData.height}cm
@@ -134,14 +114,54 @@ export default function AIResultsScreen() {
             Diet: {result.workoutData.diet}
           </Text>
         </Card.Header>
-        <Card.Footer padded>
-          <Text color="white" fontSize={14} lineHeight={20}>
-            {result.analysis}
-          </Text>
-        </Card.Footer>
       </Card>
-    );
-  };
+    </TouchableOpacity>
+  );
+
+  const renderDetailModal = () => (
+    <Modal
+      visible={!!selectedResult}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={() => setSelectedResult(null)}
+    >
+      <View style={styles.modalContainer}>
+        <View style={styles.modalContent}>
+          <TouchableOpacity
+            style={styles.closeButton}
+            onPress={() => setSelectedResult(null)}
+          >
+            <AntDesign name="close" size={24} color="white" />
+          </TouchableOpacity>
+
+          {selectedResult && (
+            <ScrollView style={styles.modalScroll}>
+              <Text style={styles.modalDate}>
+                {selectedResult.timestamp.toDate().toLocaleDateString()}
+              </Text>
+
+              <LineGraph
+                points={testData}
+                color="#4484B2"
+                animated={false}
+                style={{ height: 200, marginVertical: 20 }}
+              />
+
+              <Text style={styles.modalStats}>
+                Weight: {selectedResult.workoutData.weight}kg {"\n"}
+                Height: {selectedResult.workoutData.height}cm {"\n"}
+                Diet: {selectedResult.workoutData.diet}
+              </Text>
+
+              <Text style={styles.modalAnalysis}>
+                {selectedResult.analysis}
+              </Text>
+            </ScrollView>
+          )}
+        </View>
+      </View>
+    </Modal>
+  );
 
   return (
     <>
@@ -159,7 +179,7 @@ export default function AIResultsScreen() {
               size={24}
               color="white"
               style={{ marginLeft: 10 }}
-              onPress={handleClose}
+              onPress={() => router.push("/(tabs)/profile")}
             />
           ),
         }}
@@ -172,7 +192,7 @@ export default function AIResultsScreen() {
         ) : (
           <ScrollView contentContainerStyle={styles.scrollContent}>
             {results.length > 0 ? (
-              results.map((result) => renderResultCard(result))
+              results.map(renderCompactCard)
             ) : (
               <Text
                 color="white"
@@ -185,6 +205,7 @@ export default function AIResultsScreen() {
             )}
           </ScrollView>
         )}
+        {renderDetailModal()}
       </View>
     </>
   );
@@ -203,5 +224,43 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#242424",
+    width: width * 0.9,
+    height: height * 0.8,
+    borderRadius: 20,
+    padding: 20,
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    padding: 10,
+  },
+  modalScroll: {
+    flex: 1,
+  },
+  modalDate: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalStats: {
+    color: "#888",
+    fontSize: 16,
+    marginVertical: 10,
+    lineHeight: 24,
+  },
+  modalAnalysis: {
+    color: "white",
+    fontSize: 16,
+    lineHeight: 24,
+    marginTop: 20,
   },
 });
