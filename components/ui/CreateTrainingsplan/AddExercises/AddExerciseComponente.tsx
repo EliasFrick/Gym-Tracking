@@ -14,7 +14,6 @@ import { ExerciseComponentProps } from "@/types/interfaces";
 const { width, height } = Dimensions.get("window");
 
 export function AddExerciseComponent({
-  items,
   title,
   setTitle,
   description,
@@ -40,45 +39,41 @@ export function AddExerciseComponent({
   return (
     <View>
       <View style={styles.inputContainer}>
-        <Text style={{ marginBottom: 8 }}>Title:</Text>
+        <Text style={[styles.label, { color: "#E0E0E0" }]}>Title:</Text>
         <Input
           style={{
             width: width * 0.9,
             height: height * 0.05,
+            color: "#FFFFFF",
           }}
-          placeholder={`Name of Exercise...`}
+          placeholderTextColor="#A0A0A0"
+          placeholder="Name of Exercise..."
           value={title}
           onChangeText={(text) => setTitle(text)}
         />
       </View>
       <View style={styles.inputContainer}>
-        <Text style={{ marginBottom: 8 }}>Description:</Text>
-        <View
-          style={{
-            width: width * 0.9,
-          }}
-        >
+        <Text style={[styles.label, { color: "#E0E0E0" }]}>Description:</Text>
+        <View style={{ width: width * 0.9 }}>
           <TextArea
             placeholder="Description..."
             style={{
               height: height * 0.15,
+              color: "#FFFFFF",
             }}
+            placeholderTextColor="#A0A0A0"
             value={description}
             onChangeText={(text) => setDescription(text)}
           />
         </View>
       </View>
 
-      <View style={styles.inputContainer}>
-        <Text>Add Picture:</Text>
-        <View
-          style={{
-            flexDirection: "row",
-          }}
-        >
+      {/*  <View style={styles.inputContainer}>
+        <Text style={[styles.label, { color: "#E0E0E0" }]}>Add Picture:</Text>
+        <View style={{ flexDirection: "row" }}>
           <Button alignSelf="center" size="$6" onPress={pickImage}>
-            <AntDesign name="cloudupload" size={24} color="black" />
-            <Text>Add Picture</Text>
+            <AntDesign name="cloudupload" size={24} color="white" />
+            <Text style={{ color: "#FFFFFF" }}>Add Picture</Text>
           </Button>
           {image && (
             <View style={{ alignItems: "center", marginTop: 10 }}>
@@ -86,7 +81,7 @@ export function AddExerciseComponent({
             </View>
           )}
         </View>
-      </View>
+      </View> */}
     </View>
   );
 }
@@ -110,5 +105,8 @@ const styles = StyleSheet.create({
   image: {
     width: width * 0.3,
     height: width * 0.3,
+  },
+  label: {
+    marginBottom: 8,
   },
 });

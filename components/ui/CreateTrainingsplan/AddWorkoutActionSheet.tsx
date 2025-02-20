@@ -6,6 +6,8 @@ import {
   TouchableWithoutFeedback,
   View,
   ScrollView,
+  Text,
+  TouchableOpacity,
 } from "react-native";
 import { SheetManager } from "react-native-actions-sheet";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
@@ -140,18 +142,21 @@ export const AddWorkoutActionSheet = (
       }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <ScrollView keyboardShouldPersistTaps="handled" style={{ flex: 1 }}>
+        <ScrollView>
           <XStack
             justifyContent="space-between"
             width="100%"
             paddingHorizontal={10}
           >
-            <TouchableWithoutFeedback onPress={closeWorkoutActionSheet}>
-              <AntDesign name="close" size={width * 0.1} color="white" />
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={saveWorkoutInDB}>
-              <AntDesign name="save" size={width * 0.1} color="white" />
-            </TouchableWithoutFeedback>
+            <TouchableOpacity
+              onPress={closeWorkoutActionSheet}
+              style={{ padding: 10 }}
+            >
+              <AntDesign name="close" size={width * 0.1} color="grey" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={saveWorkoutInDB} style={{ padding: 10 }}>
+              <AntDesign name="save" size={width * 0.1} color="grey" />
+            </TouchableOpacity>
           </XStack>
           <View>
             <AddWorkoutComponent
@@ -172,11 +177,3 @@ export const AddWorkoutActionSheet = (
     </ActionSheet>
   );
 };
-
-const styles = StyleSheet.create({
-  sheetContainer: {
-    marginTop: height * 0.02,
-    justifyContent: "flex-start",
-    alignItems: "flex-start",
-  },
-});

@@ -26,7 +26,6 @@ export const AddWorkoutComponent = memo(
     setInformations,
     ...props
   }: ExerciseComponentProps) => {
-
     const toggleShowPickExerciseModal = async () => {
       console.log("toggleShowPickExerciseModal");
     };
@@ -47,13 +46,15 @@ export const AddWorkoutComponent = memo(
     return (
       <View>
         <View style={styles.inputContainer}>
-          <Text style={styles.title}>Title:</Text>
+          <Text style={[styles.title, { color: "#E0E0E0" }]}>Title:</Text>
           <Input
             style={{
               width: width * 0.9,
               height: height * 0.05,
+              color: "#FFFFFF",
             }}
-            placeholder={`Name of Workout...`}
+            placeholderTextColor="#A0A0A0"
+            placeholder="Name of Workout..."
             value={title}
             onChangeText={(text) => setTitle(text)}
           />
@@ -65,7 +66,9 @@ export const AddWorkoutComponent = memo(
               width: width * 0.9,
             }}
           >
-            <Text style={styles.title}>Add Exercises:</Text>
+            <Text style={[styles.title, { color: "#E0E0E0" }]}>
+              Add Exercises:
+            </Text>
             <TouchableOpacity
               onPress={() => toggleShowPickExerciseModal()}
               style={{ marginBottom: height * 0.03 }}
