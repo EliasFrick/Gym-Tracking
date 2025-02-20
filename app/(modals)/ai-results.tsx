@@ -133,7 +133,6 @@ export default function AIResultsScreen() {
           >
             <AntDesign name="close" size={24} color="white" />
           </TouchableOpacity>
-
           {selectedResult && (
             <ScrollView style={styles.modalScroll}>
               <Text style={styles.modalDate}>
@@ -179,7 +178,9 @@ export default function AIResultsScreen() {
               size={24}
               color="white"
               style={{ marginLeft: 10 }}
-              onPress={() => router.push("/(tabs)/profile")}
+              onPress={() => {
+                router.back();
+              }}
             />
           ),
         }}
