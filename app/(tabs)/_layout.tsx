@@ -35,11 +35,36 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="weight"
+        options={{
+          title: "",
+          headerTitleStyle: { fontSize: scale(18), color: "white" },
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "scale" : "scale-outline"}
+              size={focused ? 30 : 25}
+              color="white"
+            />
+          ),
+          headerTitle: "Bodyweight Tracking",
+          tabBarLabel: "",
+        }}
+      />
+      <Tabs.Screen
         name="(workout)"
         options={{
           tabBarIcon: ({ focused }) => (
-            <View style={[styles.iconContainer, focused && styles.iconContainerFocused]}>
-              <Ionicons name="barbell" size={focused ? 38 : 35} color={"black"} />
+            <View
+              style={[
+                styles.iconContainer,
+                focused && styles.iconContainerFocused,
+              ]}
+            >
+              <Ionicons
+                name="barbell"
+                size={focused ? 38 : 35}
+                color={"black"}
+              />
             </View>
           ),
           headerShown: false,
@@ -47,18 +72,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="weight"
+        name="ranking"
         options={{
           title: "",
           headerTitleStyle: { fontSize: scale(18), color: "white" },
           tabBarIcon: ({ focused }) => (
-            <Ionicons 
-              name={focused ? "scale" : "scale-outline"} 
-              size={focused ? 30 : 25} 
-              color="white" 
+            <Ionicons
+              name={focused ? "trophy" : "trophy-outline"}
+              size={focused ? 30 : 25}
+              color="white"
             />
           ),
-          headerTitle: "Weight Tracking",
+          headerTitle: "Ranking",
           tabBarLabel: "",
         }}
       />
