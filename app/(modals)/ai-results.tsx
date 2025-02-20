@@ -178,9 +178,7 @@ export default function AIResultsScreen() {
               size={24}
               color="white"
               style={{ marginLeft: 10 }}
-              onPress={() => {
-                router.back();
-              }}
+              onPress={() => router.replace("/(tabs)/profile")}
             />
           ),
         }}
