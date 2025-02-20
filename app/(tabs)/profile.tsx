@@ -102,21 +102,23 @@ export default function ProfileScreen() {
       if (!result.canceled) {
         const localUri = result.assets[0].uri;
 
-        // Lade das Bild in Firebase Storage hoch und hole die URL
-        const firebaseUrl = await uploadImageToFirebase(localUri);
+        try {
+          // Speichere das Bild im LocalStorage
+          await AsyncStorage.setItem("profileImage", localUri);
+          setProfileImage(localUri);
 
-        if (firebaseUrl) {
-          setProfileImage(firebaseUrl);
-          await AsyncStorage.setItem("profileImage", firebaseUrl);
-
-          // Optional: Aktualisiere das User-Dokument in Firestore mit der neuen Profilbild-URL
+          // Optional: Wenn online, auch in Firebase speichern
           if (user) {
-            await updateDoc(doc(firestoreDB, "User", user.uid), {
-              profileImage: firebaseUrl,
-            });
+            const firebaseUrl = await uploadImageToFirebase(localUri);
+            if (firebaseUrl) {
+              await updateDoc(doc(firestoreDB, "User", user.uid), {
+                profileImage: firebaseUrl,
+              });
+            }
           }
-        } else {
-          Alert.alert("Upload Error", "Failed to upload image to Firebase");
+        } catch (error) {
+          console.error("Error saving image:", error);
+          Alert.alert("Error", "Failed to save image");
         }
       }
     } catch (error) {
@@ -141,26 +143,17 @@ export default function ProfileScreen() {
   const uploadImageToFirebase = async (uri: string): Promise<string | null> => {
     if (!user) return null;
     try {
-      // Hole den Blob aus dem URI
       const response = await fetch(uri);
       const blob = await response.blob();
-
-      // Erstelle einen Storage-Ref, z.B. unter "profilePhotos/{userId}.jpg"
       const storageRef = ref(storage, `profilePhotos/${user.uid}.jpg`);
-
-      // Lade den Blob hoch
       await uploadBytes(storageRef, blob);
-
-      // Hole die Download-URL
       const downloadURL = await getDownloadURL(storageRef);
       return downloadURL;
     } catch (error) {
-      console.error("Fehler beim Upload des Bildes:", error);
+      console.error("Error uploading image to Firebase:", error);
       return null;
     }
   };
-
- 
 
   return (
     <View style={styles.container}>

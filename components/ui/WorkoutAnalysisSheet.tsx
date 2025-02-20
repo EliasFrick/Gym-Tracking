@@ -152,7 +152,6 @@ Output Template:
 
 💡 Actionable Recommendations: (Provide 2-3 specific, data-driven suggestions, e.g., "Increase lower body training volume by 20% or add an extra leg session per week.")
 
-📈 Progress Charts (if applicable): (Suggest visual representations like bar charts for muscle group balance, line charts for strength progression, etc.)
 
 Tone & Style:
 
