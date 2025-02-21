@@ -42,7 +42,7 @@ export default function RankingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(48, 48, 49)",
+    backgroundColor: "#1A1A1A",
     padding: 20,
   },
   contentContainer: {

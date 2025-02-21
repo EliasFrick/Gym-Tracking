@@ -190,3 +190,8 @@ export interface WorkoutProgress {
   currentExerciseIndex: number;
   lastUpdated: string;
 }
+
+export interface WeightEntry {
+  weight: number;
+  date: Date;
+}
