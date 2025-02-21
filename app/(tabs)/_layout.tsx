@@ -29,7 +29,11 @@ export default function TabLayout() {
           title: "",
           headerTitleStyle: { fontSize: scale(18), color: "white" },
           tabBarIcon: ({ focused }) => (
-            <Ionicons name="home" size={focused ? 30 : 25} color="white" />
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={focused ? 30 : 25}
+              color="white"
+            />
           ),
           headerTitle: "Workout History",
         }}

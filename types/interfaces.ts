@@ -195,3 +195,32 @@ export interface WeightEntry {
   weight: number;
   date: Date;
 }
+
+export interface UserInfo {
+  username: string;
+  firstName: string;
+  lastName: string;
+  height: string;
+  diet?: "bulking" | "cutting" | "maintaining";
+}
+
+export interface AnalysisData {
+  language: string;
+  userInformation: string;
+}
+
+export interface Exercise {
+  id: string;
+  name: string;
+  mainGroup: string;
+  primaryMuscle: string;
+}
+
+export interface WorkoutHistoryItem {
+  id: string;
+  date: string;
+  workoutId: string;
+  exercises: {
+    [key: string]: { reps: string; weight: string }[];
+  };
+}

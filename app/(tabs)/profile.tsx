@@ -24,12 +24,12 @@ const menuItems = [
     title: "AI Results",
     onPress: () => router.push("/(modals)/ai-results"),
   },
-  /* {
-    icon: "person-outline",
-    title: "Personal Data",
-    route: "/personal-data",
-  },
   {
+    icon: "person-outline",
+    title: "Profile Information",
+    onPress: () => router.push("/(modals)/profile-information"),
+  },
+  /* {
     icon: "settings-outline",
     title: "Settings",
     route: "/settings",
@@ -278,7 +278,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 15,
     paddingHorizontal: 10,
     borderBottomColor: "#333",
   },

@@ -139,12 +139,12 @@ export default function AIResultsScreen() {
                 {selectedResult.timestamp.toDate().toLocaleDateString()}
               </Text>
 
-              <LineGraph
+              {/* <LineGraph
                 points={testData}
                 color="#4484B2"
                 animated={false}
                 style={{ height: 200, marginVertical: 20 }}
-              />
+              /> */}
 
               <Text style={styles.modalStats}>
                 Weight: {selectedResult.workoutData.weight}kg {"\n"}

@@ -30,30 +30,15 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
-import { WeightEntry } from "@/types/interfaces";
+import {
+  AnalysisData,
+  Exercise,
+  UserInfo,
+  WeightEntry,
+  WorkoutHistoryItem,
+} from "@/types/interfaces";
 
 const { width, height } = Dimensions.get("window");
-
-interface AnalysisData {
-  language: string;
-  userInformation: string;
-}
-
-interface Exercise {
-  id: string;
-  name: string;
-  mainGroup: string;
-  primaryMuscle: string;
-}
-
-interface WorkoutHistoryItem {
-  id: string;
-  date: string;
-  workoutId: string;
-  exercises: {
-    [key: string]: { reps: string; weight: string }[];
-  };
-}
 
 const dietOptions = [
   { name: "Muskelaufbau (Bulk)", value: "bulking" },
@@ -74,6 +59,13 @@ export const WorkoutAnalysisSheet = (
     [key: string]: Exercise;
   }>({});
   const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    username: "",
+    firstName: "",
+    lastName: "",
+    height: "",
+    diet: "maintaining",
+  });
 
   // Fetch exercise names when component mounts
   useEffect(() => {
@@ -122,15 +114,39 @@ export const WorkoutAnalysisSheet = (
     setWeightHistory(weights);
   };
 
+  const loadUserInfo = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const userDoc = await getDoc(doc(firestoreDB, "User", user.uid));
+      if (userDoc.exists()) {
+        const data = userDoc.data();
+        setUserInfo({
+          username: data.userName || "",
+          firstName: data.firstname || "",
+          lastName: data.lastname || "",
+          height: data.height?.toString() || "",
+          diet: data.diet || "",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading user info:", error);
+      Alert.alert("Error", "Failed to load user information");
+    } finally {
+    }
+  };
+
   const analyzeWorkouts = async () => {
     setIsLoading(true);
     await fetchBodyWeight();
+    await loadUserInfo();
     try {
       const user = auth.currentUser;
       if (!user) {
         throw new Error("No user logged in");
       }
-
+      const currentWeight = weightHistory[weightHistory.length - 1].weight;
       const workoutHistory = props.payload?.workoutHistory || [];
 
       const formattedWorkoutHistory = workoutHistory.map(
@@ -187,9 +203,10 @@ Use emoji icons to make it engaging (optional)
 Be brief but informative
         
 Personal Information:
-- Nutrition: ${analysisData.diet}
+-FirstName: ${userInfo.firstName}
+- Nutrition: ${userInfo.diet}
 - Weight: ${weightHistory}
-- Size: ${analysisData.height}cm
+- Size: ${userInfo.height}cm
 -User Informations: ${analysisData.userInformation}
         
 Workout-History:
@@ -223,10 +240,10 @@ ${JSON.stringify(formattedWorkoutHistory, null, 2)}
           analysis: result,
           timestamp: new Date(),
           workoutData: {
-            diet: analysisData.diet,
-            weight: analysisData.weight,
-            height: analysisData.height,
+            diet: userInfo.diet,
+            weight: currentWeight,
             analyzedWorkouts: formattedWorkoutHistory,
+            height: userInfo.height,
           },
         }
       );
@@ -239,17 +256,6 @@ ${JSON.stringify(formattedWorkoutHistory, null, 2)}
       setIsLoading(false);
     }
   };
-
-  /*  const openDietSelector = () => {
-    SheetManager.show("diet-selector-sheet", {
-      payload: {
-        selectedDiet: analysisData.diet,
-        onSelect: (diet: AnalysisData["diet"]) => {
-          setAnalysisData((prev) => ({ ...prev, diet }));
-        },
-      },
-    });
-  }; */
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
