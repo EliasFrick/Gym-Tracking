@@ -156,12 +156,31 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   };
 
   const saveWorkout = async () => {
+    // Überprüfe alle Eingaben auf numerische Werte
+    const hasInvalidInputs = Object.values(workoutLog).some((sets) =>
+      sets.some((set) => {
+        const reps = set.reps.trim().replace(",", ".");
+        const weight = set.weight.trim().replace(",", ".");
+        return (
+          (reps && isNaN(Number(reps))) || (weight && isNaN(Number(weight)))
+        );
+      })
+    );
+
+    if (hasInvalidInputs) {
+      Alert.alert(
+        "Invalid Input",
+        "Please enter only numbers for reps and weight. Use dots or commas for decimal numbers.",
+        [{ text: "OK" }]
+      );
+      return;
+    }
+
     const workoutData = {
       workoutId: props.payload?.workoutId,
       date: new Date().toISOString(),
       exercises: workoutLog,
     };
-    console.log("Workout Data:", workoutData);
 
     try {
       const user = auth.currentUser;
@@ -172,7 +191,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
         );
         return;
       }
-      // Create document ID: workoutId (trimmed) + '-' + current ISO date/time
+
       const docId = `${workoutData.workoutId.trim()}-${workoutData.date}`;
       const workoutDocRef = doc(
         firestoreDB,
@@ -183,15 +202,12 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       );
       await setDoc(workoutDocRef, workoutData);
 
-      // Remove saved progress
       if (props.payload?.workoutId) {
         await removeWorkoutProgress(props.payload.workoutId);
       }
-      // Clear local workout data so that text inputs are empty
       setWorkoutLog({});
       setExercises([]);
       setCurrentExerciseIndex(0);
-      // Alert the user and close the Action Sheet
       Alert.alert("Success", "Workout saved successfully!");
       SheetManager.hide("workout-exercise-sheet");
     } catch (error) {
@@ -287,7 +303,8 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                               value
                             )
                           }
-                          keyboardType="numeric"
+                          /*                           keyboardType="numeric"
+                           */
                         />
                       </View>
                       <View style={styles.inputContainer}>
@@ -303,7 +320,8 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                               value
                             )
                           }
-                          keyboardType="numeric"
+                          /*                           keyboardType="numeric"
+                           */
                         />
                       </View>
                       {isLastSet && (
