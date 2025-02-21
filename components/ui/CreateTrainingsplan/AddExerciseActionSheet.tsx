@@ -20,6 +20,9 @@ import {
   setDoc as firebaseSetDoc,
   collection,
   addDoc,
+  getDocs,
+  query,
+  where,
 } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import EventEmitter from "@/components/EventListener";
@@ -87,14 +90,53 @@ export const AddExerciseActionSheet = (
     }
   };
 
+  const getNextCustomExerciseId = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return "C1";
+
+      const exercisesRef = collection(
+        firestoreDB,
+        "User",
+        user.uid,
+        "Exercises"
+      );
+      const q = query(exercisesRef, where("userID", "==", user.uid));
+      const querySnapshot = await getDocs(q);
+
+      let maxNumber = 0;
+      querySnapshot.forEach((doc) => {
+        const id = doc.id;
+        if (id.startsWith("C")) {
+          const num = parseInt(id.substring(1));
+          if (!isNaN(num) && num > maxNumber) {
+            maxNumber = num;
+          }
+        }
+      });
+
+      return `C${maxNumber + 1}`;
+    } catch (error) {
+      console.error("Error getting next exercise ID:", error);
+      return "C1";
+    }
+  };
+
   const saveCustomExercise = async () => {
     try {
       const usersCollection = collection(firestoreDB, "User");
       const userRef = doc(usersCollection, firebaseUser?.uid);
       const exerciseRef = collection(userRef, "Exercises");
-      await setDoc(doc(exerciseRef, customExercise.name), customExercise);
 
-      alert("Successfull saved");
+      // Generiere die nächste ID
+      const nextId = await getNextCustomExerciseId();
+
+      await setDoc(doc(exerciseRef, nextId), {
+        ...customExercise,
+        id: nextId, // Speichere die ID auch im Dokument
+      });
+
+      alert("Successfully saved");
       deleteExerciseData();
       SheetManager.hide("add-exercise-modal-sheet");
     } catch (error) {

@@ -15,7 +15,7 @@ import ActionSheet, {
   SheetProps,
   SheetManager,
 } from "react-native-actions-sheet";
-import { Text, XStack, YStack, Select, Adapt, Sheet } from "tamagui";
+import { Text, XStack, YStack, Select, Adapt, Sheet, TextArea } from "tamagui";
 import { GEMINI_API_KEY } from "@env";
 import axios from "axios";
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
@@ -26,16 +26,17 @@ import {
   getDocs,
   writeBatch,
   setDoc,
+  query,
+  orderBy,
 } from "firebase/firestore";
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
+import { WeightEntry } from "@/types/interfaces";
 
 const { width, height } = Dimensions.get("window");
 
 interface AnalysisData {
-  diet: "bulking" | "cutting" | "maintaining" | "";
-  weight: string;
-  height: string;
   language: string;
+  userInformation: string;
 }
 
 interface Exercise {
@@ -64,16 +65,15 @@ export const WorkoutAnalysisSheet = (
   props: SheetProps<"workout-analysis-sheet">
 ) => {
   const [analysisData, setAnalysisData] = useState<AnalysisData>({
-    diet: "",
-    weight: "",
-    height: "",
-    language: "english",
+    language: "",
+    userInformation: "",
   });
   const [analysis, setAnalysis] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [exerciseNames, setExerciseNames] = useState<{
     [key: string]: Exercise;
   }>({});
+  const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
 
   // Fetch exercise names when component mounts
   useEffect(() => {
@@ -96,8 +96,35 @@ export const WorkoutAnalysisSheet = (
     }
   };
 
+  const fetchBodyWeight = async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const weightsRef = collection(
+      firestoreDB,
+      "User",
+      user.uid,
+      "WeightHistory"
+    );
+
+    const q = query(weightsRef, orderBy("date", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    const weights: WeightEntry[] = [];
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      weights.push({
+        weight: data.weight,
+        date: data.date.toDate(),
+      });
+    });
+
+    setWeightHistory(weights);
+  };
+
   const analyzeWorkouts = async () => {
     setIsLoading(true);
+    await fetchBodyWeight();
     try {
       const user = auth.currentUser;
       if (!user) {
@@ -161,8 +188,9 @@ Be brief but informative
         
 Personal Information:
 - Nutrition: ${analysisData.diet}
-- Weight: ${analysisData.weight}kg
+- Weight: ${weightHistory}
 - Size: ${analysisData.height}cm
+-User Informations: ${analysisData.userInformation}
         
 Workout-History:
 ${JSON.stringify(formattedWorkoutHistory, null, 2)}
@@ -212,7 +240,7 @@ ${JSON.stringify(formattedWorkoutHistory, null, 2)}
     }
   };
 
-  const openDietSelector = () => {
+  /*  const openDietSelector = () => {
     SheetManager.show("diet-selector-sheet", {
       payload: {
         selectedDiet: analysisData.diet,
@@ -221,7 +249,7 @@ ${JSON.stringify(formattedWorkoutHistory, null, 2)}
         },
       },
     });
-  };
+  }; */
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -232,54 +260,33 @@ ${JSON.stringify(formattedWorkoutHistory, null, 2)}
         <YStack space="$4" padding="$4">
           <Text style={styles.title}>Training Analyze</Text>
 
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Training Goal</Text>
-            <TouchableOpacity
-              style={styles.selectButton}
-              onPress={openDietSelector}
-            >
-              <Text style={styles.selectButtonText}>
-                {dietOptions.find((opt) => opt.value === analysisData.diet)
-                  ?.name || "Choose your diet..."}
-              </Text>
-              <ChevronDown size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-
-          <XStack space="$4">
-            <View style={[styles.inputContainer, { flex: 1 }]}>
-              <Text style={styles.label}>Weight (kg)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={analysisData.weight}
-                onChangeText={(text) =>
-                  setAnalysisData((prev) => ({ ...prev, weight: text }))
-                }
-              />
-            </View>
-
-            <View style={[styles.inputContainer, { flex: 1 }]}>
-              <Text style={styles.label}>Height (cm)</Text>
-              <TextInput
-                style={styles.input}
-                keyboardType="numeric"
-                value={analysisData.height}
-                onChangeText={(text) =>
-                  setAnalysisData((prev) => ({ ...prev, height: text }))
-                }
-              />
-            </View>
-          </XStack>
           <View style={[styles.inputContainer]}>
-            <Text style={styles.label}>Language</Text>
+            <Text style={styles.label}>Set your language</Text>
             <TextInput
               style={styles.input}
               keyboardType="default"
-              placeholder="set a language"
+              placeholder="english..."
               value={analysisData.language}
               onChangeText={(text) =>
                 setAnalysisData((prev) => ({ ...prev, language: text }))
+              }
+            />
+          </View>
+          <View style={{ width: width * 0.9 }}>
+            <Text style={styles.label}>Give more Informations about you</Text>
+            <TextArea
+              placeholder="input..."
+              style={{
+                height: height * 0.15,
+                color: "#FFFFFF",
+                backgroundColor: "#2D2D2D",
+                borderRadius: 8,
+                borderColor: "#2D2D2D",
+              }}
+              placeholderTextColor="#A0A0A0"
+              value={analysisData.userInformation}
+              onChangeText={(text) =>
+                setAnalysisData((prev) => ({ ...prev, userInformation: text }))
               }
             />
           </View>

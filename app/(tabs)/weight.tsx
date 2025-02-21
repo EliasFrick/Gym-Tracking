@@ -23,13 +23,11 @@ import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { LineGraph } from "react-native-graph";
 import { scale } from "react-native-size-matters";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { WeightEntry } from "@/types/interfaces";
 
 const { width } = Dimensions.get("window");
 
-interface WeightEntry {
-  weight: number;
-  date: Date;
-}
+
 
 export default function WeightScreen() {
   const [currentWeight, setCurrentWeight] = useState("");
@@ -187,18 +185,7 @@ export default function WeightScreen() {
     }
   };
 
-  // Neue Funktion zur Aufbereitung der Daten für LineGraph
   const prepareWeightDataForGraph = () => {
-    console.log(
-      "test: ",
-      weightHistory
-        .sort((a, b) => a.date.getTime() - b.date.getTime()) // Sortiere nach Datum aufsteigend
-        .map((entry) => ({
-          value: entry.weight,
-          date: entry.date,
-        }))
-    );
-
     return weightHistory
       .sort((a, b) => a.date.getTime() - b.date.getTime()) // Sortiere nach Datum aufsteigend
       .map((entry) => ({
@@ -266,7 +253,7 @@ export default function WeightScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "rgb(48, 48, 49)",
+    backgroundColor: "#1A1A1A",
     padding: 20,
   },
   contentContainer: {
