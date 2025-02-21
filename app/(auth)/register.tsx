@@ -16,22 +16,26 @@ import { IUser, IUserRegisterCredentials } from "@/types/interfaces";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig";
 import { firestoreDB } from "@/database/Firebaseconfig";
-import { doc, setDoc as firebaseSetDoc, collection, getDocs, query, where } from "firebase/firestore";
-import { CustomDropDown } from "@/components/ui/CreateTrainingsplan/CustomDropDown";
-import { Button } from "react-native";
-import DatePicker from "react-native-date-picker";
+import {
+  doc,
+  setDoc as firebaseSetDoc,
+  collection,
+  getDocs,
+  query,
+  where,
+} from "firebase/firestore";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const RegisterScreen = () => {
   const [userCredentials, setUserCredentials] =
     useState<IUserRegisterCredentials>({
-      firstname: "Elias",
-      lastname: "Frick",
-      email: "elias.frick.ef@gmail.com",
-      password: "TestTest",
-      passwordConfirm: "TestTest",
+      firstname: "",
+      lastname: "",
+      email: "",
+      password: "",
+      passwordConfirm: "",
       birthDate: "",
-      userName: "DuracellHase",
+      userName: "",
     });
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date()); // Zustand für das Datum
@@ -65,7 +69,7 @@ const RegisterScreen = () => {
       const usersRef = collection(firestoreDB, "User");
       const q = query(usersRef, where("userName", "==", username));
       const querySnapshot = await getDocs(q);
-      
+
       return !querySnapshot.empty;
     } catch (error) {
       console.error("Error checking username:", error);
@@ -86,7 +90,9 @@ const RegisterScreen = () => {
 
     try {
       // Prüfe ob Username bereits existiert
-      const usernameExists = await checkUsernameExists(userCredentials.userName);
+      const usernameExists = await checkUsernameExists(
+        userCredentials.userName
+      );
       if (usernameExists) {
         alert("This username is already taken. Please choose another one.");
         return;
@@ -117,7 +123,7 @@ const RegisterScreen = () => {
         birthDate: userCredentials.birthDate,
         userName: userCredentials.userName,
       });
-      
+
       router.replace("/");
     } catch (error: any) {
       console.error("Error: ", error);

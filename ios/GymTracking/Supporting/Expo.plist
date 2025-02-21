@@ -12,5 +12,10 @@
     <string>https://u.expo.dev/530d34db-8e74-4bb9-9a3f-894d0391f283</string>
     <key>EXUpdatesRuntimeVersion</key>
     <string>1.0.0</string>
+    <key>EXUpdatesRequestHeaders</key>
+    <dict>
+      <key>expo-channel-name</key>
+      <string>your-channel-name</string>
+    </dict>
   </dict>
 </plist>

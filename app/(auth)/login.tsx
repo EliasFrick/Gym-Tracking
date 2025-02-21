@@ -23,8 +23,8 @@ import { ScrollView } from "tamagui";
 const LoginScreen = () => {
   const [userCredentials, setUserCredentials] = useState<IUserLoginCredentials>(
     {
-      email: "elias.frick.ef@gmail.com",
-      password: "TestTest",
+      email: "",
+      password: "",
     }
   );
   const windowWidth = Dimensions.get("window").width;
@@ -63,8 +63,6 @@ const LoginScreen = () => {
           );
           alert(errorMessage.substring(9));
         });
-
-     
     } catch (error) {
       console.error("Error: ", error);
     }
