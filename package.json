@@ -10,7 +10,6 @@
     "emulator": "open -a Simulator.app"
   },
   "dependencies": {
-    "@genkit-ai/googleai": "^1.0.4",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.2.0",
     "@react-native-community/netinfo": "11.4.1",
@@ -41,7 +40,6 @@
     "expo-updates": "~0.26.19",
     "expo-web-browser": "~14.0.2",
     "firebase": "^11.1.0",
-    "genkit": "^1.0.4",
     "loadash": "^1.0.0",
     "native": "^0.3.3",
     "qs": "^6.5.3",
