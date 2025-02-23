@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import * as React from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  Alert,
 } from "react-native";
 import ActionSheet, {
   SheetProps,
