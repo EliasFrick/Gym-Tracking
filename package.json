@@ -59,7 +59,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-size-matters": "^0.4.2",
     "react-native-svg": "15.8.0",
-    "expo-splash-screen": "~0.29.22"
+    "expo-splash-screen": "~0.29.22",
     "tamagui": "^1.125.10"
   },
   "devDependencies": {
