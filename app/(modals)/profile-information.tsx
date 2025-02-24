@@ -10,10 +10,11 @@ import {
 import { Text, Select } from "tamagui";
 import { Stack, useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { UserInfo } from "@/types/interfaces";
 import { SheetManager } from "react-native-actions-sheet";
+import { deleteUser } from "firebase/auth";
 
 // Definiere die Diät-Optionen
 const DIET_OPTIONS = [
@@ -100,6 +101,44 @@ export default function ProfileInformationScreen() {
         },
       },
     });
+  };
+
+  const handleDeleteAccount = async () => {
+    Alert.alert(
+      "Delete Account",
+      "Are you sure you want to delete your account? This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const user = auth.currentUser;
+              if (!user) return;
+
+              // Delete user data from Firestore
+              await deleteDoc(doc(firestoreDB, "User", user.uid));
+
+              // Delete the user authentication account
+              await deleteUser(user);
+
+              Alert.alert("Success", "Your account has been deleted");
+              router.replace("/(auth)/login");
+            } catch (error) {
+              console.error("Error deleting account:", error);
+              Alert.alert(
+                "Error",
+                "Failed to delete account. You may need to re-authenticate first."
+              );
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -190,6 +229,14 @@ export default function ProfileInformationScreen() {
         <TouchableOpacity style={styles.saveButton} onPress={saveUserInfo}>
           <Text style={styles.buttonText}>Save Changes</Text>
         </TouchableOpacity>
+
+        {/* Delete Account Button */}
+        <TouchableOpacity
+          style={styles.deleteButton}
+          onPress={handleDeleteAccount}
+        >
+          <Text style={styles.deleteButtonText}>Delete Account</Text>
+        </TouchableOpacity>
       </ScrollView>
     </>
   );
@@ -244,5 +291,19 @@ const styles = StyleSheet.create({
   selectItem: {
     backgroundColor: "#242424",
     padding: 15,
+  },
+  deleteButton: {
+    backgroundColor: "#2A2A2A",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#FF3B30",
+  },
+  deleteButtonText: {
+    color: "#FF3B30",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
