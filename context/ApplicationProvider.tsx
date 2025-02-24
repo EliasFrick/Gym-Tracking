@@ -1,7 +1,5 @@
-import React, { createContext, ReactNode, useEffect, useState } from "react";
-import NetInfo, { NetInfoState } from "@react-native-community/netinfo";
+import React, { createContext, ReactNode, useState } from "react";
 import {
-  IAppConfigContextType,
   IAppplicationContextType,
 } from "@/types/interfaces";
 

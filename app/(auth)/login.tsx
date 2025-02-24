@@ -78,7 +78,7 @@ const LoginScreen = () => {
         style={styles.background}
       />
       <View style={styles.header}>
-        <Text style={styles.title}>Gym Tracker</Text>
+        <Text style={styles.title}>GymFlow AI</Text>
       </View>
       <View style={styles.inputContainer}>
         <Text style={styles.welcomeText}>Welcome Back</Text>

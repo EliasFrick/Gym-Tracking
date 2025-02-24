@@ -224,3 +224,20 @@ export interface WorkoutHistoryItem {
     [key: string]: { reps: string; weight: string }[];
   };
 }
+
+export interface WorkoutHistoryItem {
+  id: string;
+  date: string;
+  workoutId: string;
+  workoutName: string;
+  exercises: {
+    [key: string]: { reps: string; weight: string }[];
+  };
+}
+
+export interface IUserProvider {
+  id: string;
+  name: string;
+  prime: boolean;
+  // Füge hier weitere Eigenschaften hinzu, die ein Exercise haben kann
+}

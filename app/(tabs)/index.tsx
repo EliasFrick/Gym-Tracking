@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,27 +8,24 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Card } from "tamagui";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
 import { useAppConfig } from "@/context/AppConfigProvider";
 import { Ionicons } from "@expo/vector-icons";
 import { SheetManager } from "react-native-actions-sheet";
-/* import { gemini15Flash, googleAI } from "@genkit-ai/googleai";
-import { genkit } from "genkit";
- */
-const { width, height } = Dimensions.get("window");
+import { UserInfo, WorkoutHistoryItem } from "@/types/interfaces";
+import { useUser } from "@/context/UserProvider";
 
-interface WorkoutHistoryItem {
-  id: string;
-  date: string;
-  workoutId: string;
-  workoutName: string;
-  exercises: {
-    [key: string]: { reps: string; weight: string }[];
-  };
-}
+const { width, height } = Dimensions.get("window");
 
 export default function TabOneScreen() {
   const router = useRouter();
@@ -37,6 +34,7 @@ export default function TabOneScreen() {
     []
   );
   const [refreshing, setRefreshing] = useState(false);
+  const { userData, loading, error, refreshUserData } = useUser();
 
   const fetchWorkoutHistory = async () => {
     try {
@@ -44,6 +42,7 @@ export default function TabOneScreen() {
         const user = auth.currentUser;
         if (!user) return;
 
+        // Hole die Workout-Historie wie bisher
         const historyRef = collection(
           firestoreDB,
           "User",
@@ -67,7 +66,7 @@ export default function TabOneScreen() {
     }
   };
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     fetchWorkoutHistory();
   }, []);
 
@@ -134,12 +133,17 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.analyzeButton}
-        onPress={openAnalysisSheet}
-      >
-        <Text style={styles.analyzeButtonText}>Analyze with AI</Text>
-      </TouchableOpacity>
+      {userData?.prime ? (
+        <TouchableOpacity
+          style={styles.analyzeButton}
+          onPress={openAnalysisSheet}
+        >
+          <Text style={styles.analyzeButtonText}>Analyze with AI</Text>
+        </TouchableOpacity>
+      ) : (
+        <></>
+      )}
+
       <FlatList
         data={workoutHistory}
         renderItem={renderWorkoutCard}
