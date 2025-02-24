@@ -52,6 +52,7 @@
       "requestHeaders": {
         "expo-channel-name": "your-channel-name"
       }
-    }
+    },
+    "newArchEnabled": true
   }
 }
