@@ -18,12 +18,8 @@
     "@react-native-picker/picker": "2.9.0",
     "@rehookify/datepicker": "^6.6.8",
     "@shopify/react-native-skia": "1.5.0",
-    "@tamagui/config": "^1.120.2",
-    "@tamagui/dialog": "^1.121.6",
-    "@tamagui/lucide-icons": "^1.120.2",
-    "@tamagui/popover": "^1.120.2",
-    "@tamagui/portal": "^1.120.2",
-    "@tamagui/toast": "^1.121.6",
+    "@tamagui/config": "^1.125.14",
+    "@tamagui/lucide-icons": "^1.125.14",
     "axios": "^1.7.9",
     "burnt": "^0.12.2",
     "expo": "~52.0.36",
@@ -35,6 +31,7 @@
     "expo-linking": "~7.0.5",
     "expo-network": "~7.0.5",
     "expo-router": "~4.0.17",
+    "expo-splash-screen": "~0.29.22",
     "expo-sqlite": "~15.1.2",
     "expo-status-bar": "~2.0.1",
     "expo-symbols": "~0.2.2",
@@ -59,8 +56,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-size-matters": "^0.4.2",
     "react-native-svg": "15.8.0",
-    "expo-splash-screen": "~0.29.22"
-    "tamagui": "^1.125.10"
+    "tamagui": "^1.125.14"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
