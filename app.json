@@ -1,19 +1,42 @@
 {
   "expo": {
-    "name": "Gym-Tracking",
+    "name": "GymFlow",
     "slug": "Gym-Tracking",
     "scheme": "gym-tracking",
     "version": "1.0.0",
+    "icon": "./assets/icons/splash-icon-dark.png",
     "plugins": [
       "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon-dark.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff",
+          "dark": {
+            "image": "./assets/splash-icon-light.png",
+            "backgroundColor": "#000000"
+          }
+        }
+      ],
       "expo-sqlite"
     ],
-    "newArchEnabled": true,
     "android": {
-      "package": "com.anonymous.GymTracking"
+      "package": "com.anonymous.GymTracking",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/android-light.png",
+        "monochromeImage": "./assets/icons/android-light.png",
+        "backgroundColor": "#ffffff "
+      }
     },
     "ios": {
-      "bundleIdentifier": "com.anonymous.GymTracking"
+      "bundleIdentifier": "com.anonymous.GymTracking",
+      "icon": {
+        "light": "./assets/icons/ios-light.png",
+        "dark": "./assets/icons/ios-dark.png",
+        "tinted": "./assets/icons/ios-tinted.png"
+      }
     },
     "extra": {
       "router": {

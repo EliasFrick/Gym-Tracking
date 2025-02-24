@@ -38,11 +38,14 @@ const RegisterScreen = () => {
       userName: "",
     });
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Zustand für das Datum
-  const [showPicker, setShowPicker] = useState(false); // Zustand für die Sichtbarkeit des Pickers
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [showPicker, setShowPicker] = useState(false);
 
   const handleDateChange = (event: any, date: any) => {
-    setShowPicker(false);
+    if (Platform.OS === "android") {
+      setShowPicker(false);
+    }
+
     if (date) {
       const utcDate = new Date(
         Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
@@ -206,20 +209,23 @@ const RegisterScreen = () => {
           value={userCredentials.userName}
           onChangeText={(text) => handleInputChange("userName", text)}
         />
-        <View style={styles.datePicker}>
-          <RNDateTimePicker
-            mode="date"
-            value={selectedDate}
-            maximumDate={new Date()}
-            onChange={handleDateChange} // Handler für Änderungen
-          />
-        </View>
+        <TouchableOpacity
+          style={styles.datePicker}
+          onPress={() => setShowPicker(!showPicker)}
+        >
+          <Text style={{ color: "#fff" }}>
+            {selectedDate.toLocaleDateString()}
+          </Text>
+        </TouchableOpacity>
+
         {showPicker && (
           <RNDateTimePicker
             mode="date"
             value={selectedDate}
             maximumDate={new Date()}
-            onChange={handleDateChange} // Datum aktualisieren
+            onChange={handleDateChange}
+            textColor="white"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
           />
         )}
         {/* Password & Confirm Password */}

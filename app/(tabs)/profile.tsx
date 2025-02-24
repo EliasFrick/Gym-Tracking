@@ -17,33 +17,14 @@ import { firestoreDB } from "@/database/Firebaseconfig";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateDoc, doc, getDoc } from "firebase/firestore"; // updateDoc falls du auch Firestore updaten möchtest
 import { LineGraph } from "react-native-graph";
-
-const menuItems = [
-  {
-    icon: "analytics-outline",
-    title: "AI Results",
-    onPress: () => router.push("/(modals)/ai-results"),
-  },
-  {
-    icon: "person-outline",
-    title: "Profile Information",
-    onPress: () => router.push("/(modals)/profile-information"),
-  },
-  /* {
-    icon: "settings-outline",
-    title: "Settings",
-    route: "/settings",
-  }, */
-];
+import { useUser } from "@/context/UserProvider";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const user = auth.currentUser;
-  const [inputText, setInputText] = useState("Hey Gemini mein name ist Elias");
-  const [responseText, setResponseText] = useState("gg");
-  const [loading, setLoading] = useState(false);
+  const { userData, loading, error, refreshUserData } = useUser();
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -77,6 +58,28 @@ export default function ProfileScreen() {
 
     loadUserData();
   }, [user]);
+
+  const menuItems = [
+    ...(userData?.prime
+      ? [
+          {
+            icon: "analytics-outline",
+            title: "AI Results",
+            onPress: () => router.push("/(modals)/ai-results"),
+          },
+        ]
+      : []),
+    {
+      icon: "person-outline",
+      title: "Profile Information",
+      onPress: () => router.push("/(modals)/profile-information"),
+    },
+    /* {
+      icon: "settings-outline",
+      title: "Settings",
+      route: "/settings",
+    }, */
+  ];
 
   const pickImage = async () => {
     try {

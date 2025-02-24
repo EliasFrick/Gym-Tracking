@@ -24,7 +24,7 @@ const LoadingScreen = memo(() => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("@/assets/Logo Design Preview.png")}
+        source={require("@/assets/icons/splash-icon-dark.png")}
         style={styles.image}
         resizeMode="contain"
       />
@@ -71,10 +71,10 @@ export function AuthenticationProvider({ children }: React.PropsWithChildren) {
     if (loading) return;
 
     if (
-      user && 
-      rootSegments !== "(app)" && 
-      rootSegments !== "(modals)" &&  // Erlaubt Modal-Routen
-      rootSegments !== "(tabs)" &&    // Erlaubt Tab-Routen
+      user &&
+      rootSegments !== "(app)" &&
+      rootSegments !== "(modals)" && // Erlaubt Modal-Routen
+      rootSegments !== "(tabs)" && // Erlaubt Tab-Routen
       rootSegments !== "workout-details"
     ) {
       router.replace("/");
