@@ -10,8 +10,18 @@ import { Button, Input, TextArea } from "tamagui";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import * as ImagePicker from "expo-image-picker";
 import { ExerciseComponentProps } from "@/types/interfaces";
+import { SheetManager } from "react-native-actions-sheet";
 
 const { width, height } = Dimensions.get("window");
+
+const MUSCLE_GROUP = [
+  { label: "Arms", value: "Arms" },
+  { label: "Chest", value: "Chest" },
+  { label: "Back", value: "Back" },
+  { label: "Shoulder", value: "Shoulder" },
+  { label: "Legs", value: "Legs" },
+  { label: "Neck", value: "Neck" },
+] as const;
 
 export function AddExerciseComponent({
   title,
@@ -20,6 +30,8 @@ export function AddExerciseComponent({
   setDescription,
   image,
   setImage,
+  mainGroup,
+  setMainGroup,
   ...props
 }: ExerciseComponentProps) {
   const pickImage = async () => {
@@ -34,6 +46,17 @@ export function AddExerciseComponent({
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
+  };
+
+  const openMuscleGroupSheet = () => {
+    SheetManager.show("muscle-group-selector-sheet", {
+      payload: {
+        selectedMuscleGroup: mainGroup || "",
+        onSelect: (mainGroup: string) => {
+          setMainGroup(mainGroup);
+        },
+      },
+    });
   };
 
   return (
@@ -51,6 +74,18 @@ export function AddExerciseComponent({
           value={title}
           onChangeText={(text) => setTitle(text)}
         />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Muscle Group</Text>
+        <TouchableOpacity
+          style={styles.dropdownInput}
+          onPress={openMuscleGroupSheet}
+        >
+          <Text style={{ color: "white", fontSize: 16 }}>
+            {MUSCLE_GROUP.find((option) => option.value === mainGroup)?.label ||
+              "Select Muscle Group"}
+          </Text>
+        </TouchableOpacity>
       </View>
       <View style={styles.inputContainer}>
         <Text style={[styles.label, { color: "#E0E0E0" }]}>Description:</Text>
@@ -97,10 +132,10 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   inputContainer: {
-    width: "100%", // Nimmt die volle Breite des übergeordneten Containers
+    width: "100%",
     marginVertical: height * 0.02,
     paddingHorizontal: width * 0.05,
-    alignItems: "flex-start", // Text linksbündig
+    alignItems: "flex-start",
   },
   image: {
     width: width * 0.3,
@@ -108,5 +143,13 @@ const styles = StyleSheet.create({
   },
   label: {
     marginBottom: 8,
+    color: "white",
+  },
+  dropdownInput: {
+    backgroundColor: "#242424",
+    padding: 15,
+    borderRadius: 8,
+    color: "white",
+    fontSize: 16,
   },
 });
