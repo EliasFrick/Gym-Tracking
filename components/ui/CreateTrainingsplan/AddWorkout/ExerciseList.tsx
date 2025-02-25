@@ -11,7 +11,6 @@ import { IExerciseListProps } from "@/types/interfaces";
 import { DocumentData } from "firebase/firestore";
 import { fetchDataFromFirestore } from "@/database/FetchDataFromFirestore";
 import { fetchCustomExercises } from "@/database/fetchCustomExercises";
-import { AppConfigContext } from "@/context/AppConfigProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -21,6 +20,15 @@ export function ExerciseList({
 }: IExerciseListProps) {
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
+
+  const MUSCLE_GROUP_ORDER = [
+    "Arms",
+    "Chest",
+    "Back",
+    "Shoulder",
+    "Legs",
+    "Neck",
+  ];
 
   useEffect(() => {
     const fetchDefaultExercises = async () => {
@@ -64,10 +72,18 @@ export function ExerciseList({
     [defaultExercises, customExercises]
   );
 
+  const groupedExercises = useMemo(() => {
+    const combined = [...defaultExercises, ...customExercises];
+    return MUSCLE_GROUP_ORDER.reduce((acc, group) => {
+      acc[group] = combined.filter((exercise) => exercise.mainGroup === group);
+      return acc;
+    }, {} as Record<string, DocumentData[]>);
+  }, [defaultExercises, customExercises]);
+
   return (
     <View style={{ width: width * 0.9, height: height * 0.92 }}>
       <ScrollView style={{ marginBottom: height * 0.15 }}>
-        {combinedExercises.length === 0 ? (
+        {Object.keys(groupedExercises).length === 0 ? (
           <Text
             style={{
               textAlign: "center",
@@ -78,58 +94,72 @@ export function ExerciseList({
             Keine Übungen gefunden.
           </Text>
         ) : (
-          combinedExercises.map((value, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() =>
-                selectExercise(
-                  value.id,
-                  value.name,
-                  value.primaryMuscle,
-                  value.mainGroup
-                )
-              }
-              style={{
-                height: height * 0.05,
-                marginBottom: height * 0.01,
-              }}
-            >
-              <View
+          Object.entries(groupedExercises).map(([groupName, exercises]) => (
+            <View key={groupName}>
+              <Text
                 style={{
-                  height: "100%",
-                  backgroundColor: pickedExercises?.some(
-                    (exercise) => exercise.id === value.id
-                  )
-                    ? "green"
-                    : "lightgrey",
-                  borderRadius: 8,
-                  paddingVertical: 8,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  fontSize: 20,
+                  fontWeight: "bold",
+                  marginVertical: 10,
+                  color: "white",
                 }}
               >
-                <Text
+                {groupName}
+              </Text>
+              {exercises.map((value, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() =>
+                    selectExercise(
+                      value.id,
+                      value.name,
+                      value.primaryMuscle,
+                      value.mainGroup
+                    )
+                  }
                   style={{
-                    flexShrink: 1,
-                    flexWrap: "wrap",
-                    marginLeft: width * 0.05,
-                    fontSize: 16,
+                    height: height * 0.05,
+                    marginBottom: height * 0.01,
                   }}
                 >
-                  {value.name}
-                </Text>
-                <Ionicons
-                  name="add"
-                  size={24}
-                  color="black"
-                  style={{
-                    marginRight: width * 0.03,
-                    alignSelf: "center",
-                  }}
-                />
-              </View>
-            </TouchableOpacity>
+                  <View
+                    style={{
+                      height: "100%",
+                      backgroundColor: pickedExercises?.some(
+                        (exercise) => exercise.id === value.id
+                      )
+                        ? "green"
+                        : "lightgrey",
+                      borderRadius: 8,
+                      paddingVertical: 8,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        flexShrink: 1,
+                        flexWrap: "wrap",
+                        marginLeft: width * 0.05,
+                        fontSize: 16,
+                      }}
+                    >
+                      {value.name}
+                    </Text>
+                    <Ionicons
+                      name="add"
+                      size={24}
+                      color="black"
+                      style={{
+                        marginRight: width * 0.03,
+                        alignSelf: "center",
+                      }}
+                    />
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
           ))
         )}
       </ScrollView>
