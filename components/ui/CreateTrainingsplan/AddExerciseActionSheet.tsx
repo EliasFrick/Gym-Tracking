@@ -47,7 +47,7 @@ export const AddExerciseActionSheet = (
       name: "",
       description: "",
       primaryMuscle: [],
-      mainGroup: null,
+      mainGroup: "",
       image: null,
     });
 
@@ -124,21 +124,25 @@ export const AddExerciseActionSheet = (
 
   const saveCustomExercise = async () => {
     try {
-      const usersCollection = collection(firestoreDB, "User");
-      const userRef = doc(usersCollection, firebaseUser?.uid);
-      const exerciseRef = collection(userRef, "Exercises");
+      if (customExercise.name === "" || customExercise.mainGroup === "") {
+        alert("Please enter a Name and main Group");
+        return;
+      } else {
+        const usersCollection = collection(firestoreDB, "User");
+        const userRef = doc(usersCollection, firebaseUser?.uid);
+        const exerciseRef = collection(userRef, "Exercises");
 
-      // Generiere die nächste ID
-      const nextId = await getNextCustomExerciseId();
+        const nextId = await getNextCustomExerciseId();
 
-      await setDoc(doc(exerciseRef, nextId), {
-        ...customExercise,
-        id: nextId, // Speichere die ID auch im Dokument
-      });
+        await setDoc(doc(exerciseRef, nextId), {
+          ...customExercise,
+          id: nextId,
+        });
 
-      alert("Successfully saved");
-      deleteExerciseData();
-      SheetManager.hide("add-exercise-modal-sheet");
+        alert("Successfully saved");
+        deleteExerciseData();
+        SheetManager.hide("add-exercise-modal-sheet");
+      }
     } catch (error) {
       console.error("Error adding document: ", error);
       alert("Error while saving exercise");
@@ -151,7 +155,7 @@ export const AddExerciseActionSheet = (
       name: "",
       description: "",
       primaryMuscle: [],
-      mainGroup: null,
+      mainGroup: "",
       image: null,
     });
   };
@@ -192,6 +196,10 @@ export const AddExerciseActionSheet = (
         <AddExerciseComponent
           title={customExercise.name}
           setTitle={(title) => updateCustomExercise("name", title)}
+          setMainGroup={(mainGroup) =>
+            updateCustomExercise("mainGroup", mainGroup)
+          }
+          mainGroup={customExercise.mainGroup}
           description={customExercise.description}
           setDescription={(desc) => updateCustomExercise("description", desc)}
           image={customExercise.image}
