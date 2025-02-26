@@ -9,14 +9,10 @@ import {
 } from "react-native";
 import { Text, YStack, XStack } from "tamagui";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, storage } from "@/database/Firebaseconfig";
-import { router, useRouter } from "expo-router";
+import { auth } from "@/database/Firebaseconfig";
+import { useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { firestoreDB } from "@/database/Firebaseconfig";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { updateDoc, doc, getDoc } from "firebase/firestore"; // updateDoc falls du auch Firestore updaten möchtest
-import { LineGraph } from "react-native-graph";
+
 import { useUser } from "@/context/UserProvider";
 
 export default function ProfileScreen() {
@@ -24,40 +20,24 @@ export default function ProfileScreen() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
   const user = auth.currentUser;
-  const { userData, loading, error, refreshUserData } = useUser();
+
+  // Get user data and context methods
+  const {
+    userData,
+    loading,
+    error,
+    refreshUserData,
+    updateProfileImage,
+    deleteProfileImage,
+  } = useUser();
 
   useEffect(() => {
-    const loadUserData = async () => {
-      try {
-        // Lade gespeichertes Profilbild
-        const savedImage = await AsyncStorage.getItem("profileImage");
-        if (savedImage) {
-          setProfileImage(savedImage);
-        }
-
-        // Versuche zuerst den Username aus dem LocalStorage zu laden
-        const cachedUsername = await AsyncStorage.getItem("userName");
-        if (cachedUsername) {
-          setUsername(cachedUsername);
-        }
-
-        // Wenn online, aktualisiere den Username aus Firestore
-        if (user) {
-          const userDoc = await getDoc(doc(firestoreDB, "User", user.uid));
-          if (userDoc.exists()) {
-            const firestoreUsername = userDoc.data().userName;
-            setUsername(firestoreUsername);
-            // Speichere den aktuellen Username im LocalStorage
-            await AsyncStorage.setItem("userName", firestoreUsername);
-          }
-        }
-      } catch (error) {
-        console.error("Error loading user data:", error);
-      }
-    };
-
-    loadUserData();
-  }, [user]);
+    // Whenever userData changes, sync local states
+    if (userData) {
+      setUsername(userData.userName ?? "");
+      setProfileImage(userData.profileImage || null);
+    }
+  }, [userData]);
 
   const menuItems = [
     ...(userData?.prime
@@ -70,20 +50,24 @@ export default function ProfileScreen() {
         ]
       : []),
     {
+      icon: "barbell",
+      title: "My Exercises",
+      onPress: () => router.push("/(modals)/exercises"),
+    },
+    {
       icon: "person-outline",
       title: "Profile Information",
       onPress: () => router.push("/(modals)/profile-information"),
     },
-    /* {
-      icon: "settings-outline",
-      title: "Settings",
-      route: "/settings",
-    }, */
+    // You can add more menu items here...
   ];
 
+  /**
+   * Prompt user to pick an image and upload it via the UserProvider
+   */
   const pickImage = async () => {
     try {
-      // Frage nach Erlaubnis
+      // Request permission
       const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== "granted") {
@@ -94,7 +78,7 @@ export default function ProfileScreen() {
         return;
       }
 
-      // Starte den ImagePicker
+      // Launch the Image Picker
       const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
         allowsEditing: true,
@@ -104,57 +88,45 @@ export default function ProfileScreen() {
 
       if (!result.canceled) {
         const localUri = result.assets[0].uri;
-
-        try {
-          // Speichere das Bild im LocalStorage
-          await AsyncStorage.setItem("profileImage", localUri);
-          setProfileImage(localUri);
-
-          // Optional: Wenn online, auch in Firebase speichern
-          if (user) {
-            const firebaseUrl = await uploadImageToFirebase(localUri);
-            if (firebaseUrl) {
-              await updateDoc(doc(firestoreDB, "User", user.uid), {
-                profileImage: firebaseUrl,
-              });
-            }
-          }
-        } catch (error) {
-          console.error("Error saving image:", error);
-          Alert.alert("Error", "Failed to save image");
-        }
+        // Use our context method to upload & update Firestore
+        await updateProfileImage(localUri);
+        // Force a data refresh or rely on local state
+        refreshUserData();
       }
-    } catch (error) {
-      console.error("Error picking image:", error);
+    } catch (err) {
+      console.error("Error picking image:", err);
       Alert.alert("Error", "Failed to pick image");
     }
+  };
+
+  /**
+   * Delete the user's profile image from Firebase
+   */
+  const handleDeleteImage = async () => {
+    Alert.alert(
+      "Delete Image",
+      "Are you sure you want to delete your profile picture?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            await deleteProfileImage();
+            setProfileImage(null);
+            refreshUserData();
+          },
+        },
+      ]
+    );
   };
 
   const handleLogout = async () => {
     try {
       await auth.signOut();
       router.replace("/(auth)/login");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
-
-  const handleMenuItemPress = (route: string) => {
-    router.push(route);
-  };
-
-  const uploadImageToFirebase = async (uri: string): Promise<string | null> => {
-    if (!user) return null;
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const storageRef = ref(storage, `profilePhotos/${user.uid}.jpg`);
-      await uploadBytes(storageRef, blob);
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-    } catch (error) {
-      console.error("Error uploading image to Firebase:", error);
-      return null;
+    } catch (err) {
+      console.error("Error signing out:", err);
     }
   };
 
@@ -171,13 +143,24 @@ export default function ProfileScreen() {
               }
               style={styles.avatar}
             />
-
             <View style={styles.editIconContainer}>
               <Ionicons name="camera" size={20} color="white" />
             </View>
           </TouchableOpacity>
-          <Text style={styles.name}>{username || "Loading..."}</Text>
+          <Text style={styles.name}>
+            {loading ? "Loading..." : username || "No username"}
+          </Text>
         </View>
+
+        {/* Delete button (only if user has a profile image) */}
+        {/* {profileImage ? (
+          <Button
+            title="Delete Profile Picture"
+            onPress={handleDeleteImage}
+            color="#FF6B6B"
+          />
+        ) : null} */}
+
         <YStack space="$3" style={styles.menuContainer}>
           {menuItems.map((item, index) => (
             <TouchableOpacity
@@ -246,10 +229,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     marginBottom: 5,
-  },
-  email: {
-    fontSize: 16,
-    color: "#666",
   },
   menuContainer: {
     backgroundColor: "#242424",

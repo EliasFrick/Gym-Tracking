@@ -36,6 +36,7 @@ const RegisterScreen = () => {
       passwordConfirm: "",
       birthDate: "",
       userName: "",
+      prime: true,
     });
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date());

@@ -11,6 +11,7 @@ export interface IUserRegisterCredentials {
   passwordConfirm: string;
   birthDate: string;
   userName: string;
+  prime?: boolean;
 }
 
 export interface IUser {
@@ -241,5 +242,10 @@ export interface IUserProvider {
   id: string;
   name: string;
   prime: boolean;
-  // Füge hier weitere Eigenschaften hinzu, die ein Exercise haben kann
+  userName?: string;
+  firstname?: string;
+  lastname?: string;
+  height?: number;
+  diet?: string;
+  profileImage?: string;
 }

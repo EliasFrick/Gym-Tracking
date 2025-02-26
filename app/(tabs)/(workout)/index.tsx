@@ -5,6 +5,8 @@ import {
   View,
   Text,
   TouchableWithoutFeedback,
+  FlatList,
+  RefreshControl,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import ExerciseCard from "@/components/ui/ExerciseCard";
@@ -16,6 +18,7 @@ import { TamaguiPopOver } from "@/components/ui/TamaguiPopOver";
 import { scale } from "react-native-size-matters";
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
 import { getLocalWorkouts, syncWorkouts } from "../../../utils/localWorkouts";
+import { useFocusEffect } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
@@ -24,36 +27,43 @@ export default function indexScreen() {
   const navigation = useNavigation();
   const user = auth.currentUser;
   const { isOnline, syncDataNow } = useContext(AppConfigContext);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Neuen Zustand für den Popover hinzufügen:
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   // Workouts beim Laden der Komponente abrufen
   useEffect(() => {
-    const loadWorkouts = async () => {
-      try {
-        // Erst lokale Workouts laden
-        const localWorkouts = await getLocalWorkouts();
-        setWorkout(localWorkouts);
-
-        // Wenn online, dann mit Server synchronisieren
-        if (user && isOnline) {
-          const serverWorkouts = await fetchUserWorkouts();
-          await syncWorkouts(serverWorkouts);
-          setWorkout(serverWorkouts);
-          await syncDataNow();
-        }
-      } catch (error) {
-        console.error("Fehler beim Laden der Workouts:", error);
-      }
-    };
-
     loadWorkouts();
   }, [user, isOnline]);
 
+  const loadWorkouts = async () => {
+    try {
+      // Erst lokale Workouts laden
+      const localWorkouts = await getLocalWorkouts();
+      setWorkout(localWorkouts);
+
+      // Wenn online, dann mit Server synchronisieren
+      if (user && isOnline) {
+        const serverWorkouts = await fetchUserWorkouts();
+        await syncWorkouts(serverWorkouts);
+        setWorkout(serverWorkouts);
+        await syncDataNow();
+      }
+    } catch (error) {
+      console.error("Fehler beim Laden der Workouts:", error);
+    }
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadWorkouts();
+    setRefreshing(false);
+  };
+
   React.useLayoutEffect(() => {
     navigation.setOptions({
-      headerShown: false, // Wir bauen den Header selbst im Render-Bereich
+      headerShown: false,
     });
   }, [navigation]);
 
@@ -78,26 +88,29 @@ export default function indexScreen() {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <ScrollView
+        <FlatList 
           contentContainerStyle={styles.scrollViewContent}
-          style={styles.container}
-        >
-          {workout && workout.length > 0 ? (
-            workout.map((value, index) => (
-              <ExerciseCard
-                key={index}
-                {...value}
-                rotation={index % 2 === 0 ? "5deg" : "-5deg"}
-              />
-            ))
-          ) : (
+          data={workout} 
+          keyExtractor={(item, index) => index.toString()} 
+          renderItem={({ item, index }) => (
+            <ExerciseCard
+              key={index}
+              {...item}
+              rotation={index % 2 === 0 ? "5deg" : "-5deg"}
+            />
+          )}
+          ListEmptyComponent={
+            // Komponente für leere Liste
             <View style={{ marginTop: 20 }}>
               <Text style={{ fontSize: 18, color: "white" }}>
                 Create your first workout
               </Text>
             </View>
-          )}
-        </ScrollView>
+          }
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        />
       </View>
     </TouchableWithoutFeedback>
   );

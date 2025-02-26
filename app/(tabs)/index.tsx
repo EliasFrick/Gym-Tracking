@@ -13,16 +13,14 @@ import {
   query,
   orderBy,
   getDocs,
-  doc,
-  getDoc,
+
 } from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
 import { useAppConfig } from "@/context/AppConfigProvider";
-import { Ionicons } from "@expo/vector-icons";
 import { SheetManager } from "react-native-actions-sheet";
-import { UserInfo, WorkoutHistoryItem } from "@/types/interfaces";
+import { WorkoutHistoryItem } from "@/types/interfaces";
 import { useUser } from "@/context/UserProvider";
 
 const { width, height } = Dimensions.get("window");
