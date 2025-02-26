@@ -1,23 +1,19 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   Alert,
   Keyboard,
-  TouchableWithoutFeedback,
 } from "react-native";
 import ActionSheet, {
-  SheetProps,
   ActionSheetProps,
   SheetManager,
 } from "react-native-actions-sheet";
 import { Dimensions } from "react-native";
 import { XStack, Button, ScrollView } from "tamagui";
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "@tamagui/lucide-icons";
-import { AppplicationContext } from "@/context/ApplicationProvider";
 import { WorkoutExercise } from "@/types/interfaces";
 import {
   saveWorkoutProgress,

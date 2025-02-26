@@ -9,7 +9,7 @@ import {
   ScrollView,
   Alert,
 } from "react-native";
-import { Text } from "tamagui";
+import { Button, Text, XStack } from "tamagui";
 import {
   collection,
   addDoc,
@@ -27,16 +27,25 @@ import { WeightEntry } from "@/types/interfaces";
 
 const { width } = Dimensions.get("window");
 
-
-
 export default function WeightScreen() {
   const [currentWeight, setCurrentWeight] = useState("");
   const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
+  const [filteredData, setFilteredData] = useState<WeightEntry[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // timeRange can be 'M' (1 month), '6M' (6 months), 'Y' (1 year), 'Max' (all data)
+  const [timeRange, setTimeRange] = useState<"M" | "6M" | "Y" | "Max">("Max");
+
+  // For displaying the currently “hovered” point when panning on the graph
+  const [selectedWeight, setSelectedWeight] = useState<string>("");
 
   useEffect(() => {
     loadWeightHistory();
   }, []);
+
+  useEffect(() => {
+    filterData();
+  }, [timeRange, weightHistory]);
 
   const loadWeightHistory = async () => {
     try {
@@ -185,9 +194,50 @@ export default function WeightScreen() {
     }
   };
 
-  const prepareWeightDataForGraph = () => {
-    return weightHistory
-      .sort((a, b) => a.date.getTime() - b.date.getTime()) // Sortiere nach Datum aufsteigend
+  /**
+   * Filters the full weightHistory array based on the selected time range
+   */
+  const filterData = () => {
+    const now = new Date().getTime();
+    let filtered = [...weightHistory];
+
+    switch (timeRange) {
+      case "M": {
+        // last 30 days
+        const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
+        filtered = weightHistory.filter((e) => e.date.getTime() >= oneMonthAgo);
+        break;
+      }
+      case "6M": {
+        // last 6 x 30 days
+        const sixMonthsAgo = now - 6 * 30 * 24 * 60 * 60 * 1000;
+        filtered = weightHistory.filter(
+          (e) => e.date.getTime() >= sixMonthsAgo
+        );
+        break;
+      }
+      case "Y": {
+        // last 365 days
+        const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
+        filtered = weightHistory.filter((e) => e.date.getTime() >= oneYearAgo);
+        break;
+      }
+      case "Max":
+      default:
+        filtered = weightHistory;
+        break;
+    }
+    setFilteredData(filtered);
+  };
+
+  /**
+   * Sort ascending by date for the graph (oldest → newest),
+   * then map to { value, date }
+   */
+  const prepareWeightDataForGraph = (data: WeightEntry[]) => {
+    return data
+      .slice()
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
       .map((entry) => ({
         value: entry.weight,
         date: entry.date,
@@ -217,28 +267,87 @@ export default function WeightScreen() {
           {weightHistory.length > 0 ? (
             <>
               <View style={styles.graphContainer}>
+                {/* Display selected weight on top of the graph */}
+                <Text style={styles.selectedWeightText}>
+                  {selectedWeight
+                    ? `Selected: ${selectedWeight}`
+                    : "Slide to see weight"}
+                </Text>
                 <LineGraph
-                  points={prepareWeightDataForGraph()}
+                  points={prepareWeightDataForGraph(filteredData)}
                   color="#F86E51"
-                  animated={true}
+                  animated
+                  enablePanGesture
+                  onGestureStart={() => {
+                    // Could trigger haptic feedback here if desired
+                  }}
+                  onPointSelected={(point) => {
+                    setSelectedWeight(`${point.value.toFixed(1)} kg`);
+                  }}
+                  onGestureEnd={() => {
+                    // Reset or keep last value? Currently we reset
+                    setSelectedWeight("");
+                  }}
                   style={styles.graph}
                 />
+
+                <XStack
+                  gap={20}
+                  marginTop={10}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Button
+                    color="white"
+                    style={styles.filterButton}
+                    onPress={() => setTimeRange("M")}
+                  >
+                    M
+                  </Button>
+                  <Button
+                    color="white"
+                    style={styles.filterButton}
+                    onPress={() => setTimeRange("6M")}
+                  >
+                    6 M
+                  </Button>
+                  <Button
+                    color="white"
+                    style={styles.filterButton}
+                    onPress={() => setTimeRange("Y")}
+                  >
+                    Y
+                  </Button>
+                  <Button
+                    color="white"
+                    style={styles.filterButton}
+                    onPress={() => setTimeRange("Max")}
+                  >
+                    Max
+                  </Button>
+                </XStack>
               </View>
+
               <View style={styles.historyContainer}>
                 <Text style={styles.historyTitle}>Weight History</Text>
-                {weightHistory.map((entry, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.historyItem}
-                    onLongPress={() => deleteWeightEntry(entry)}
-                    delayLongPress={500}
-                  >
-                    <Text style={styles.historyWeight}>{entry.weight} kg</Text>
-                    <Text style={styles.historyDate}>
-                      {entry.date.toLocaleDateString()}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                {filteredData
+                  .slice()
+                  .sort((a, b) => b.date.getTime() - a.date.getTime())
+                  .map((entry, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.historyItem}
+                      onLongPress={() => deleteWeightEntry(entry)}
+                      delayLongPress={500}
+                    >
+                      <Text style={styles.historyWeight}>
+                        {entry.weight} kg
+                      </Text>
+                      <Text style={styles.historyDate}>
+                        {entry.date.toLocaleDateString()}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
               </View>
             </>
           ) : (
@@ -289,11 +398,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#242424",
     borderRadius: 12,
     padding: 15,
-    height: 300,
+    height: 320,
     marginBottom: 20,
+  },
+  selectedWeightText: {
+    color: "white",
+    textAlign: "center",
+    marginBottom: 8,
+    fontSize: 14,
   },
   graph: {
     flex: 1,
+  },
+  filterButton: {
+    backgroundColor: "#333",
+    borderColor: "#F86E51",
+    borderWidth: 1,
+    borderRadius: 8,
   },
   historyContainer: {
     backgroundColor: "#242424",

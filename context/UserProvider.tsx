@@ -1,22 +1,31 @@
 import React, { createContext, ReactNode, useState, useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
-import { IUserProvider } from "@/types/interfaces";
-import { auth, firestoreDB } from "@/database/Firebaseconfig";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 
-// Define the context type
+import { IUserProvider } from "@/types/interfaces";
+import { auth, firestoreDB, storage } from "@/database/Firebaseconfig";
+
 interface UserContextType {
   userData: IUserProvider | null;
   loading: boolean;
   error: string | null;
   refreshUserData: () => Promise<void>;
+  updateProfileImage: (localUri: string) => Promise<void>;
+  deleteProfileImage: () => Promise<void>;
 }
 
-// Create the context
 export const UserContext = createContext<UserContextType>({
   userData: null,
   loading: true,
   error: null,
   refreshUserData: async () => {},
+  updateProfileImage: async () => {},
+  deleteProfileImage: async () => {},
 });
 
 interface UserProviderProps {
@@ -30,9 +39,12 @@ export function UserProvider({ children }: React.PropsWithChildren) {
   const [error, setError] = useState<string | null>(null);
 
   const user = auth.currentUser;
-  if (!user) return;
 
+  /**
+   * Fetch the current user document from Firestore
+   */
   const fetchUserData = async () => {
+    if (!user?.uid) return;
     try {
       setLoading(true);
       setError(null);
@@ -52,17 +64,115 @@ export function UserProvider({ children }: React.PropsWithChildren) {
     }
   };
 
-  // Initial fetch when component mounts
-  useEffect(() => {
-    if (user.uid) {
-      fetchUserData();
-    }
-  }, [user.uid]);
-
-  // Function to manually refresh user data
+  /**
+   * Manually refresh user data (e.g., after updates)
+   */
   const refreshUserData = async () => {
     await fetchUserData();
   };
+
+  /**
+   * Internal helper to upload a local file (URI) to Firebase Storage
+   * and return its download URL.
+   */
+  const uploadProfileImageToStorage = async (
+    localUri: string
+  ): Promise<string | null> => {
+    if (!user?.uid) return null;
+
+    try {
+      // Convert URI to Blob
+      const response = await fetch(localUri);
+      const blob = await response.blob();
+
+      // Reference in Storage: profilePhotos/{userId}.jpg
+      const storageRef = ref(storage, `profilePhotos/${user.uid}.jpg`);
+
+      // Upload the file
+      await uploadBytes(storageRef, blob);
+
+      // Retrieve the download URL
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+    } catch (err) {
+      console.error("Error uploading profile image:", err);
+      return null;
+    }
+  };
+
+  /**
+   * Upload or replace the user’s profile image in Firebase Storage
+   * and update Firestore with the new URL.
+   */
+  const updateProfileImage = async (localUri: string) => {
+    if (!user?.uid) return;
+
+    try {
+      setLoading(true);
+      const downloadURL = await uploadProfileImageToStorage(localUri);
+
+      if (!downloadURL) {
+        setError("Failed to get download URL from Firebase Storage.");
+        return;
+      }
+
+      // Update Firestore
+      await updateDoc(doc(firestoreDB, "User", user.uid), {
+        profileImage: downloadURL,
+      });
+
+      // Update our local state
+      setUserData((prev) =>
+        prev ? { ...prev, profileImage: downloadURL } : null
+      );
+    } catch (err) {
+      console.error("Error updating profile image:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Delete the user’s profile image from Firebase Storage and Firestore
+   */
+  const deleteProfileImage = async () => {
+    if (!user?.uid) return;
+
+    try {
+      setLoading(true);
+
+      // Delete from Storage
+      const storageRef = ref(storage, `profilePhotos/${user.uid}.jpg`);
+      await deleteObject(storageRef).catch((err) => {
+        // If the object doesn't exist, it's fine. We'll just log it.
+        console.log("No existing profile image in storage to delete:", err);
+      });
+
+      // Remove from Firestore
+      await updateDoc(doc(firestoreDB, "User", user.uid), {
+        profileImage: "",
+      });
+
+      // Update our local state
+      setUserData((prev) => (prev ? { ...prev, profileImage: "" } : null));
+    } catch (err) {
+      console.error("Error deleting profile image:", err);
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchUserData();
+    } else {
+      setUserData(null);
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid]);
 
   return (
     <UserContext.Provider
@@ -71,6 +181,8 @@ export function UserProvider({ children }: React.PropsWithChildren) {
         loading,
         error,
         refreshUserData,
+        updateProfileImage,
+        deleteProfileImage,
       }}
     >
       {children}

@@ -11,11 +11,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { Link, useRouter } from "expo-router";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig";
 import { IUserLoginCredentials } from "@/types/interfaces";
 import { ScrollView } from "tamagui";
@@ -39,6 +35,17 @@ const LoginScreen = () => {
   };
 
   const tryLogin = async () => {
+    // Validierung der Eingaben
+    if (!userCredentials.email || !/\S+@\S+\.\S+/.test(userCredentials.email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (!userCredentials.password) {
+      alert("Please enter a password.");
+      return;
+    }
+
     try {
       const auth = getAuth();
       await signInWithEmailAndPassword(
@@ -55,13 +62,21 @@ const LoginScreen = () => {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          console.error(
-            "Error Code: ",
-            errorCode,
-            " ErrorMessage: ",
-            errorMessage
-          );
-          alert(errorMessage.substring(9));
+          console.log(errorCode);
+          console.log(error.message);
+
+          // Überprüfen, ob die E-Mail oder das Passwort falsch ist
+          if (errorCode === "auth/invalid-credential") {
+            alert("Wrong Email or Password.");
+          } else {
+            console.error(
+              "Error Code: ",
+              errorCode,
+              " ErrorMessage: ",
+              errorMessage
+            );
+            alert("Ein Fehler ist aufgetreten: " + errorMessage.substring(9));
+          }
         });
     } catch (error) {
       console.error("Error: ", error);

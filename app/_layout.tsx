@@ -22,12 +22,12 @@ export default function RootLayout() {
   return (
     <TamaguiProvider config={config}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-      <PortalProvider>
-        <SheetProvider>
-          <AppConfigProvider>
-            <ApplicationProvider>
-              <AuthenticationProvider>
-                  <UserProvider >
+        <PortalProvider>
+          <SheetProvider>
+            <AppConfigProvider>
+              <ApplicationProvider>
+                <AuthenticationProvider>
+                  <UserProvider>
                     <Stack
                       screenOptions={{
                         headerShown: false,
@@ -75,11 +75,11 @@ export default function RootLayout() {
                       />
                     </Stack>
                   </UserProvider>
-              </AuthenticationProvider>
-            </ApplicationProvider>
-          </AppConfigProvider>
-        </SheetProvider>
-      </PortalProvider>
+                </AuthenticationProvider>
+              </ApplicationProvider>
+            </AppConfigProvider>
+          </SheetProvider>
+        </PortalProvider>
       </GestureHandlerRootView>
     </TamaguiProvider>
   );
