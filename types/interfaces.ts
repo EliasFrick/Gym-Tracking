@@ -240,6 +240,7 @@ export interface WorkoutHistoryItem {
 
 export interface IUserProvider {
   id: string;
+  uId: string;
   name: string;
   prime: boolean;
   userName?: string;
@@ -248,4 +249,13 @@ export interface IUserProvider {
   height?: number;
   diet?: string;
   profileImage?: string;
+}
+
+export interface IUserContextType {
+  userData: IUserProvider | null;
+  loading: boolean;
+  error: string | null;
+  refreshUserData: () => Promise<void>;
+  updateProfileImage: (localUri: string) => Promise<void>;
+  deleteProfileImage: () => Promise<void>;
 }

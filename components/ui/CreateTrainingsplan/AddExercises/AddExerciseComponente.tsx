@@ -94,7 +94,7 @@ export function AddExerciseComponent({
             placeholder="Description..."
             style={{
               height: height * 0.15,
-              color: "#FFFFFF",
+              color: "black",
             }}
             placeholderTextColor="#A0A0A0"
             value={description}

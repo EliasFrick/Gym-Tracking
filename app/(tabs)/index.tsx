@@ -8,13 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Card } from "tamagui";
-import {
-  collection,
-  query,
-  orderBy,
-  getDocs,
-
-} from "firebase/firestore";
+import { collection, query, orderBy, getDocs } from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
@@ -151,6 +145,14 @@ export default function TabOneScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
         showsVerticalScrollIndicator={false}
+        ListEmptyComponent={
+          // Komponente für leere Liste
+          <View style={{ marginTop: 20 }}>
+            <Text style={{ fontSize: 18, color: "white" }}>
+              Complete a workout first
+            </Text>
+          </View>
+        }
       />
     </View>
   );
