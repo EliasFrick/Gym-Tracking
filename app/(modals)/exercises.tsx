@@ -5,13 +5,17 @@ import {
   Dimensions,
   TouchableOpacity,
   ScrollView,
+  Alert,
+  FlatList,
 } from "react-native";
 import { Text } from "tamagui";
 import { fetchDataFromFirestore } from "@/database/FetchDataFromFirestore";
 import { fetchCustomExercises } from "@/database/fetchCustomExercises";
-import { DocumentData } from "firebase/firestore";
+import { collection, deleteDoc, doc, DocumentData } from "firebase/firestore";
 import { Stack, useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
+import { firestoreDB } from "@/database/Firebaseconfig";
+import { useUser } from "@/context/UserProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,6 +26,7 @@ export default function ExercisesScreen() {
   const [activeTab, setActiveTab] = useState<"default" | "custom">("default");
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
+  const { userData } = useUser();
 
   useEffect(() => {
     loadExercises();
@@ -35,6 +40,7 @@ export default function ExercisesScreen() {
       setDefaultExercises(result);
     } else {
       const result = await fetchCustomExercises();
+      console.log(result);
       setCustomExercises(result);
     }
   };
@@ -48,7 +54,45 @@ export default function ExercisesScreen() {
       return acc;
     }, {} as Record<string, DocumentData[]>);
   }, [activeTab, defaultExercises, customExercises]);
-  console.log(customExercises);
+
+  // Funktion zum Löschen einer Übung
+  const deleteExercise = (exerciseId: string) => {
+    console.log(exerciseId);
+    Alert.alert(
+      "Delete Exercise",
+      "Do you want to delete this exercise?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            await deleteExerciseById(exerciseId);
+            loadExercises();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  const deleteExerciseById = async (id: string) => {
+    try {
+      const usersCollection = collection(firestoreDB, "User");
+      const userRef = doc(usersCollection, userData?.uId);
+      const exerciseRef = collection(userRef, "Exercises");
+      const exericseDocRef = doc(exerciseRef, id);
+
+      await deleteDoc(exericseDocRef);
+
+      alert("Workout deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting Exercise:", error);
+      alert("Error deleting Exercise. Please try again.");
+    }
+  };
 
   return (
     <>
@@ -108,22 +152,27 @@ export default function ExercisesScreen() {
         </View>
 
         {/* Exercise List */}
-        <ScrollView style={styles.scrollView}>
-          {Object.entries(groupedExercises).map(([groupName, exercises]) => (
-            <View key={groupName} style={styles.groupContainer}>
+        <FlatList
+          data={Object.entries(groupedExercises)}
+          keyExtractor={(item) => item[0]}
+          renderItem={({ item: [groupName, exercises] }) => (
+            <View style={styles.groupContainer}>
               <Text style={styles.groupTitle}>{groupName}</Text>
-              {exercises.map((exercise, index) => (
-                <View key={index} style={styles.exerciseCard}>
-                  <Text style={styles.exerciseName}>{exercise.name}</Text>
-                  <Text style={styles.exerciseDetail}>
-                    {/*                     Primary Muscle: {exercise.primaryMuscle?.join(", ")}
-                     */}{" "}
-                  </Text>
-                </View>
-              ))}
+              <FlatList
+                data={exercises}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    onLongPress={() => deleteExercise(item.id)} // ID der Übung verwenden
+                    style={styles.exerciseCard}
+                  >
+                    <Text style={styles.exerciseName}>{item.name}</Text>
+                  </TouchableOpacity>
+                )}
+              />
             </View>
-          ))}
-        </ScrollView>
+          )}
+        />
       </View>
     </>
   );

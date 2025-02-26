@@ -7,19 +7,10 @@ import {
   deleteObject,
 } from "firebase/storage";
 
-import { IUserProvider } from "@/types/interfaces";
+import { IUserContextType, IUserProvider } from "@/types/interfaces";
 import { auth, firestoreDB, storage } from "@/database/Firebaseconfig";
 
-interface UserContextType {
-  userData: IUserProvider | null;
-  loading: boolean;
-  error: string | null;
-  refreshUserData: () => Promise<void>;
-  updateProfileImage: (localUri: string) => Promise<void>;
-  deleteProfileImage: () => Promise<void>;
-}
-
-export const UserContext = createContext<UserContextType>({
+export const UserContext = createContext<IUserContextType>({
   userData: null,
   loading: true,
   error: null,
@@ -27,11 +18,6 @@ export const UserContext = createContext<UserContextType>({
   updateProfileImage: async () => {},
   deleteProfileImage: async () => {},
 });
-
-interface UserProviderProps {
-  children: ReactNode;
-  userId: string; // The ID of the current user
-}
 
 export function UserProvider({ children }: React.PropsWithChildren) {
   const [userData, setUserData] = useState<IUserProvider | null>(null);
