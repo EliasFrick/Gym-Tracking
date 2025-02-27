@@ -16,6 +16,7 @@ import { useAppConfig } from "@/context/AppConfigProvider";
 import { SheetManager } from "react-native-actions-sheet";
 import { WorkoutHistoryItem } from "@/types/interfaces";
 import { useUser } from "@/context/UserProvider";
+import _ from "lodash";
 
 const { width, height } = Dimensions.get("window");
 
@@ -125,7 +126,7 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      {userData?.prime ? (
+      {userData?.prime && workoutHistory.length > 0 ? (
         <TouchableOpacity
           style={styles.analyzeButton}
           onPress={openAnalysisSheet}
