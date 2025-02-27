@@ -90,65 +90,83 @@ export const WorkoutAnalysisSheet = (
     }
   };
 
-  const fetchBodyWeight = async () => {
+  const fetchBodyWeight = async (): Promise<WeightEntry[]> => {
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) return [];
+    try {
+      const weightsRef = collection(
+        firestoreDB,
+        "User",
+        user.uid,
+        "WeightHistory"
+      );
 
-    const weightsRef = collection(
-      firestoreDB,
-      "User",
-      user.uid,
-      "WeightHistory"
-    );
+      const q = query(weightsRef, orderBy("date", "desc"));
+      const querySnapshot = await getDocs(q);
 
-    const q = query(weightsRef, orderBy("date", "desc"));
-    const querySnapshot = await getDocs(q);
-
-    const weights: WeightEntry[] = [];
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
-      weights.push({
-        weight: data.weight,
-        date: data.date.toDate(),
+      const weights: WeightEntry[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        weights.push({
+          weight: data.weight,
+          date: data.date.toDate(),
+        });
       });
-    });
 
-    setWeightHistory(weights);
+      return weights;
+    } catch (error) {
+      console.error("Error fetching body weight:", error);
+      return [];
+    }
   };
 
-  const loadUserInfo = async () => {
+  const loadUserInfo = async (): Promise<UserInfo | null> => {
     try {
       const user = auth.currentUser;
-      if (!user) return;
+      if (!user) return null;
 
       const userDoc = await getDoc(doc(firestoreDB, "User", user.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
-        setUserInfo({
+        const info: UserInfo = {
           username: data.userName || "",
           firstName: data.firstname || "",
           lastName: data.lastname || "",
           height: data.height?.toString() || "",
           diet: data.diet || "",
-        });
+        };
+        return info;
       }
     } catch (error) {
       console.error("Error loading user info:", error);
       Alert.alert("Error", "Failed to load user information");
-    } finally {
     }
+    return null;
   };
 
   const analyzeWorkouts = async () => {
     setIsLoading(true);
-    await fetchBodyWeight();
-    await loadUserInfo();
     try {
       const user = auth.currentUser;
       if (!user) {
         throw new Error("No user logged in");
       }
-      const currentWeight = weightHistory[weightHistory.length - 1].weight;
+
+      // Fetch weight history and user info concurrently
+      const [weightHistoryData, userInfoData] = await Promise.all([
+        fetchBodyWeight(),
+        loadUserInfo(),
+      ]);
+
+      // Update state if needed
+      setWeightHistory(weightHistoryData);
+      if (userInfoData) {
+        setUserInfo(userInfoData);
+      }
+
+      const currentWeight =
+        weightHistoryData[weightHistoryData.length - 1]?.weight || "";
+
       const workoutHistory = props.payload?.workoutHistory || [];
 
       const formattedWorkoutHistory = workoutHistory.map(
@@ -174,6 +192,8 @@ export const WorkoutAnalysisSheet = (
           };
         }
       );
+
+      console.log(JSON.stringify(weightHistoryData, null, 2));
 
       const prompt = `
 You are an AI assistant that analyzes a user's gym workout history and provides structured feedback to help them optimize their training.
@@ -205,12 +225,15 @@ Use emoji icons to make it engaging (optional)
 Be brief but informative
         
 Personal Information:
--FirstName: ${userInfo.firstName}
-- Nutrition: ${userInfo.diet}
-- Weight: ${weightHistory}
-- Size: ${userInfo.height}cm
--User Informations: ${analysisData.userInformation}
-        
+- FirstName: ${userInfoData?.firstName || ""}
+- Nutrition: ${userInfoData?.diet || ""}
+- Weight: ${currentWeight}
+- Bodyweight History: ${JSON.stringify(weightHistoryData.reverse(), null, 2)}
+- Size: ${userInfoData?.height || ""}cm
+- User Informations: ${analysisData.userInformation || ""}
+
+when analyzing your body weight, also take into account the date that it says and tell me whether the trend is increasing or decreasing and how much I gain or lose on average per week and whether this is good or bad
+
 Workout-History:
 ${JSON.stringify(formattedWorkoutHistory, null, 2)}
       Write the report in ${analysisData.language}`;
@@ -242,10 +265,10 @@ ${JSON.stringify(formattedWorkoutHistory, null, 2)}
           analysis: result,
           timestamp: new Date(),
           workoutData: {
-            diet: userInfo.diet,
+            diet: userInfoData?.diet || "",
             weight: currentWeight,
             analyzedWorkouts: formattedWorkoutHistory,
-            height: userInfo.height,
+            height: userInfoData?.height || "",
           },
         }
       );
@@ -363,6 +386,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     marginTop: 15,
+    marginBottom: height * 0.4,
   },
   analysisText: {
     color: "white",

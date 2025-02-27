@@ -259,3 +259,15 @@ export interface IUserContextType {
   updateProfileImage: (localUri: string) => Promise<void>;
   deleteProfileImage: () => Promise<void>;
 }
+
+export interface AIResult {
+  id: string;
+  analysis: string;
+  timestamp: Date;
+  workoutData: {
+    diet: string;
+    weight: string;
+    height: string;
+    analyzedWorkouts: any[];
+  };
+}

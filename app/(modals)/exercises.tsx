@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  ScrollView,
   Alert,
   FlatList,
+  RefreshControl,
 } from "react-native";
 import { Text } from "tamagui";
 import { fetchDataFromFirestore } from "@/database/FetchDataFromFirestore";
@@ -16,10 +16,69 @@ import { Stack, useRouter } from "expo-router";
 import { AntDesign } from "@expo/vector-icons";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import { useUser } from "@/context/UserProvider";
+import { Swipeable } from "react-native-gesture-handler";
+// If you're using Expo Router, you may need a different focus hook.
+// This import is from React Navigation:
+import { useFocusEffect } from "@react-navigation/native";
+import { SheetManager } from "react-native-actions-sheet";
 
 const { width, height } = Dimensions.get("window");
-
 const MUSCLE_GROUP_ORDER = ["Arms", "Chest", "Back", "Shoulder", "Legs"];
+
+/**
+ * A separate component for each exercise row.
+ * This allows us to safely use hooks (like useRef) at the top level.
+ */
+function ExerciseItem({
+  item,
+  deleteExerciseById,
+  loadExercises,
+}: {
+  item: DocumentData;
+  deleteExerciseById: (id: string) => Promise<void>;
+  loadExercises: () => Promise<void>;
+}) {
+  const swipeableRef = React.useRef<Swipeable>(null);
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete Exercise",
+      "Do you want to delete this Exercise?",
+      [
+        {
+          text: "Cancel",
+          onPress: () => swipeableRef.current?.close(),
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          onPress: async () => {
+            await deleteExerciseById(item.id);
+            swipeableRef.current?.close();
+            loadExercises();
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  return (
+    <Swipeable
+      ref={swipeableRef}
+      renderRightActions={() => (
+        <TouchableOpacity style={styles.deleteContainer} onPress={handleDelete}>
+          <Text style={styles.deleteText}>Delete</Text>
+        </TouchableOpacity>
+      )}
+      onSwipeableRightOpen={handleDelete}
+    >
+      <View style={styles.exerciseCard}>
+        <Text style={styles.exerciseName}>{item.name}</Text>
+      </View>
+    </Swipeable>
+  );
+}
 
 export default function ExercisesScreen() {
   const router = useRouter();
@@ -27,23 +86,30 @@ export default function ExercisesScreen() {
   const [defaultExercises, setDefaultExercises] = useState<DocumentData[]>([]);
   const [customExercises, setCustomExercises] = useState<DocumentData[]>([]);
   const { userData } = useUser();
-
-  useEffect(() => {
-    loadExercises();
-  }, []);
+  const [refreshing, setRefreshing] = useState(false);
 
   const loadExercises = async () => {
-    if (activeTab === "default") {
-      const result = await fetchDataFromFirestore({
-        collectionName: "DefaultExercises",
-      });
-      setDefaultExercises(result);
-    } else {
-      const result = await fetchCustomExercises();
-      console.log(result);
-      setCustomExercises(result);
+    try {
+      if (activeTab === "default") {
+        const result = await fetchDataFromFirestore({
+          collectionName: "DefaultExercises",
+        });
+        setDefaultExercises(result);
+      } else {
+        const result = await fetchCustomExercises();
+        setCustomExercises(result);
+      }
+    } catch (error) {
+      console.log("Error loading exercises:", error);
     }
   };
+
+  // Refresh exercises automatically when the screen is focused
+  useFocusEffect(
+    useCallback(() => {
+      loadExercises();
+    }, [activeTab])
+  );
 
   // Gruppiere Übungen nach Muskelgruppen
   const groupedExercises = React.useMemo(() => {
@@ -55,29 +121,6 @@ export default function ExercisesScreen() {
     }, {} as Record<string, DocumentData[]>);
   }, [activeTab, defaultExercises, customExercises]);
 
-  // Funktion zum Löschen einer Übung
-  const deleteExercise = (exerciseId: string) => {
-    console.log(exerciseId);
-    Alert.alert(
-      "Delete Exercise",
-      "Do you want to delete this exercise?",
-      [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
-        {
-          text: "Delete",
-          onPress: async () => {
-            await deleteExerciseById(exerciseId);
-            loadExercises();
-          },
-        },
-      ],
-      { cancelable: true }
-    );
-  };
-
   const deleteExerciseById = async (id: string) => {
     try {
       const usersCollection = collection(firestoreDB, "User");
@@ -86,12 +129,31 @@ export default function ExercisesScreen() {
       const exericseDocRef = doc(exerciseRef, id);
 
       await deleteDoc(exericseDocRef);
-
       alert("Workout deleted successfully!");
     } catch (error) {
       console.error("Error deleting Exercise:", error);
       alert("Error deleting Exercise. Please try again.");
     }
+  };
+
+  const renderExerciseItem = ({ item }: { item: DocumentData }) => {
+    return (
+      <ExerciseItem
+        item={item}
+        deleteExerciseById={deleteExerciseById}
+        loadExercises={loadExercises}
+      />
+    );
+  };
+
+  const openExerciseActionSheet = () => {
+    SheetManager.show("add-exercise-modal-sheet");
+  };
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await loadExercises();
+    setRefreshing(false);
   };
 
   return (
@@ -119,10 +181,7 @@ export default function ExercisesScreen() {
         <View style={styles.tabContainer}>
           <TouchableOpacity
             style={[styles.tab, activeTab === "default" && styles.activeTab]}
-            onPress={() => {
-              setActiveTab("default");
-              loadExercises();
-            }}
+            onPress={() => setActiveTab("default")}
           >
             <Text
               style={[
@@ -135,10 +194,7 @@ export default function ExercisesScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.tab, activeTab === "custom" && styles.activeTab]}
-            onPress={() => {
-              setActiveTab("custom");
-              loadExercises();
-            }}
+            onPress={() => setActiveTab("custom")}
           >
             <Text
               style={[
@@ -150,6 +206,20 @@ export default function ExercisesScreen() {
             </Text>
           </TouchableOpacity>
         </View>
+        {activeTab === "default" ? (
+          <></>
+        ) : (
+          <View style={styles.addButtonContainer}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => {
+                openExerciseActionSheet();
+              }}
+            >
+              <Text style={styles.addButtonText}>Add Exercise</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Exercise List */}
         <FlatList
@@ -161,17 +231,13 @@ export default function ExercisesScreen() {
               <FlatList
                 data={exercises}
                 keyExtractor={(item, index) => index.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onLongPress={() => deleteExercise(item.id)} // ID der Übung verwenden
-                    style={styles.exerciseCard}
-                  >
-                    <Text style={styles.exerciseName}>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
+                renderItem={renderExerciseItem}
               />
             </View>
           )}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
         />
       </View>
     </>
@@ -202,6 +268,21 @@ const styles = StyleSheet.create({
     color: "white",
     marginLeft: 16,
   },
+  addButtonContainer: {
+    alignItems: "center",
+    marginVertical: 15,
+  },
+  addButton: {
+    backgroundColor: "#F86E51",
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+  },
+  addButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
   tabContainer: {
     flexDirection: "row",
     paddingTop: 20,
@@ -224,12 +305,9 @@ const styles = StyleSheet.create({
     color: "#F86E51",
     fontWeight: "bold",
   },
-  scrollView: {
-    flex: 1,
-    padding: 16,
-  },
   groupContainer: {
     marginBottom: 24,
+    paddingHorizontal: 16,
   },
   groupTitle: {
     fontSize: 20,
@@ -249,8 +327,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 4,
   },
-  exerciseDetail: {
-    fontSize: 14,
-    color: "#888",
+  deleteContainer: {
+    backgroundColor: "#F86E51",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 100,
+    paddingHorizontal: 20,
+    height: height * 0.063,
+  },
+  deleteText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
