@@ -203,6 +203,7 @@ const DeletePopover = (props: IEditCardPopover) => {
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
+  const { currentWorkout } = useContext(AppplicationContext);
 
   useEffect(() => {
     const handleDeleteWorkout = () => {
@@ -231,6 +232,37 @@ const DeletePopover = (props: IEditCardPopover) => {
     } catch (error) {
       console.error("Error deleting workout:", error);
       alert("Error deleting workout. Please try again.");
+    }
+  };
+
+  const handleEdit = async () => {
+    try {
+      // Fetch current workout data
+      const workoutRef = doc(
+        firestoreDB,
+        "User",
+        firebaseUser?.uid || "",
+        "Workouts",
+        props.title
+      );
+      const workoutDoc = await getDoc(workoutRef);
+
+      if (workoutDoc.exists()) {
+        const workoutData = workoutDoc.data();
+        // Open edit sheet with current exercises
+        SheetManager.show("edit-workout-sheet", {
+          payload: {
+            workoutId: props.title,
+            exercises: workoutData.exercises || [],
+          },
+        });
+
+        // Close the delete/edit popover
+        props.setShowDeletePopover(false);
+      }
+    } catch (error) {
+      console.error("Error editing workout:", error);
+      alert("Error editing workout. Please try again.");
     }
   };
 
@@ -294,7 +326,7 @@ const DeletePopover = (props: IEditCardPopover) => {
             theme="active"
             aria-label="Close"
             width={width * 0.9}
-            onPress={() => setShowAlertDialog(true)}
+            onPress={handleEdit}
           >
             Edit
           </Button>

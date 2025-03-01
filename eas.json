@@ -1,8 +1,7 @@
 {
   "cli": {
     "version": ">= 14.2.0",
-    "appVersionSource": "remote",
-    "requireCommit": true
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -22,6 +21,7 @@
       "channel": "production"
     }
   },
+
   "submit": {
     "production": {}
   }

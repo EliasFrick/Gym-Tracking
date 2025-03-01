@@ -41,7 +41,7 @@ export const AddWorkoutActionSheet = (
     name: "",
     description: "",
     primaryMuscle: [],
-    mainGroup: null,
+    mainGroup: '',
     image: null,
   });
 

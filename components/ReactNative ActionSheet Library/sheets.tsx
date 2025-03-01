@@ -7,6 +7,7 @@ import { WorkoutExerciseSheet } from "../ui/WorkoutExerciseSheet";
 import { WorkoutAnalysisSheet } from "../ui/WorkoutAnalysisSheet";
 import { DietSelectorSheet } from "../ui/DietSelectorSheet";
 import { MsucleGroupSelectorSheet } from "../ui/MuslceGroupSelectorSheet";
+import { EditWorkoutActionSheet } from "../ui/CreateTrainingsplan/EditWorkoutActionSheet";
 
 registerSheet("add-workout-modal-sheet", AddWorkoutActionSheet);
 registerSheet("add-exercise-modal-sheet", AddExerciseActionSheet);
@@ -15,6 +16,7 @@ registerSheet("workout-exercise-sheet", WorkoutExerciseSheet);
 registerSheet("workout-analysis-sheet", WorkoutAnalysisSheet);
 registerSheet("diet-selector-sheet", DietSelectorSheet);
 registerSheet("muscle-group-selector-sheet", MsucleGroupSelectorSheet);
+registerSheet("edit-workout-sheet", EditWorkoutActionSheet);
 
 // We extend some of the types here to give us great intellisense
 // across the app for all registered sheets.
@@ -61,6 +63,18 @@ declare module "react-native-actions-sheet" {
         selectedMuscleGroup: string;
         onSelect: (muscleGroup: string) => void;
       };
+    };
+    "edit-workout-sheet": {
+      payload: {
+        workoutId: string;
+        exercises: Array<{
+          id: string;
+          name: string;
+          primaryMuscle: string[];
+          mainGroup: string[];
+        }>;
+      };
+      returnValue?: any;
     };
   }
 }
