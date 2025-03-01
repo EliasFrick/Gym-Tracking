@@ -39,8 +39,6 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
   }, [props.payload?.exercises]);
 
   const handleSave = async () => {
-    console.log(userData!.uId);
-
     try {
       if (!user) {
         Alert.alert("Error", "No user is signed in");
@@ -50,11 +48,11 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
       const workoutRef = doc(
         firestoreDB,
         "User",
-        userData!.uId,
+        user?.uid,
         "Workouts",
         props.payload?.workoutId || ""
       );
-
+      console.log(exercises);
       await updateDoc(workoutRef, {
         exercises: exercises,
       });
@@ -71,7 +69,6 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
     SheetManager.hide("edit-workout-sheet");
   };
 
-  console.log(exercises);
   return (
     <ActionSheet
       id="edit-workout-sheet"
@@ -83,67 +80,61 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
         <XStack
           justifyContent="space-between"
           alignItems="center"
-          paddingVertical={height * 0.04}
+          paddingVertical={height * 0.02}
+          style={styles.header}
         >
           <TouchableOpacity onPress={handleClose} style={{ padding: 10 }}>
-            <AntDesign name="close" size={width * 0.1} color="white" />
+            <AntDesign name="close" size={width * 0.08} color="white" />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleSave} style={{ padding: 10 }}>
-            <AntDesign name="save" size={width * 0.1} color="white" />
+          <TouchableOpacity
+            onPress={() => handleSave()}
+            style={{ padding: 10 }}
+          >
+            <AntDesign name="save" size={width * 0.08} color="white" />
           </TouchableOpacity>
         </XStack>
-        {/*         <XStack
-          justifyContent="space-between"
-          alignItems="center"
-          paddingVertical={height * 0.04}
-        >
-          <Button
-            icon={<AntDesign name="close" size={width * 0.1} color="white" />}
-            onPress={handleClose}
-            backgroundColor="transparent"
-          />
-          <Button
-            icon={<AntDesign name="save" size={width * 0.1} color="white" />}
-            onPress={handleSave}
-            backgroundColor="transparent"
-          />
-        </XStack>
- */}
+
         {/* Debug Text */}
         <Text style={styles.debugText}>
           {exercises?.length || 0} exercises loaded
         </Text>
 
-        {/* Content Container with Explicit Height */}
-        <View style={styles.scrollContainer}>
-          {/* Use native React Native ScrollView instead of Tamagui ScrollView */}
-          <View style={styles.scrollViewContent}>
-            <View style={{ marginBottom: height * 0.1 }}>
-              {/* Panel to add new exercises */}
-              <AddExercisePanel
-                pickedExercises={exercises}
-                setPickedExercises={setExercises}
-              />
-            </View>
+        {/* ScrollView with defined height */}
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={true}
+        >
+          <View style={styles.addExerciseContainer}>
+            <AddExercisePanel
+              pickedExercises={exercises}
+              setPickedExercises={setExercises}
+            />
+          </View>
 
-            {/* List of current exercises */}
+          {/* List of current exercises */}
+          <View style={styles.exerciseListContainer}>
             {exercises && exercises.length > 0 ? (
               exercises.map((exercise) => (
-                <SavedExercisePanel
-                  key={exercise.id}
-                  id={exercise.id}
-                  name={exercise.name}
-                  primaryMuscle={exercise.primaryMuscle}
-                  mainGroup={exercise.mainGroup}
-                  pickedExercises={exercises}
-                  setPickedExercises={setExercises}
-                />
+                <View key={exercise.id} style={styles.exerciseItem}>
+                  <SavedExercisePanel
+                    id={exercise.id}
+                    name={exercise.name}
+                    primaryMuscle={exercise.primaryMuscle}
+                    mainGroup={exercise.mainGroup}
+                    pickedExercises={exercises}
+                    setPickedExercises={setExercises}
+                  />
+                </View>
               ))
             ) : (
               <Text style={styles.emptyText}>No exercises added yet</Text>
             )}
           </View>
-        </View>
+
+          {/* Add extra padding at the bottom for better scrolling */}
+          <View style={styles.bottomPadding} />
+        </ScrollView>
       </View>
     </ActionSheet>
   );
@@ -155,14 +146,29 @@ const styles = StyleSheet.create({
     height: height * 0.85,
   },
   actionSheetContent: {},
-  scrollContainer: {
-    flex: 1,
-    marginTop: 10,
+  header: {
+    paddingHorizontal: 10,
+  },
+  scrollView: {
+    marginBottom: height * 0.05,
   },
   scrollViewContent: {
-    width: "100%",
     alignItems: "center",
     paddingHorizontal: 15,
+  },
+  addExerciseContainer: {
+    width: "100%",
+    alignItems: "center",
+    marginBottom: height * 0.07,
+    marginTop: 10,
+  },
+  exerciseListContainer: {
+    width: "100%",
+    alignItems: "center",
+  },
+  exerciseItem: {
+    width: "100%",
+    marginBottom: 10,
   },
   debugText: {
     color: "white",
@@ -173,5 +179,8 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginTop: 20,
+  },
+  bottomPadding: {
+    height: 100, // Extra padding at bottom for better scrolling
   },
 });
