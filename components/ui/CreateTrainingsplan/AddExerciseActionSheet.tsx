@@ -19,15 +19,12 @@ import {
   doc,
   setDoc as firebaseSetDoc,
   collection,
-  addDoc,
   getDocs,
   query,
   where,
 } from "firebase/firestore";
 import { firestoreDB } from "@/database/Firebaseconfig";
 import EventEmitter from "@/components/EventListener";
-import { AddWorkoutComponent } from "./AddWorkout/AddWorkoutComponente";
-import { AppConfigContext } from "@/context/AppConfigProvider";
 import ActionSheet, { SheetProps } from "react-native-actions-sheet";
 import { SheetManager } from "react-native-actions-sheet";
 import { XStack } from "tamagui";

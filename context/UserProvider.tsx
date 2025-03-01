@@ -120,7 +120,7 @@ export function UserProvider({ children }: React.PropsWithChildren) {
   };
 
   /**
-   * Delete the user’s profile image from Firebase Storage and Firestore
+   * Delete the user's profile image from Firebase Storage and Firestore
    */
   const deleteProfileImage = async () => {
     if (!user?.uid) return;

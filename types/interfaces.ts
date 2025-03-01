@@ -41,8 +41,8 @@ export interface IWorkoutInfrmations {
 export interface ExerciseComponentProps {
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
-  mainGroup: string;
-  setMainGroup: React.Dispatch<React.SetStateAction<string>>;
+  mainGroup?: string;
+  setMainGroup?: React.Dispatch<React.SetStateAction<string>>;
   description: string;
   setDescription: React.Dispatch<React.SetStateAction<string>>;
   image: string | null;

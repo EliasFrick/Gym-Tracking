@@ -138,6 +138,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   };
 
   const addSet = (exerciseId: string) => {
+    console.log(exerciseId);
     setWorkoutLog((prev) => ({
       ...prev,
       [exerciseId]: [...prev[exerciseId], { reps: "", weight: "" }],
