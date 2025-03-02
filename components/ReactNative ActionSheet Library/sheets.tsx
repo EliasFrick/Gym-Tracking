@@ -2,7 +2,11 @@ import { registerSheet } from "react-native-actions-sheet";
 import { AddWorkoutActionSheet } from "../ui/CreateTrainingsplan/AddWorkoutActionSheet";
 import { AddExerciseActionSheet } from "../ui/CreateTrainingsplan/AddExerciseActionSheet";
 import { PickExercisActionSheet } from "../ui/CreateTrainingsplan/AddWorkout/PickExerciseActionSheet";
-import { IPickedExercises, WorkoutExercise } from "@/types/interfaces";
+import {
+  IExerciseDuringWorkout,
+  IPickedExercises,
+  WorkoutExercise,
+} from "@/types/interfaces";
 import { WorkoutExerciseSheet } from "../ui/WorkoutExerciseSheet";
 import { WorkoutAnalysisSheet } from "../ui/WorkoutAnalysisSheet";
 import { DietSelectorSheet } from "../ui/DietSelectorSheet";
@@ -32,9 +36,13 @@ declare module "react-native-actions-sheet" {
     };
     "add-exercise-for-Workout-modal-sheet": {
       payload: {
-        pickedExercises: IPickedExercises[] | undefined;
-        setPickedExercises: React.Dispatch<
+        pickedExercises?: IPickedExercises[] | undefined;
+        setPickedExercises?: React.Dispatch<
           React.SetStateAction<IPickedExercises[] | undefined>
+        >;
+        newExericseDuringWorkout?: IExerciseDuringWorkout[] | undefined;
+        setNewExericseDuringWorkout?: React.Dispatch<
+          React.SetStateAction<IExerciseDuringWorkout[] | undefined>
         >;
       };
       returnValue?: any;
@@ -43,7 +51,7 @@ declare module "react-native-actions-sheet" {
       payload: {
         workoutId: string;
         currentWorkout: WorkoutExercise[];
-        onExerciseCreated?: (exercise: Exercise) => void;
+        onExerciseCreated?: (exercise: IExerciseDuringWorkout) => void;
       };
       returnValue?: any;
     };

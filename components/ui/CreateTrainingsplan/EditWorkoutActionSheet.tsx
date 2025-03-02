@@ -21,9 +21,7 @@ import { useUser } from "@/context/UserProvider";
 const { width, height } = Dimensions.get("window");
 
 export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
-  const [exercises, setExercises] = useState<IPickedExercises[] | undefined>(
-    []
-  );
+  const [exercises, setExercises] = useState<IPickedExercises[] | undefined>([]);
   const auth = getAuth();
   const user = auth.currentUser;
   const { userData } = useUser();

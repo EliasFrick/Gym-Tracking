@@ -15,7 +15,11 @@ import ActionSheet, {
 import { Dimensions } from "react-native";
 import { XStack, Button, ScrollView } from "tamagui";
 import { ChevronLeft, ChevronRight, Plus, Trash2 } from "@tamagui/lucide-icons";
-import { WorkoutExercise } from "@/types/interfaces";
+import {
+  ISet,
+  IExerciseDuringWorkout,
+  IPickedExercises,
+} from "@/types/interfaces";
 import {
   saveWorkoutProgress,
   getWorkoutProgress,
@@ -26,31 +30,16 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
+import { WorkoutExerciseSheetProps } from "@/types/types";
 const { width, height } = Dimensions.get("window");
 
-interface ExerciseSet {
-  reps: string;
-  weight: string;
-}
-
-interface Exercise {
-  id: string;
-  name: string;
-  sets: ExerciseSet[];
-}
-
-type WorkoutExerciseSheetProps = ActionSheetProps & {
-  payload?: {
-    workoutId: string;
-    currentWorkout: WorkoutExercise[];
-  };
-};
-
 export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<IPickedExercises[] | undefined>(
+    []
+  );
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [workoutLog, setWorkoutLog] = useState<{
-    [key: string]: ExerciseSet[];
+    [key: string]: ISet[];
   }>({});
 
   // Load saved progress when opening
@@ -101,7 +90,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
         const initialLog = exercisesList.reduce((acc, exercise) => {
           acc[exercise.id] = [{ reps: "", weight: "" }];
           return acc;
-        }, {} as { [key: string]: ExerciseSet[] });
+        }, {} as { [key: string]: ISet[] });
         setWorkoutLog(initialLog);
       }
     } catch (error) {
@@ -109,14 +98,14 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     }
   }, [props.payload?.currentWorkout]);
 
-  const currentExercise = exercises[currentExerciseIndex];
+  const currentExercise = exercises![currentExerciseIndex];
 
   const handleNavigate = (direction: "prev" | "next") => {
     if (direction === "prev" && currentExerciseIndex > 0) {
       setCurrentExerciseIndex((prev) => prev - 1);
     } else if (
       direction === "next" &&
-      currentExerciseIndex < exercises.length - 1
+      currentExerciseIndex < exercises!.length - 1
     ) {
       setCurrentExerciseIndex((prev) => prev + 1);
     }
@@ -237,50 +226,67 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   };
 
   const handleAddExercise = () => {
-    Alert.alert("Add Exercise", "How would you like to add an exercise?", [
-      {
-        text: "Choose Existing",
-        onPress: () => openExercisePicker(),
-      },
-      {
-        text: "Create New",
-        onPress: () => openCreateExercise(),
-      },
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-    ]);
+    openExercisePicker();
   };
 
   const openExercisePicker = () => {
     SheetManager.show("add-exercise-for-Workout-modal-sheet", {
       payload: {
         pickedExercises: exercises,
-        setPickedExercises: (newExercises) => {
-          // Nach Auswahl der Übung fragen, ob sie permanent hinzugefügt werden soll
-          const lastExercise = newExercises[newExercises.length - 1];
-          if (lastExercise) {
-            askToSavePermanently(lastExercise);
+        setPickedExercises: (updaterOrExercises) => {
+          // If it's a function, call it with the current exercises
+          if (typeof updaterOrExercises === "function") {
+            const updatedExercises = updaterOrExercises(exercises);
+            processNewExercises(updatedExercises);
+          } else {
+            // Otherwise, use it directly
+            processNewExercises(updaterOrExercises);
           }
-          setExercises(newExercises);
         },
       },
     });
   };
 
-  const openCreateExercise = () => {
+  // Helper function to process new exercises
+  const processNewExercises = (newExercises: any) => {
+    if (!newExercises || !Array.isArray(newExercises)) return;
+
+    // Check if we've added a new exercise
+    if (newExercises.length > (exercises?.length || 0)) {
+      const lastExercise = newExercises[newExercises.length - 1];
+
+      if (lastExercise && lastExercise.id) {
+        // Update workout log with the new exercise
+        setWorkoutLog((prev) => ({
+          ...prev,
+          [lastExercise.id]: [{ reps: "", weight: "" }],
+        }));
+
+        askToSavePermanently(lastExercise);
+      }
+    }
+
+    // Update exercises state
+    setExercises(newExercises);
+  };
+
+  /* const openCreateExercise = () => {
     SheetManager.show("add-exercise-modal-sheet", {
       payload: {
         onExerciseCreated: (newExercise) => {
+          // Initialisiere workoutLog für die neue Übung
+          setWorkoutLog((prev) => ({
+            ...prev,
+            [newExercise.id]: [{ reps: "", weight: "" }],
+          }));
           askToSavePermanently(newExercise);
           setExercises([...exercises, newExercise]);
         },
       },
     });
-  };
+  }; */
 
-  const askToSavePermanently = (exercise: Exercise) => {
+  const askToSavePermanently = (exercise: IExerciseDuringWorkout) => {
     Alert.alert(
       "Save Exercise",
       "Would you like to add this exercise permanently to this workout?",
@@ -297,7 +303,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     );
   };
 
-  const saveExercisePermanently = async (exercise: Exercise) => {
+  const saveExercisePermanently = async (exercise: IExerciseDuringWorkout) => {
     try {
       const user = auth.currentUser;
       if (!user) return;
@@ -307,7 +313,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
         "User",
         user.uid,
         "Workouts",
-        props.payload?.workoutId || ""
+        props?.payload?.workoutId || ""
       );
 
       // Aktuelles Workout abrufen
