@@ -52,7 +52,6 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
         "Workouts",
         props.payload?.workoutId || ""
       );
-      console.log(exercises);
       await updateDoc(workoutRef, {
         exercises: exercises,
       });
