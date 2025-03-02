@@ -131,10 +131,10 @@ export interface IPickedExercises {
 }
 
 export interface IPickedExercisesDeleteList {
-  id: string;
-  name: string;
-  primaryMuscle: string[];
-  mainGroup: string[];
+  id?: string;
+  name?: string;
+  primaryMuscle?: string[];
+  mainGroup?: string[];
   pickedExercises: IPickedExercises[] | undefined;
   setPickedExercises: React.Dispatch<
     React.SetStateAction<IPickedExercises[] | undefined>

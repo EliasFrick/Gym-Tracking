@@ -5,10 +5,10 @@ import {
   Dimensions,
   Text,
 } from "react-native";
-import { Input, ScrollView, TextArea } from "tamagui";
+import { Input } from "tamagui";
 import { ExerciseComponentProps } from "@/types/interfaces";
 import { AddExercisePanel } from "./AddExercisePanel";
-import { useEffect, useState, memo } from "react";
+import { useEffect, memo } from "react";
 import { SavedExercisePanel } from "./SavedExercisePanel";
 import EventEmitter from "@/components/EventListener";
 
@@ -29,6 +29,7 @@ export const AddWorkoutComponent = memo(
     const toggleShowPickExerciseModal = async () => {
       console.log("toggleShowPickExerciseModal");
     };
+
     useEffect(() => {
       const deleteExerciseFromList = (exerciseID: string) => {
         setInformations((prev) =>
@@ -78,19 +79,11 @@ export const AddWorkoutComponent = memo(
                 setPickedExercises={setInformations}
               />
             </TouchableOpacity>
-            <ScrollView style={{ marginBottom: 20000 }}>
-              {informations?.map((value, index) => (
-                <SavedExercisePanel
-                  key={index}
-                  name={value.name}
-                  id={value.id}
-                  primaryMuscle={value.primaryMuscle}
-                  mainGroup={value.mainGroup}
-                  pickedExercises={informations}
-                  setPickedExercises={setInformations}
-                />
-              ))}
-            </ScrollView>
+            {/* Hier nur eine SavedExercisePanel-Komponente verwenden, die alle Übungen verwaltet */}
+            <SavedExercisePanel
+              pickedExercises={informations}
+              setPickedExercises={setInformations}
+            />
           </View>
         </View>
       </View>

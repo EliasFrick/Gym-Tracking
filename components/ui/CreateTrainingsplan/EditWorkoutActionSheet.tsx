@@ -114,18 +114,12 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
           {/* List of current exercises */}
           <View style={styles.exerciseListContainer}>
             {exercises && exercises.length > 0 ? (
-              exercises.map((exercise) => (
-                <View key={exercise.id} style={styles.exerciseItem}>
-                  <SavedExercisePanel
-                    id={exercise.id}
-                    name={exercise.name}
-                    primaryMuscle={exercise.primaryMuscle}
-                    mainGroup={exercise.mainGroup}
-                    pickedExercises={exercises}
-                    setPickedExercises={setExercises}
-                  />
-                </View>
-              ))
+              <View style={styles.exerciseItem}>
+                <SavedExercisePanel
+                  pickedExercises={exercises}
+                  setPickedExercises={setExercises}
+                />
+              </View>
             ) : (
               <Text style={styles.emptyText}>No exercises added yet</Text>
             )}
