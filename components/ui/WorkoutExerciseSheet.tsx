@@ -23,7 +23,7 @@ import {
 } from "@/utils/storage";
 import AntDesign from "@expo/vector-icons/AntDesign";
 // Import Firestore functions and firebase services
-import { doc, setDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 const { width, height } = Dimensions.get("window");
@@ -236,13 +236,110 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
     );
   };
 
+  const handleAddExercise = () => {
+    Alert.alert("Add Exercise", "How would you like to add an exercise?", [
+      {
+        text: "Choose Existing",
+        onPress: () => openExercisePicker(),
+      },
+      {
+        text: "Create New",
+        onPress: () => openCreateExercise(),
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+    ]);
+  };
+
+  const openExercisePicker = () => {
+    SheetManager.show("add-exercise-for-Workout-modal-sheet", {
+      payload: {
+        pickedExercises: exercises,
+        setPickedExercises: (newExercises) => {
+          // Nach Auswahl der Übung fragen, ob sie permanent hinzugefügt werden soll
+          const lastExercise = newExercises[newExercises.length - 1];
+          if (lastExercise) {
+            askToSavePermanently(lastExercise);
+          }
+          setExercises(newExercises);
+        },
+      },
+    });
+  };
+
+  const openCreateExercise = () => {
+    SheetManager.show("add-exercise-modal-sheet", {
+      payload: {
+        onExerciseCreated: (newExercise) => {
+          askToSavePermanently(newExercise);
+          setExercises([...exercises, newExercise]);
+        },
+      },
+    });
+  };
+
+  const askToSavePermanently = (exercise: Exercise) => {
+    Alert.alert(
+      "Save Exercise",
+      "Would you like to add this exercise permanently to this workout?",
+      [
+        {
+          text: "Yes",
+          onPress: () => saveExercisePermanently(exercise),
+        },
+        {
+          text: "No, just for this session",
+          style: "cancel",
+        },
+      ]
+    );
+  };
+
+  const saveExercisePermanently = async (exercise: Exercise) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const workoutRef = doc(
+        firestoreDB,
+        "User",
+        user.uid,
+        "Workouts",
+        props.payload?.workoutId || ""
+      );
+
+      // Aktuelles Workout abrufen
+      const workoutDoc = await getDoc(workoutRef);
+      if (workoutDoc.exists()) {
+        const workoutData = workoutDoc.data();
+        const currentExercises = workoutData.exercises || [];
+
+        // Neue Übung hinzufügen
+        await updateDoc(workoutRef, {
+          exercises: [
+            ...currentExercises,
+            {
+              id: exercise.id,
+              name: exercise.name,
+            },
+          ],
+        });
+
+        Alert.alert("Success", "Exercise permanently added to workout!");
+      }
+    } catch (error) {
+      console.error("Error saving exercise:", error);
+      Alert.alert("Error", "Failed to save exercise permanently");
+    }
+  };
+
   return (
     <ActionSheet
       containerStyle={styles.container}
       gestureEnabled={false}
       closeOnTouchBackdrop={true}
-      keyboardShouldPersistTaps="handled"
-      onTouchEnd={() => Keyboard.dismiss()}
       {...props}
     >
       <View style={styles.content}>
@@ -269,6 +366,15 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
             onPress={() => handleNavigate("next")}
           />
         </XStack>
+
+        {/* Add Exercise Button */}
+        <Button
+          icon={Plus}
+          onPress={handleAddExercise}
+          style={styles.addExerciseButton}
+        >
+          Add Exercise
+        </Button>
 
         {/* Scrollable Area */}
         <View style={styles.scrollableWrapper}>
@@ -443,5 +549,9 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     alignSelf: "flex-end",
     marginBottom: 4,
+  },
+  addExerciseButton: {
+    marginVertical: 10,
+    backgroundColor: "#4a4a4a",
   },
 });

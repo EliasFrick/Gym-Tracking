@@ -43,6 +43,7 @@ declare module "react-native-actions-sheet" {
       payload: {
         workoutId: string;
         currentWorkout: WorkoutExercise[];
+        onExerciseCreated?: (exercise: Exercise) => void;
       };
       returnValue?: any;
     };
