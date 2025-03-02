@@ -150,8 +150,13 @@ export interface IExerciseListProps {
 }
 
 export interface IAppConfigContextType {
-  isConnected: boolean | null;
-  setIsConnected: React.Dispatch<React.SetStateAction<boolean | null>>;
+  isOnline: boolean;
+  lastSync: Date | null;
+  syncDataNow: () => Promise<void>;
+  onRefresh: boolean;
+  refresh: () => void;
+  isConnected: boolean;
+  setIsConnected: (connected: boolean) => void;
   refreshDatabase: number;
   triggerRefreshDatabase: () => void;
 }

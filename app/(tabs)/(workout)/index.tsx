@@ -26,7 +26,7 @@ export default function indexScreen() {
   const [workout, setWorkout] = useState<IExerciseCard[]>();
   const navigation = useNavigation();
   const user = auth.currentUser;
-  const { isOnline, syncDataNow } = useContext(AppConfigContext);
+  const { isOnline, syncDataNow, refresh } = useContext(AppConfigContext);
   const [refreshing, setRefreshing] = useState(false);
 
   // Neuen Zustand für den Popover hinzufügen:
@@ -35,7 +35,7 @@ export default function indexScreen() {
   // Workouts beim Laden der Komponente abrufen
   useEffect(() => {
     loadWorkouts();
-  }, [user, isOnline]);
+  }, [user, isOnline, syncDataNow]);
 
   const loadWorkouts = async () => {
     try {
@@ -55,9 +55,10 @@ export default function indexScreen() {
     }
   };
 
-  const onRefresh = async () => {
+  const handleRefresh = async () => {
     setRefreshing(true);
     await loadWorkouts();
+    refresh();
     setRefreshing(false);
   };
 
@@ -88,10 +89,10 @@ export default function indexScreen() {
             </View>
           </TouchableWithoutFeedback>
         </View>
-        <FlatList 
+        <FlatList
           contentContainerStyle={styles.scrollViewContent}
-          data={workout} 
-          keyExtractor={(item, index) => index.toString()} 
+          data={workout}
+          keyExtractor={(item, index) => index.toString()}
           renderItem={({ item, index }) => (
             <ExerciseCard
               key={index}
@@ -108,7 +109,7 @@ export default function indexScreen() {
             </View>
           }
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
           }
         />
       </View>

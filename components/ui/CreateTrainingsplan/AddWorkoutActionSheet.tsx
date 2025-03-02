@@ -34,14 +34,14 @@ export const AddWorkoutActionSheet = (
   const auth = getAuth();
   const firebaseUser = auth.currentUser;
   const [workout, setWorkout] = useState<IPickedExercises[]>();
-  const { isOnline } = useContext(AppConfigContext);
+  const { isOnline, refresh } = useContext(AppConfigContext);
 
   const [customExercise, setCustomExercise] = useState<ICreateCustomExercise>({
     userID: firebaseUser!.uid,
     name: "",
     description: "",
     primaryMuscle: [],
-    mainGroup: '',
+    mainGroup: "",
     image: null,
   });
 
@@ -66,6 +66,7 @@ export const AddWorkoutActionSheet = (
   const saveWorkoutInDB = async () => {
     try {
       await saveCustomWorkout();
+      refresh();
     } catch (err) {
       console.error("Error adding document: ", err);
     }
@@ -118,7 +119,6 @@ export const AddWorkoutActionSheet = (
       await setDoc(doc(workoutRef, workoutData.name), workoutData);
 
       deleteWorkoutData();
-      alert("Workout saved successfully!");
       SheetManager.hide("add-workout-modal-sheet");
     } catch (error: any) {
       console.error("Error adding document: ", error);

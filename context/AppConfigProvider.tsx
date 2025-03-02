@@ -2,22 +2,29 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import NetInfo from "@react-native-community/netinfo";
 import { syncData } from "@/utils/offlineStorage";
 import { processPendingWorkouts } from "@/utils/localWorkouts";
+import { IAppConfigContextType } from "@/types/interfaces";
 
-interface AppConfigContextType {
-  isOnline: boolean;
-  lastSync: Date | null;
-  syncDataNow: () => Promise<void>;
-}
-
-export const AppConfigContext = createContext<AppConfigContextType>({
+export const AppConfigContext = createContext<IAppConfigContextType>({
   isOnline: false,
   lastSync: null,
   syncDataNow: async () => {},
+  onRefresh: false,
+  refresh: () => {},
+  isConnected: false,
+  setIsConnected: () => {},
+  refreshDatabase: 0,
+  triggerRefreshDatabase: () => {},
 });
 
 export function AppConfigProvider({ children }: { children: React.ReactNode }) {
   const [isOnline, setIsOnline] = useState(false);
   const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [onRefresh, setOnRefresh] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [refreshDatabase, setRefreshDatabase] = useState(0);
+
+  const refresh = () => setOnRefresh((prev) => !prev);
+  const triggerRefreshDatabase = () => setRefreshDatabase((prev) => prev + 1);
 
   useEffect(() => {
     // Initial check
@@ -53,7 +60,19 @@ export function AppConfigProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AppConfigContext.Provider value={{ isOnline, lastSync, syncDataNow }}>
+    <AppConfigContext.Provider
+      value={{
+        isOnline,
+        lastSync,
+        syncDataNow,
+        onRefresh,
+        refresh,
+        isConnected,
+        setIsConnected,
+        refreshDatabase,
+        triggerRefreshDatabase,
+      }}
+    >
       {children}
     </AppConfigContext.Provider>
   );
