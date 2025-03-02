@@ -8,24 +8,23 @@ import ActionSheet, {
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ExerciseList } from "./ExerciseList";
 import { ListWithAddedExercises } from "./ListWithAddedExercises";
+import { IExerciseDuringWorkout, IPickedExercises } from "@/types/interfaces";
 
 const { width, height } = Dimensions.get("window");
 
 export const PickExercisActionSheet = (
   props: SheetProps<"add-exercise-for-Workout-modal-sheet">
 ) => {
-  // Zugriff auf die übergebene Payload
-  const { pickedExercises, setPickedExercises } = props.payload!;
+  const { pickedExercises, setPickedExercises } = props.payload! || undefined;
 
-  // Lokaler State initialisiert mit pickedExercises
-  const [localExercises, setLocalExercises] = useState(pickedExercises);
+  const [localExercises, setLocalExercises] = useState<
+    IPickedExercises[] | undefined
+  >(pickedExercises);
 
-  // Aktualisiere den lokalen State, wenn sich die übergebene Liste ändert.
   useEffect(() => {
     setLocalExercises(pickedExercises);
   }, [pickedExercises]);
 
-  // Schließt den Sheet über die korrekte ID
   const closeSheet = useCallback(() => {
     SheetManager.hide("add-exercise-for-Workout-modal-sheet");
   }, []);
@@ -51,7 +50,7 @@ export const PickExercisActionSheet = (
             <ExerciseList
               pickedExercises={localExercises}
               setPickedExercises={(newExercises) => {
-                setPickedExercises(newExercises);
+                setPickedExercises!(newExercises);
                 setLocalExercises(newExercises);
               }}
             />

@@ -146,6 +146,7 @@ export interface IExerciseListProps {
   setPickedExercises: React.Dispatch<
     React.SetStateAction<IPickedExercises[] | undefined>
   >;
+
   exercises?: any;
 }
 
@@ -217,13 +218,6 @@ export interface AnalysisData {
   userInformation: string;
 }
 
-export interface Exercise {
-  id: string;
-  name: string;
-  mainGroup: string;
-  primaryMuscle: string;
-}
-
 export interface WorkoutHistoryItem {
   id: string;
   date: string;
@@ -275,4 +269,15 @@ export interface AIResult {
     height: string;
     analyzedWorkouts: any[];
   };
+}
+
+export interface ISet {
+  reps: string;
+  weight: string;
+}
+
+export interface IExerciseDuringWorkout {
+  id: string; // Passe den Typ (z. B. number) an, falls nötig
+  name: string;
+  sets: ISet[];
 }
