@@ -1,10 +1,9 @@
 import { Dimensions, Text, View } from "react-native";
 import { Card, XStack } from "tamagui";
 import { IPickedExercisesDeleteList } from "@/types/interfaces";
-import AntDesign from "@expo/vector-icons/AntDesign";
 import DraggableFlatList, {
-  ScaleDecorator,
   RenderItemParams,
+  ScaleDecorator,
 } from "react-native-draggable-flatlist";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 const { width, height } = Dimensions.get("window");
@@ -13,6 +12,12 @@ export function SavedExercisePanel({
   pickedExercises,
   setPickedExercises,
 }: IPickedExercisesDeleteList) {
+  const deleteExercise = (id: string) => {
+    setPickedExercises((prev) =>
+      prev?.filter((exercise) => exercise.id !== id)
+    );
+  };
+
   const renderItem = ({ item, drag, isActive }: RenderItemParams<any>) => {
     return (
       <ScaleDecorator>
@@ -60,14 +65,8 @@ export function SavedExercisePanel({
     );
   };
 
-  const deleteExercise = (id: string) => {
-    setPickedExercises((prev) =>
-      prev?.filter((exercise) => exercise.id !== id)
-    );
-  };
-
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ width: "100%", height: height * 0.62 }}>
       <DraggableFlatList
         data={pickedExercises || []}
         onDragEnd={({ data }) => setPickedExercises(data)}

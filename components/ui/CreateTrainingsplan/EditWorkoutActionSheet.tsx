@@ -6,14 +6,10 @@ import {
   Alert,
   Text,
   TouchableOpacity,
-  ScrollView,
 } from "react-native";
-import ActionSheet, {
-  SheetManager,
-  SheetProps,
-} from "react-native-actions-sheet";
-import { Button, XStack } from "tamagui";
-import { collection, doc, updateDoc } from "firebase/firestore";
+import ActionSheet, { SheetManager } from "react-native-actions-sheet";
+import { XStack } from "tamagui";
+import { doc, updateDoc } from "firebase/firestore";
 import { firestoreDB, getAuth } from "@/database/Firebaseconfig";
 import { AddExercisePanel } from "./AddWorkout/AddExercisePanel";
 import { SavedExercisePanel } from "./AddWorkout/SavedExercisePanel";
@@ -85,6 +81,9 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
           <TouchableOpacity onPress={handleClose} style={{ padding: 10 }}>
             <AntDesign name="close" size={width * 0.08} color="white" />
           </TouchableOpacity>
+          <Text style={{ color: "white", fontSize: width * 0.07 }}>
+            {props.payload?.workoutId}
+          </Text>
           <TouchableOpacity
             onPress={() => handleSave()}
             style={{ padding: 10 }}
@@ -94,16 +93,10 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
         </XStack>
 
         {/* Debug Text */}
-        <Text style={styles.debugText}>
-          {exercises?.length || 0} exercises loaded
-        </Text>
-
+        {/*         <Text style={styles.debugText}>{exercises?.length || 0} exercises</Text>
+         */}
         {/* ScrollView with defined height */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContent}
-          showsVerticalScrollIndicator={true}
-        >
+        <View style={styles.scrollViewContent}>
           <View style={styles.addExerciseContainer}>
             <AddExercisePanel
               pickedExercises={exercises}
@@ -126,8 +119,8 @@ export const EditWorkoutActionSheet = (props: EditWorkoutActionSheetProps) => {
           </View>
 
           {/* Add extra padding at the bottom for better scrolling */}
-          <View style={styles.bottomPadding} />
-        </ScrollView>
+          <View />
+        </View>
       </View>
     </ActionSheet>
   );
@@ -158,6 +151,7 @@ const styles = StyleSheet.create({
   exerciseListContainer: {
     width: "100%",
     alignItems: "center",
+    height: height * 0.5, // Add a specific height
   },
   exerciseItem: {
     width: "100%",
@@ -172,8 +166,5 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     marginTop: 20,
-  },
-  bottomPadding: {
-    height: 100, // Extra padding at bottom for better scrolling
   },
 });
