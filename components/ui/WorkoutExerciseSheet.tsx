@@ -6,6 +6,7 @@ import {
   TextInput,
   Alert,
   Keyboard,
+  TouchableOpacity,
 } from "react-native";
 import ActionSheet, {
   ActionSheetProps,
@@ -20,7 +21,7 @@ import {
   getWorkoutProgress,
   removeWorkoutProgress,
 } from "@/utils/storage";
-
+import AntDesign from "@expo/vector-icons/AntDesign";
 // Import Firestore functions and firebase services
 import { doc, setDoc } from "firebase/firestore";
 
@@ -54,8 +55,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
 
   // Load saved progress when opening
   useEffect(() => {
-    /*     console.log("props", props);
-     */ const loadSavedProgress = async () => {
+    const loadSavedProgress = async () => {
       if (!props.payload?.workoutId) return;
 
       const savedProgress = await getWorkoutProgress(props.payload.workoutId);
@@ -83,7 +83,6 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   // Initialize exercises
   useEffect(() => {
     if (!props.payload?.currentWorkout) {
-      console.log("No workout data available");
       return;
     }
 
@@ -138,7 +137,6 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   };
 
   const addSet = (exerciseId: string) => {
-    console.log(exerciseId);
     setWorkoutLog((prev) => ({
       ...prev,
       [exerciseId]: [...prev[exerciseId], { reps: "", weight: "" }],
@@ -305,7 +303,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                         />
                       </View>
                       <View style={styles.inputContainer}>
-                        <Text style={styles.inputLabel}>Weight (kg)</Text>
+                        <Text style={styles.inputLabel}>Weight</Text>
                         <TextInput
                           style={styles.input}
                           value={set.weight}
@@ -322,13 +320,12 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                         />
                       </View>
                       {isLastSet && (
-                        <Button
-                          icon={Trash2}
+                        <TouchableOpacity
                           onPress={() => deleteSet(currentExercise.id, index)}
                           style={styles.deleteSetButton}
-                          size="$2"
-                          chromeless
-                        />
+                        >
+                          <AntDesign name="delete" size={24} color="white" />
+                        </TouchableOpacity>
                       )}
                     </XStack>
                   </View>
