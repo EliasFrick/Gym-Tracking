@@ -18,6 +18,10 @@
             "image": "./assets/splash-icon-light.png",
             "backgroundColor": "#000000"
           }
+        },
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow $(PRODUCT_NAME) to access to your photo library so that you can select a new profile picture "
         }
       ],
       "expo-sqlite"
