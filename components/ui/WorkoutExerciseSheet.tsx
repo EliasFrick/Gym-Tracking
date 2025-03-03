@@ -378,7 +378,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       containerStyle={styles.container}
       gestureEnabled={false}
       closeOnTouchBackdrop={true}
-      {...props}
+      {...(({ payload, ...rest }) => rest)(props)}
     >
       <View style={styles.content}>
         {/* Navigation */}
@@ -405,17 +405,6 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
           />
         </XStack>
 
-        {/* Last Workout Data - separat nach dem XStack */}
-        {currentExercise && lastWorkoutData[currentExercise.id] && (
-          <View style={styles.lastWorkoutDataContainer}>
-            <Text style={styles.lastWorkoutData}>
-              Letztes Training: {lastWorkoutData[currentExercise.id]?.weight} kg
-              × {lastWorkoutData[currentExercise.id]?.reps} Wiederholungen (
-              {lastWorkoutData[currentExercise.id]?.date})
-            </Text>
-          </View>
-        )}
-
         {/* Add Exercise Button */}
         <Button
           icon={Plus}
@@ -424,6 +413,20 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
         >
           Add Exercise
         </Button>
+
+        {/* Last Workout Data - direkt unter dem Add Exercise Button */}
+        {/* {currentExercise && lastWorkoutData[currentExercise.id] && (
+          <View style={styles.lastWorkoutDataContainer}>
+            <Text style={styles.lastWorkoutData}>
+              Letztes Training: {lastWorkoutData[currentExercise.id]?.weight} kg
+              × {lastWorkoutData[currentExercise.id]?.reps} Wiederholungen
+              {lastWorkoutData[currentExercise.id]?.date
+                ? ` (${lastWorkoutData[currentExercise.id]?.date})`
+                : ""}
+            </Text>
+          </View>
+        )} */}
+        <Text>awdawdaw</Text>
 
         {/* Scrollable Area */}
         <View style={styles.scrollableWrapper}>
@@ -453,6 +456,9 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                               value
                             )
                           }
+                          placeholder={
+                            lastWorkoutData[currentExercise.id]?.reps
+                          }
                           /*                           keyboardType="numeric"
                            */
                         />
@@ -469,6 +475,9 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                               "weight",
                               value
                             )
+                          }
+                          placeholder={
+                            lastWorkoutData[currentExercise.id]?.weight
                           }
                           /*                           keyboardType="numeric"
                            */
@@ -563,13 +572,19 @@ const styles = StyleSheet.create({
   },
   lastWorkoutData: {
     color: "white",
-    fontSize: 14,
+    fontSize: 16,
     textAlign: "center",
+    fontWeight: "500",
   },
   lastWorkoutDataContainer: {
     alignItems: "center",
-    marginBottom: 10,
+    marginVertical: 10,
     paddingHorizontal: 10,
+    paddingVertical: 12,
+    backgroundColor: "rgba(60, 80, 60, 0.7)",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#5c8c5c",
   },
   setContainer: {
     marginVertical: 12,
