@@ -241,7 +241,7 @@ export interface IUserProvider {
   id: string;
   uId: string;
   name: string;
-  prime: boolean;
+  prime?: boolean;
   userName?: string;
   firstname?: string;
   lastname?: string;

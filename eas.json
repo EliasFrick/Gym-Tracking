@@ -23,6 +23,12 @@
   },
 
   "submit": {
-    "production": {}
+    "production": {
+      "ios": {
+        "appleId": "elias.frick.04@icloud.com",
+        "ascAppId": "6742711009",
+        "appleTeamId": "W8W7L79UK8"
+      }
+    }
   }
 }
