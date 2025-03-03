@@ -26,11 +26,11 @@ import {
   removeWorkoutProgress,
 } from "@/utils/storage";
 import AntDesign from "@expo/vector-icons/AntDesign";
-// Import Firestore functions and firebase services
 import { doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { WorkoutExerciseSheetProps } from "@/types/types";
+import { getLastWorkoutDataForExercise } from "@/utils/workoutUtils";
 const { width, height } = Dimensions.get("window");
 
 export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
@@ -40,6 +40,9 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [workoutLog, setWorkoutLog] = useState<{
     [key: string]: ISet[];
+  }>({});
+  const [lastWorkoutData, setLastWorkoutData] = useState<{
+    [key: string]: { weight: string; reps: string; date: string } | null;
   }>({});
 
   // Load saved progress when opening
@@ -97,6 +100,34 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       console.error("Error processing exercises:", error);
     }
   }, [props.payload?.currentWorkout]);
+
+  // Fetch last workout data for the current exercise
+  useEffect(() => {
+    const fetchLastWorkoutData = async () => {
+      if (
+        !exercises ||
+        exercises.length === 0 ||
+        currentExerciseIndex >= exercises.length
+      ) {
+        return;
+      }
+
+      const currentExercise = exercises[currentExerciseIndex];
+
+      // Skip if we already have the data for this exercise
+      if (lastWorkoutData[currentExercise.id]) {
+        return;
+      }
+
+      const data = await getLastWorkoutDataForExercise(currentExercise.id);
+      setLastWorkoutData((prev) => ({
+        ...prev,
+        [currentExercise.id]: data,
+      }));
+    };
+
+    fetchLastWorkoutData();
+  }, [currentExerciseIndex, exercises]);
 
   const currentExercise = exercises![currentExerciseIndex];
 
@@ -340,7 +371,8 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       Alert.alert("Error", "Failed to save exercise permanently");
     }
   };
-
+  /*   console.log(lastWorkoutData[currentExercise.id]);
+   */
   return (
     <ActionSheet
       containerStyle={styles.container}
@@ -372,6 +404,17 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
             onPress={() => handleNavigate("next")}
           />
         </XStack>
+
+        {/* Last Workout Data - separat nach dem XStack */}
+        {currentExercise && lastWorkoutData[currentExercise.id] && (
+          <View style={styles.lastWorkoutDataContainer}>
+            <Text style={styles.lastWorkoutData}>
+              Letztes Training: {lastWorkoutData[currentExercise.id]?.weight} kg
+              × {lastWorkoutData[currentExercise.id]?.reps} Wiederholungen (
+              {lastWorkoutData[currentExercise.id]?.date})
+            </Text>
+          </View>
+        )}
 
         {/* Add Exercise Button */}
         <Button
@@ -517,6 +560,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: "100%", // Full width
     zIndex: 1, // Higher z-index
+  },
+  lastWorkoutData: {
+    color: "white",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  lastWorkoutDataContainer: {
+    alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 10,
   },
   setContainer: {
     marginVertical: 12,
