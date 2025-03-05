@@ -371,8 +371,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
       Alert.alert("Error", "Failed to save exercise permanently");
     }
   };
-  /*   console.log(lastWorkoutData[currentExercise.id]);
-   */
+
   return (
     <ActionSheet
       containerStyle={styles.container}
@@ -413,20 +412,6 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
         >
           Add Exercise
         </Button>
-
-        {/* Last Workout Data - direkt unter dem Add Exercise Button */}
-        {/* {currentExercise && lastWorkoutData[currentExercise.id] && (
-          <View style={styles.lastWorkoutDataContainer}>
-            <Text style={styles.lastWorkoutData}>
-              Letztes Training: {lastWorkoutData[currentExercise.id]?.weight} kg
-              × {lastWorkoutData[currentExercise.id]?.reps} Wiederholungen
-              {lastWorkoutData[currentExercise.id]?.date
-                ? ` (${lastWorkoutData[currentExercise.id]?.date})`
-                : ""}
-            </Text>
-          </View>
-        )} */}
-        <Text>awdawdaw</Text>
 
         {/* Scrollable Area */}
         <View style={styles.scrollableWrapper}>
