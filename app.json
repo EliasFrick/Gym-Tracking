@@ -34,7 +34,10 @@
         "foregroundImage": "./assets/icons/android-light.png",
         "monochromeImage": "./assets/icons/android-light.png",
         "backgroundColor": "#ffffff "
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "ios": {
       "bundleIdentifier": "com.anonymous.GymTracking",
@@ -42,6 +45,9 @@
         "light": "./assets/icons/ios-light.png",
         "dark": "./assets/icons/ios-dark.png",
         "tinted": "./assets/icons/ios-tinted.png"
+      },
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "extra": {
