@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -8,7 +8,14 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Text, Card } from "tamagui";
-import { collection, query, orderBy, getDocs } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import { useRouter } from "expo-router";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
@@ -27,7 +34,28 @@ export default function TabOneScreen() {
     []
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [localUserData, setLocalUserData] = useState<any>();
+
   const { userData, loading, error, refreshUserData } = useUser();
+  const user = auth.currentUser;
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user?.uid) return;
+      try {
+        const userDocRef = doc(firestoreDB, "User", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          setLocalUserData(userDocSnap.data());
+        } else {
+          console.error("User not found");
+        }
+      } catch (error) {}
+    };
+
+    fetchUserData();
+  }, [userData]);
 
   const fetchWorkoutHistory = async () => {
     try {
@@ -60,6 +88,7 @@ export default function TabOneScreen() {
   };
 
   useLayoutEffect(() => {
+    // Initial fetch to ensure data is displayed quickly
     fetchWorkoutHistory();
   }, []);
 
@@ -126,15 +155,13 @@ export default function TabOneScreen() {
 
   return (
     <View style={styles.container}>
-      {userData?.prime && workoutHistory.length > 0 ? (
+      {localUserData?.prime && workoutHistory.length > 0 && (
         <TouchableOpacity
           style={styles.analyzeButton}
           onPress={openAnalysisSheet}
         >
           <Text style={styles.analyzeButtonText}>Analyze with AI</Text>
         </TouchableOpacity>
-      ) : (
-        <></>
       )}
 
       <FlatList
