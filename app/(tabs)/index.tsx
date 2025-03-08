@@ -40,6 +40,10 @@ export default function TabOneScreen() {
   const user = auth.currentUser;
 
   useEffect(() => {
+    refreshUserData();
+  }, []);
+
+  useEffect(() => {
     const fetchUserData = async () => {
       if (!user?.uid) return;
       try {

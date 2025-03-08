@@ -3,7 +3,7 @@
     "name": "GymFlow",
     "slug": "Gym-Tracking",
     "scheme": "gym-tracking",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "icon": "./assets/icons/splash-icon-dark.png",
     "plugins": [
       "expo-router",
@@ -35,9 +35,7 @@
         "monochromeImage": "./assets/icons/android-light.png",
         "backgroundColor": "#ffffff "
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "ios": {
       "bundleIdentifier": "com.anonymous.GymTracking",

@@ -30,12 +30,36 @@ export function UserProvider({ children }: React.PropsWithChildren) {
    * Fetch the current user document from Firestore
    */
   const fetchUserData = async () => {
-    if (!user?.uid) return;
+    let firstSyncUser;
+    if (!user?.uid) {
+      firstSyncUser = auth.currentUser;
+      if (!firstSyncUser) {
+        return;
+      } else if (firstSyncUser) {
+        try {
+          setLoading(true);
+          setError(null);
+
+          const userDocRef = doc(firestoreDB, "User", firstSyncUser.uid);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            setUserData(userDocSnap.data() as IUserProvider);
+          } else {
+            setError("User not found");
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : "An error occurred");
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
     try {
       setLoading(true);
       setError(null);
 
-      const userDocRef = doc(firestoreDB, "User", user.uid);
+      const userDocRef = doc(firestoreDB, "User", user!.uid);
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
@@ -151,13 +175,13 @@ export function UserProvider({ children }: React.PropsWithChildren) {
   };
 
   useEffect(() => {
+    console.log(user?.uid);
     if (user?.uid) {
       fetchUserData();
     } else {
       setUserData(null);
       setLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
 
   return (
