@@ -10,11 +10,12 @@ import {
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { Link, useRouter } from "expo-router";
+import { Link, router, useRouter } from "expo-router";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { app } from "@/database/Firebaseconfig";
 import { IUserLoginCredentials } from "@/types/interfaces";
 import { ScrollView } from "tamagui";
+import { useUser } from "@/context/UserProvider";
 
 const LoginScreen = () => {
   const [userCredentials, setUserCredentials] = useState<IUserLoginCredentials>(
@@ -23,9 +24,7 @@ const LoginScreen = () => {
       password: "",
     }
   );
-  const windowWidth = Dimensions.get("window").width;
-  const windowHeight = Dimensions.get("window").height;
-  const router = useRouter();
+  const { refreshUserData } = useUser();
 
   const handleInputChange = (name: string, value: string) => {
     setUserCredentials({

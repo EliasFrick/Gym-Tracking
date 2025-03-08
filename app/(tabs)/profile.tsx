@@ -19,17 +19,11 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [username, setUsername] = useState<string>("");
+  const [firstSync, setFirstSync] = useState<boolean>(false);
+
   const user = auth.currentUser;
 
-  // Get user data and context methods
-  const {
-    userData,
-    loading,
-    error,
-    refreshUserData,
-    updateProfileImage,
-    deleteProfileImage,
-  } = useUser();
+  const { userData, loading, refreshUserData, updateProfileImage } = useUser();
 
   useEffect(() => {
     // Whenever userData changes, sync local states
@@ -37,7 +31,7 @@ export default function ProfileScreen() {
       setUsername(userData.userName ?? "");
       setProfileImage(userData.profileImage || null);
     }
-  }, [userData]);
+  }, [userData, firstSync]);
 
   const menuItems = [
     ...(userData?.prime
@@ -99,28 +93,6 @@ export default function ProfileScreen() {
     }
   };
 
-  /**
-   * Delete the user's profile image from Firebase
-   */
-  const handleDeleteImage = async () => {
-    Alert.alert(
-      "Delete Image",
-      "Are you sure you want to delete your profile picture?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            await deleteProfileImage();
-            setProfileImage(null);
-            refreshUserData();
-          },
-        },
-      ]
-    );
-  };
-
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -157,7 +129,7 @@ export default function ProfileScreen() {
           <Button
             title="Delete Profile Picture"
             onPress={handleDeleteImage}
-            color="#FF6B6B"
+            color="#FF6B6B"c
           />
         ) : null} */}
 

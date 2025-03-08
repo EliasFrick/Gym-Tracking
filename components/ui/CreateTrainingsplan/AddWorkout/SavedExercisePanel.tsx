@@ -57,7 +57,6 @@ export function SavedExercisePanel({
               size={width * 0.09}
               color="black"
               style={{ marginRight: width * 0.03 }}
-              onPress={() => deleteExercise(item.id)}
             />
           </XStack>
         </Card>
