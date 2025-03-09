@@ -39,11 +39,11 @@ export default function indexScreen() {
 
   const loadWorkouts = async () => {
     try {
-      // Erst lokale Workouts laden
+      // Load first local Workouts
       const localWorkouts = await getLocalWorkouts();
       setWorkout(localWorkouts);
 
-      // Wenn online, dann mit Server synchronisieren
+      // Sync with DB when Online
       if (user && isOnline) {
         const serverWorkouts = await fetchUserWorkouts();
         await syncWorkouts(serverWorkouts);

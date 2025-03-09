@@ -17,16 +17,14 @@ import ActionSheet, {
   SheetProps,
   SheetManager,
 } from "react-native-actions-sheet";
-import { Text, XStack, YStack, Select, Adapt, Sheet, TextArea } from "tamagui";
+import { Text, YStack, TextArea } from "tamagui";
 import { GEMINI_API_KEY } from "@env";
 import axios from "axios";
-import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
-  writeBatch,
   setDoc,
   query,
   orderBy,
@@ -34,7 +32,6 @@ import {
 import { firestoreDB, auth } from "@/database/Firebaseconfig";
 import {
   AnalysisData,
-  Exercise,
   UserInfo,
   WeightEntry,
   WorkoutHistoryItem,
@@ -58,7 +55,7 @@ export const WorkoutAnalysisSheet = (
   const [analysis, setAnalysis] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [exerciseNames, setExerciseNames] = useState<{
-    [key: string]: Exercise;
+    [key: string]: any;
   }>({});
   const [weightHistory, setWeightHistory] = useState<WeightEntry[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo>({
@@ -78,10 +75,10 @@ export const WorkoutAnalysisSheet = (
     try {
       const exercisesRef = collection(firestoreDB, "DefaultExercises");
       const snapshot = await getDocs(exercisesRef);
-      const exerciseData: { [key: string]: Exercise } = {};
+      const exerciseData: { [key: string]: any } = {};
 
       snapshot.forEach((doc) => {
-        exerciseData[doc.id] = doc.data() as Exercise;
+        exerciseData[doc.id] = doc.data() as any;
       });
 
       setExerciseNames(exerciseData);
