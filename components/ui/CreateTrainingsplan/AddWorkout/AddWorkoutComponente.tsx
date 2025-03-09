@@ -119,7 +119,6 @@ export const AddWorkoutComponent = memo(
         }
 
         await fetchWorkoutHistory();
-        console.log(workoutHistory);
 
         const prompt = `
     I want you to create a personalized workout plan based on my workout history and my current training goals. I will provide you with my workout history, and I will also specify the muscle groups I want to train. You will generate the best possible workout plan for me, ensuring it aligns with my past training and optimizes my progress.
@@ -130,9 +129,6 @@ export const AddWorkoutComponent = memo(
     Do not include exercises I have already done excessively unless necessary for balance.
     Focus on progressive overload and muscle symmetry.
     The response should be a JSON array, where each exercise is an object with the following structure:
-    json
-    Copy
-    Edit
     [
       {
         "id": "unique_exercise_id",
@@ -165,11 +161,30 @@ export const AddWorkoutComponent = memo(
 
         console.log(response);
 
-        const result =
+        // Extract the text from the response
+        let resultText =
           response.data.candidates?.[0]?.content?.parts?.[0]?.text ||
           "Keine Analyse verfügbar.";
 
-        setAIPlan(result);
+        // Remove markdown code block indicators if present
+        resultText = resultText.replace(/```json\n|\n```/g, "");
+
+        // Try to parse the JSON or use the text as is if not valid JSON
+        try {
+          // If it's valid JSON, parse it and use it directly
+          const jsonData = JSON.parse(resultText);
+
+          // Set the exercises directly to the informations state if it's an array
+          if (Array.isArray(jsonData)) {
+            setInformations(jsonData);
+          }
+
+          // Still set the raw text to aiPlan for reference
+          setAIPlan(resultText);
+        } catch (error) {
+          console.error("Error parsing JSON from AI response:", error);
+          setAIPlan(resultText);
+        }
       } catch (error) {
         console.error("Error analyzing workouts:", error);
         setAIPlan("Fehler bei der Analyse. Bitte versuche es später erneut.");
