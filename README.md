@@ -1,7 +1,7 @@
 ## 🔧 Configuration
 
 1. Create a Firebase project
-2. Set up Firebase configuration in `database/Firebaseconfig.ts`
+2. Set up Gemini Api Key and Firebase data in `.env`
 3. Enable Authentication and Firestore in Firebase Console
 
 ## 📖 Usage
