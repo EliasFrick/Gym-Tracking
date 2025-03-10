@@ -17,7 +17,14 @@ import { auth, firestoreDB } from "@/database/Firebaseconfig";
 import axios from "axios";
 import { GEMINI_API_KEY } from "@env";
 import { useAppConfig } from "@/context/AppConfigProvider";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  orderBy,
+  query,
+  doc,
+  setDoc,
+} from "firebase/firestore";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
 import { useUser } from "@/context/UserProvider";
 
@@ -186,6 +193,9 @@ Use exercises from Default Exercises and Custom Exercises to create the workout
           // Set the exercises directly to the informations state if it's an array
           if (Array.isArray(jsonData)) {
             setInformations(jsonData);
+
+            // Check and save new custom exercises
+            await createNewCustomExercisesFromAI(jsonData);
           }
 
           // Still set the raw text to aiPlan for reference
@@ -239,18 +249,73 @@ Use exercises from Default Exercises and Custom Exercises to create the workout
       return exercises;
     };
 
-    const createNewCustomExercisesFromAI = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        throw new Error("No user logged in");
+    const createNewCustomExercisesFromAI = async (aiExercises: any[]) => {
+      try {
+        const user = auth.currentUser;
+        if (!user) {
+          throw new Error("No user logged in");
+        }
+
+        // Get existing exercises
+        const existingCustomExercises = await getCustomExercises();
+        const existingDefaultExercises = await getDefaultExercises();
+
+        // Combine both exercise arrays to check against
+        const allExistingExercises = [
+          ...existingCustomExercises,
+          ...existingDefaultExercises,
+        ];
+
+        // Filter AI exercises to find new ones (those starting with 'C')
+        const newExercises = aiExercises.filter((exercise) => {
+          // Check if ID starts with 'C'
+          if (!exercise.id.startsWith("C")) return false;
+
+          // Check if this exercise ID already exists in custom exercises
+          return !allExistingExercises.some(
+            (existing) => existing.id === exercise.id
+          );
+        });
+
+        if (newExercises.length === 0) {
+          console.log("No new custom exercises to save");
+          return;
+        }
+
+        // Save each new exercise to Firestore
+        const exercisesRef = collection(
+          firestoreDB,
+          "User",
+          user.uid,
+          "Exercises"
+        );
+
+        for (const exercise of newExercises) {
+          // Create a document with the exercise ID
+          const exerciseDoc = doc(exercisesRef, exercise.id);
+
+          // Save the exercise data
+          await setDoc(exerciseDoc, {
+            id: exercise.id,
+            name: exercise.name,
+            mainGroup: exercise.mainGroup,
+            // Include primaryMuscle if it exists
+            ...(exercise.primaryMuscle && {
+              primaryMuscle: exercise.primaryMuscle,
+            }),
+          });
+
+          console.log(
+            `Saved new custom exercise: ${exercise.id} - ${exercise.name}`
+          );
+        }
+
+        console.log(
+          `Successfully saved ${newExercises.length} new custom exercises`
+        );
+      } catch (error) {
+        console.error("Error saving new custom exercises:", error);
       }
-      const exercisesRef = collection(
-        firestoreDB,
-        "User",
-        user.uid,
-        "Exercises"
-      );
-      
     };
 
     return (
