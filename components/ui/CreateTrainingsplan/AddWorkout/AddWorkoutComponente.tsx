@@ -151,6 +151,10 @@ export const AddWorkoutComponent = memo(
     Default Exercises: ${await getDefaultExercises()}
     Custom Exercises: ${await getCustomExercises()}
 
+Use exercises from Default Exercises and Custom Exercises to create the workout
+ and if exercises are missing create them and give them back to me as an object
+  in the style of Custom Exercises and then give it a new ID which should start 
+  with C and be one number higher than the current highest ID which starts with C from Custom Exercises. 
     Return only the JSON output without any explanations or additional text
     `;
 
@@ -163,6 +167,8 @@ export const AddWorkoutComponent = memo(
             headers: { "Content-Type": "application/json" },
           }
         );
+
+        console.log(response);
 
         // Extract the text from the response
         let resultText =
@@ -213,7 +219,6 @@ export const AddWorkoutComponent = memo(
       querySnapshot.forEach((doc) => {
         exercises.push({ id: doc.id, ...doc.data() });
       });
-      console.log(exercises);
 
       return exercises;
     };
@@ -230,12 +235,23 @@ export const AddWorkoutComponent = memo(
       querySnapshot.forEach((doc) => {
         exercises.push({ id: doc.id, ...doc.data() });
       });
-      console.log(exercises);
 
       return exercises;
     };
 
-    getDefaultExercises();
+    const createNewCustomExercisesFromAI = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user logged in");
+      }
+      const exercisesRef = collection(
+        firestoreDB,
+        "User",
+        user.uid,
+        "Exercises"
+      );
+      
+    };
 
     return (
       <View>
