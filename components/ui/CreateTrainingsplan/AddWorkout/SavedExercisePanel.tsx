@@ -71,6 +71,7 @@ export function SavedExercisePanel({
         onDragEnd={({ data }) => setPickedExercises(data)}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
+        style={{ marginBottom: height * 0.1 }}
       />
     </View>
   );

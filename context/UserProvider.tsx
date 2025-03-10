@@ -175,7 +175,6 @@ export function UserProvider({ children }: React.PropsWithChildren) {
   };
 
   useEffect(() => {
-    console.log(user?.uid);
     if (user?.uid) {
       fetchUserData();
     } else {

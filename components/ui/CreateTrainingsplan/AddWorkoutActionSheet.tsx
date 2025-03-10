@@ -142,7 +142,7 @@ export const AddWorkoutActionSheet = (
       }}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <ScrollView>
+        <View>
           <XStack
             justifyContent="space-between"
             width="100%"
@@ -172,7 +172,7 @@ export const AddWorkoutActionSheet = (
               setInformations={setWorkout}
             />
           </View>
-        </ScrollView>
+        </View>
       </TouchableWithoutFeedback>
     </ActionSheet>
   );
