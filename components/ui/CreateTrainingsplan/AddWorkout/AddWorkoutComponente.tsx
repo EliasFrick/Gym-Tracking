@@ -19,6 +19,7 @@ import { GEMINI_API_KEY } from "@env";
 import { useAppConfig } from "@/context/AppConfigProvider";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { getOfflineWorkoutHistory } from "@/utils/offlineStorage";
+import { useUser } from "@/context/UserProvider";
 
 const { width, height } = Dimensions.get("window");
 
@@ -41,6 +42,7 @@ export const AddWorkoutComponent = memo(
       []
     );
     const [infoTextForAI, setinfoTextForAI] = useState<string>();
+    const { userData } = useUser();
 
     useEffect(() => {
       const deleteExerciseFromList = (exerciseID: string) => {
@@ -146,6 +148,9 @@ export const AddWorkoutComponent = memo(
     Input Data:
     Workout History:  ${workoutHistory}
     Target Muscle Groups: ${userInput}
+    Default Exercises: ${await getDefaultExercises()}
+    Custom Exercises: ${await getCustomExercises()}
+
     Return only the JSON output without any explanations or additional text
     `;
 
@@ -158,8 +163,6 @@ export const AddWorkoutComponent = memo(
             headers: { "Content-Type": "application/json" },
           }
         );
-
-        console.log(response);
 
         // Extract the text from the response
         let resultText =
@@ -192,6 +195,47 @@ export const AddWorkoutComponent = memo(
         setIsLoading(false);
       }
     };
+
+    const getCustomExercises = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user logged in");
+      }
+
+      const exercisesRef = collection(
+        firestoreDB,
+        "User",
+        user.uid,
+        "Exercises"
+      );
+      const querySnapshot = await getDocs(exercisesRef);
+      const exercises: any[] = [];
+      querySnapshot.forEach((doc) => {
+        exercises.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(exercises);
+
+      return exercises;
+    };
+
+    const getDefaultExercises = async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user logged in");
+      }
+
+      const exercisesRef = collection(firestoreDB, "DefaultExercises");
+      const querySnapshot = await getDocs(exercisesRef);
+      const exercises: any[] = [];
+      querySnapshot.forEach((doc) => {
+        exercises.push({ id: doc.id, ...doc.data() });
+      });
+      console.log(exercises);
+
+      return exercises;
+    };
+
+    getDefaultExercises();
 
     return (
       <View>

@@ -61,9 +61,6 @@ const LoginScreen = () => {
         .catch((error) => {
           const errorCode = error.code;
           const errorMessage = error.message;
-          console.log(errorCode);
-          console.log(error.message);
-
           // Überprüfen, ob die E-Mail oder das Passwort falsch ist
           if (errorCode === "auth/invalid-credential") {
             alert("Wrong Email or Password.");
