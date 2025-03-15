@@ -95,6 +95,7 @@ const LoginScreen = () => {
         <Text style={styles.welcomeText}>Welcome Back</Text>
         <Text style={styles.signInText}>Sign in to continue</Text>
         <TextInput
+          testID="email-input"
           style={styles.input}
           placeholder="Email Address"
           placeholderTextColor="#666"
@@ -104,6 +105,7 @@ const LoginScreen = () => {
           onChangeText={(text) => handleInputChange("email", text)}
         />
         <TextInput
+          testID="password-input"
           style={styles.input}
           placeholder="Password"
           placeholderTextColor="#666"

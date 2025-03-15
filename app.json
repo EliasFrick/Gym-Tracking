@@ -41,7 +41,7 @@
       "bundleIdentifier": "com.anonymous.GymTracking",
       "icon": {
         "light": "./assets/icons/ios-light.png",
-        "dark": "./assets/icons/ios-dark.png",
+        "dark": "./assets/icons/ios-tinted.png",
         "tinted": "./assets/icons/ios-tinted.png"
       },
       "infoPlist": {

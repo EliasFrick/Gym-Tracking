@@ -1,0 +1,55 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+
+# Navigate to Profile tab
+- tapOn:
+    text: "Profile"
+
+# Test profile elements
+- assertVisible: 
+    text: "Log out"
+
+# Test profile menu navigation
+# Test Profile Information
+- tapOn:
+    text: "Profile Information"
+- assertVisible:
+    text: "Profile Information"
+- assertVisible:
+    text: "Username"
+# Go back
+- tapOn:
+    text: "Back"
+    optional: true
+- back
+    optional: true
+    
+# Test My Exercises
+- tapOn:
+    text: "My Exercises"
+- assertVisible:
+    text: "My Exercises"
+# Go back
+- tapOn:
+    text: "Back"
+    optional: true
+- back
+    optional: true
+
+# Test AI Results (if user is premium)
+- runFlow:
+    when:
+      visible: "AI Results"
+    commands:
+      - tapOn:
+          text: "AI Results"
+      - assertVisible:
+          text: "AI Results"
+      - back
+
+# Test logout (don't actually log out during automated testing)
+# - tapOn:
+#     text: "Log out"
+# - assertVisible:
+#     text: "GymFlow AI"

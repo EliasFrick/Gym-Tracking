@@ -1,0 +1,105 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+- assertVisible: "GymFlow AI"
+- tapOn:
+    text: "Create Account"
+
+# Test registration form validation
+- assertVisible: "Create Account"
+# Test without filling data
+- tapOn:
+    text: "SIGN UP"
+- assertVisible: "Please fill out all fields."
+- tapOn: "OK"
+
+# Test invalid email format
+# Username field - try by ID first
+- tapOn:
+    id: "username-input" 
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 0
+    optional: true
+- inputText: "testuser"
+
+# Email field - try by ID first
+- tapOn:
+    id: "email-input"
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 1
+    optional: true
+- inputText: "invalid-email"
+
+# Password field - try by ID first
+- tapOn:
+    id: "password-input"
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 2
+    optional: true
+- inputText: "password123"
+
+# Confirm Password field - try by ID first
+- tapOn:
+    id: "confirm-password-input"
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 3
+    optional: true
+- inputText: "password123"
+
+- tapOn:
+    text: "SIGN UP"
+- assertVisible: "Please enter a valid email address."
+- tapOn: "OK"
+
+# Test password mismatch
+# Email field - try by ID first
+- tapOn:
+    id: "email-input"
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 1
+    optional: true
+# Clear field by entering empty text
+- inputText: ""
+- inputText: "newuser@example.com"
+
+# Confirm password - try by ID first
+- tapOn:
+    id: "confirm-password-input"
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 3
+    optional: true
+# Clear field by entering empty text
+- inputText: ""
+- inputText: "password456"
+
+- tapOn:
+    text: "SIGN UP"
+- assertVisible: "Passwords do not match."
+- tapOn: "OK"
+
+# Test with valid registration info (but don't actually create account in test)
+# Confirm password - try by ID first
+- tapOn:
+    id: "confirm-password-input"
+    optional: true
+# Fallback to index
+- tapOn:
+    index: 3
+    optional: true
+# Clear field by entering empty text
+- inputText: ""
+- inputText: "password123"
+
+- back

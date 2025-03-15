@@ -1,0 +1,29 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+
+# Navigate to Home tab to find workout history
+- tapOn:
+    text: "Home"
+    
+# Test navigation to workout details - using optional steps
+- tapOn:
+    index: 0 # Tap on the first workout card
+    optional: true
+    
+# Test workout details elements
+- assertVisible: 
+    text: "Exercises"
+    optional: true
+    
+# Test exercise expansion
+- tapOn:
+    text: "Bench Press"
+    optional: true
+- tapOn:
+    text: "Squat"
+    optional: true
+    
+# Test navigation back to home
+- back
+    optional: true

@@ -1,0 +1,76 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+
+# Navigate to Profile tab
+- tapOn:
+    text: "Profile"
+    
+# Navigate to Exercises modal
+- tapOn:
+    text: "My Exercises"
+    
+# Test exercises modal functionality
+- assertVisible: 
+    text: "My Exercises"
+    
+# Test adding a new exercise
+- tapOn:
+    text: "Add Exercise"
+    
+# Fill in exercise details
+# Try to use id first if available
+- tapOn:
+    id: "exercise-name-input"
+    optional: true
+# If that doesn't work, try with generic selector by index
+- tapOn:
+    index: 0
+    optional: true
+- inputText: "Test Exercise"
+
+# Select exercise type
+- tapOn:
+    text: "Exercise Type"
+- tapOn:
+    text: "Strength"
+    optional: true
+    
+# Select muscle group
+- tapOn:
+    text: "Muscle Group"
+- tapOn:
+    text: "Chest"
+    optional: true
+    
+# Add the exercise (don't actually save during testing)
+- tapOn:
+    text: "Cancel"
+    
+# Test searching for exercises
+# Try with id
+- tapOn:
+    id: "search-input"
+    optional: true
+# If that doesn't work, try with index
+- tapOn:
+    index: 0
+    optional: true
+- inputText: "bench"
+
+# Test filtering exercises
+- tapOn:
+    text: "Filter"
+    optional: true
+- tapOn:
+    text: "Chest"
+    optional: true
+- tapOn:
+    text: "Apply"
+    optional: true
+    
+# Navigate back
+- tapOn:
+    text: "Back"
+    optional: true
+- back
