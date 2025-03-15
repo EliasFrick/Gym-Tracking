@@ -1,0 +1,25 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+
+# Navigate to Ranking tab
+- tapOn:
+    text: "Ranking"
+
+# Test ranking elements
+- assertVisible: 
+    text: "Leaderboard"
+    
+# Test leaderboard display
+- assertVisible:
+    text: "Rank"
+- assertVisible:
+    text: "User"
+- assertVisible:
+    text: "Workouts"
+    
+# Test refreshing the leaderboard
+- scroll:
+    direction: DOWN
+    distance: 50%
+    start: 50%, 30%

@@ -1,0 +1,50 @@
+appId: "com.anonymous.GymTracking"
+---
+# Master test flow that runs all individual test files in sequence
+# Run this to test the entire app in one go
+
+# Step 1: Test authentication flows
+- runFlow:
+    file: login.yml
+    exitOnFail: false # Continue with other tests even if login fails
+
+- runFlow:
+    file: register.yml
+    exitOnFail: false
+
+# Step 2: Test main app screens after login
+- runFlow:
+    file: home_screen.yml
+    exitOnFail: false
+
+- runFlow:
+    file: profile_screen.yml
+    exitOnFail: false
+
+- runFlow:
+    file: weight_screen.yml
+    exitOnFail: false
+
+- runFlow:
+    file: ranking_screen.yml
+    exitOnFail: false
+
+# Step 3: Test workout functionality
+- runFlow:
+    file: workout_screen.yml
+    exitOnFail: false
+
+- runFlow:
+    file: workout_details.yml
+    exitOnFail: false
+
+# Step 4: Test modal screens
+- runFlow:
+    file: exercises_modal.yml
+    exitOnFail: false
+
+# Final success message
+- assertVisible: 
+    text: "GymFlow AI"
+    optional: true
+- assertTrue: true

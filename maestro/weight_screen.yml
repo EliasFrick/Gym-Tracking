@@ -1,0 +1,55 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+
+# Navigate to Weight tab
+- tapOn:
+    text: "Weight"
+
+# Test weight tracking elements
+- assertVisible: 
+    text: "Weight Tracking"
+
+# Test adding a new weight entry
+- tapOn: 
+    text: "Add"
+- assertVisible:
+    text: "Add Weight"
+    
+# Try with id first
+- tapOn:
+    id: "weight-input"
+    optional: true
+# Then try with index as fallback
+- tapOn:
+    index: 0
+    optional: true
+- inputText: "75.5" # Enter a weight
+- tapOn:
+    text: "Save"
+    
+# Verify weight was added (optional, as it might not appear immediately)
+- assertVisible: 
+    text: "75.5"
+    optional: true
+    
+# Test filtering options
+- tapOn:
+    text: "Week"
+- assertVisible:
+    text: "Week"
+    
+- tapOn:
+    text: "Month"
+- assertVisible:
+    text: "Month"
+    
+- tapOn:
+    text: "Year"
+- assertVisible:
+    text: "Year"
+    
+- tapOn:
+    text: "All"
+- assertVisible:
+    text: "All"

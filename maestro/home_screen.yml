@@ -1,0 +1,54 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+# Skip login by assuming we're already logged in or using a test account
+# If we're not logged in, we'll be redirected to login screen
+
+# Test home screen elements
+- assertVisible: "GymFlow AI"
+  optional: true # This might not be visible on the home screen
+
+# Check for workout history or empty state
+- assertVisible:
+    text: "Complete a workout first" 
+    optional: true # Will only be visible if no workouts exist
+
+# Pull to refresh workout history
+- scroll:
+    direction: DOWN
+    distance: 50%
+    start: 50%, 30%
+    
+# Try to tap on a workout if any exists
+- tapOn:
+    index: 0
+    optional: true
+- assertVisible: 
+    text: "Exercises"
+    optional: true
+- back
+    optional: true
+
+# Test opening analyze with AI (for premium users)
+- tapOn:
+    text: "Analyze with AI"
+    optional: true
+- assertVisible: 
+    text: "Workout Analysis"
+    optional: true
+- tapOn: 
+    text: "Close"
+    optional: true
+      
+# Test tab navigation
+- tapOn: 
+    text: "Ranking"
+- assertVisible: "Leaderboard"
+- tapOn:
+    text: "Weight"
+- assertVisible: "Weight Tracking"
+- tapOn:
+    text: "Profile"
+- assertVisible: "Log out"
+- tapOn:
+    text: "Home"

@@ -1,0 +1,79 @@
+appId: "com.anonymous.GymTracking"
+---
+- launchApp
+- assertVisible: "GymFlow AI"
+- assertVisible: "Welcome Back"
+- assertVisible: "Sign in to continue"
+
+# Test login with invalid credentials
+# Try email field by id
+- tapOn:
+    id: "email-input"
+    optional: true
+# Fallback to index if no ID
+- tapOn:
+    index: 0
+    optional: true
+- inputText: "appst@gmail.com"
+
+# Try password field by id
+- tapOn:
+    id: "password-input"
+    optional: true
+# Fallback to index if no ID
+- tapOn:
+    index: 1
+    optional: true
+- inputText: "AppledawdawdaTester"
+
+- tapOn:
+    text: "SIGN IN"
+- assertVisible: "Wrong Email or Password."
+- tapOn: "OK"
+- tapOn:
+    id: "email-input"
+    optional: true
+- eraseText: 100
+- tapOn:
+    id: "password-input"
+    optional: true
+- eraseText: 100
+
+# Test login with valid credentials
+# Try email field by id
+- tapOn:
+    id: "email-input"
+    optional: true
+# Fallback to index if no ID
+- tapOn:
+    index: 0
+    optional: true
+# Clear field by entering empty text
+- inputText: ""
+# Replace with a valid test account email
+- inputText: "appletest@gmail.com"
+
+# Try password field by id
+- tapOn:
+    id: "password-input"
+    optional: true
+# Fallback to index if no ID
+- tapOn:
+    index: 1
+    optional: true
+# Clear field by entering empty text
+- inputText: ""
+# Replace with a valid test account password
+- inputText: "AppleTester"
+- tapOn:
+    text: "SIGN IN"
+    # Check for home screen elements
+- assertVisible:
+    text: "Workout History"
+    optional: true
+# If there are workouts, we might not see the "Complete a workout first" message
+# Instead, check for the tab bar
+# If your tab bar has a testID
+- assertVisible:
+    id: "tab-bar"
+    optional: true
