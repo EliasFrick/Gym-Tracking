@@ -3,7 +3,7 @@
     "name": "GymFlow",
     "slug": "Gym-Tracking",
     "scheme": "gym-tracking",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "icon": "./assets/icons/splash-icon-dark.png",
     "plugins": [
       "expo-router",

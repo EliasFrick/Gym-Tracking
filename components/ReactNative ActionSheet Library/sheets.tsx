@@ -10,7 +10,7 @@ import {
 import { WorkoutExerciseSheet } from "../ui/WorkoutExerciseSheet";
 import { WorkoutAnalysisSheet } from "../ui/WorkoutAnalysisSheet";
 import { DietSelectorSheet } from "../ui/DietSelectorSheet";
-import { MsucleGroupSelectorSheet } from "../ui/MuslceGroupSelectorSheet";
+import { MuscleGroupSelectorSheet } from "../ui/MuslceGroupSelectorSheet";
 import { EditWorkoutActionSheet } from "../ui/CreateTrainingsplan/EditWorkoutActionSheet";
 
 registerSheet("add-workout-modal-sheet", AddWorkoutActionSheet);
@@ -19,7 +19,7 @@ registerSheet("add-exercise-for-Workout-modal-sheet", PickExercisActionSheet);
 registerSheet("workout-exercise-sheet", WorkoutExerciseSheet);
 registerSheet("workout-analysis-sheet", WorkoutAnalysisSheet);
 registerSheet("diet-selector-sheet", DietSelectorSheet);
-registerSheet("muscle-group-selector-sheet", MsucleGroupSelectorSheet);
+registerSheet("muscle-group-selector-sheet", MuscleGroupSelectorSheet);
 registerSheet("edit-workout-sheet", EditWorkoutActionSheet);
 
 // We extend some of the types here to give us great intellisense

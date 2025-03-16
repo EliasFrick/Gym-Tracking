@@ -14,9 +14,10 @@ const MUSCLE_GROUP = [
   { name: "Shoulder", value: "Shoulder" },
   { name: "Legs", value: "Legs" },
   { name: "Neck", value: "Neck" },
+  { name: "Six-Pack", value: "Six-Pack" },
 ] as const;
 
-export const MsucleGroupSelectorSheet = (
+export const MuscleGroupSelectorSheet = (
   props: SheetProps<"muscle-group-selector-sheet">
 ) => {
   const selectedDiet = props.payload?.selectedMuscleGroup;

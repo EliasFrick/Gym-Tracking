@@ -5,9 +5,7 @@ import {
   Dimensions,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
   ScrollView,
-  Alert,
 } from "react-native";
 import { Text } from "tamagui";
 import {
@@ -24,12 +22,7 @@ import { LineGraph } from "react-native-graph";
 import { scale } from "react-native-size-matters";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const { width } = Dimensions.get("window");
-
-interface WeightEntry {
-  weight: number;
-  date: Date;
-}
+const { width, height } = Dimensions.get("window");
 
 export default function RankingScreen() {
   return (
