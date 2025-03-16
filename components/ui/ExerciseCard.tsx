@@ -66,7 +66,7 @@ const AlertDialogDemo = memo(
             ]}
             enterStyle={{ x: 0, y: -20, opacity: 0, scale: 0.9 }}
             exitStyle={{ x: 0, y: 10, opacity: 0, scale: 0.95 }}
-            style={{ maxWidth: "80%" }}
+            style={{ maxWidth: "80%", zIndex: 2000000 }}
           >
             <YStack space>
               <AlertDialog.Title>{title}</AlertDialog.Title>
@@ -319,9 +319,7 @@ const DeletePopover = (props: IEditCardPopover) => {
             acceptButtonText={"Delete Workout"}
             cancelButtonText={"Cancel"}
           />
-
           <Dialog.Description>{props.lastTrained}</Dialog.Description>
-
           <Button
             theme="active"
             aria-label="Close"
@@ -335,16 +333,11 @@ const DeletePopover = (props: IEditCardPopover) => {
               theme="active"
               backgroundColor={"red"}
               aria-label="Close"
-              width={width * 0.4}
               onPress={() => setShowAlertDialog(true)}
+              width={width * 0.9}
             >
               Delete
             </Button>
-            <Dialog.Close displayWhenAdapted asChild>
-              <Button width={width * 0.4} theme="active" aria-label="Close">
-                Save changes
-              </Button>
-            </Dialog.Close>
           </XStack>
           <Dialog.Description>{props.exercisesInPlan}</Dialog.Description>
           <Unspaced>

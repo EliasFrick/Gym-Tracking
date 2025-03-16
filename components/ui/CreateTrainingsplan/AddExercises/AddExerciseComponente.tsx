@@ -21,6 +21,7 @@ const MUSCLE_GROUP = [
   { label: "Shoulder", value: "Shoulder" },
   { label: "Legs", value: "Legs" },
   { label: "Neck", value: "Neck" },
+  { label: "Six-Pack", value: "Six-Pack" },
 ] as const;
 
 export function AddExerciseComponent({

@@ -444,8 +444,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                           placeholder={
                             lastWorkoutData[currentExercise.id]?.reps
                           }
-                          /*                           keyboardType="numeric"
-                           */
+                          keyboardType="numeric"
                         />
                       </View>
                       <View style={styles.inputContainer}>
@@ -464,8 +463,7 @@ export const WorkoutExerciseSheet = (props: WorkoutExerciseSheetProps) => {
                           placeholder={
                             lastWorkoutData[currentExercise.id]?.weight
                           }
-                          /*                           keyboardType="numeric"
-                           */
+                          keyboardType="numeric"
                         />
                       </View>
                       {isLastSet && (
