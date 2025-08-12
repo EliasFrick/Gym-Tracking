@@ -14,7 +14,6 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-
   ScrollView,
   StyleSheet,
   TextInput,
@@ -23,8 +22,6 @@ import {
 } from "react-native";
 import WeightLineChart from "@/components/ui/WeightLineChart";
 import { Button, Text, XStack } from "tamagui";
-
-
 
 export default function WeightScreen() {
   const [currentWeight, setCurrentWeight] = useState("");
