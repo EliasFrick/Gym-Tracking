@@ -14,17 +14,17 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
+
   ScrollView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
-import { LineGraph } from "react-native-graph";
+import WeightLineChart from "@/components/ui/WeightLineChart";
 import { Button, Text, XStack } from "tamagui";
 
-const { width } = Dimensions.get("window");
+
 
 export default function WeightScreen() {
   const [currentWeight, setCurrentWeight] = useState("");
@@ -198,34 +198,27 @@ export default function WeightScreen() {
    */
   const filterData = () => {
     const now = new Date().getTime();
-    let filtered = [...weightHistory];
 
-    switch (timeRange) {
-      case "M": {
-        // last 30 days
-        const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
-        filtered = weightHistory.filter((e) => e.date.getTime() >= oneMonthAgo);
-        break;
+    const filtered = (() => {
+      switch (timeRange) {
+        case "M": {
+          const oneMonthAgo = now - 30 * 24 * 60 * 60 * 1000;
+          return weightHistory.filter((e) => e.date.getTime() >= oneMonthAgo);
+        }
+        case "6M": {
+          const sixMonthsAgo = now - 6 * 30 * 24 * 60 * 60 * 1000;
+          return weightHistory.filter((e) => e.date.getTime() >= sixMonthsAgo);
+        }
+        case "Y": {
+          const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
+          return weightHistory.filter((e) => e.date.getTime() >= oneYearAgo);
+        }
+        case "Max":
+        default:
+          return weightHistory;
       }
-      case "6M": {
-        // last 6 x 30 days
-        const sixMonthsAgo = now - 6 * 30 * 24 * 60 * 60 * 1000;
-        filtered = weightHistory.filter(
-          (e) => e.date.getTime() >= sixMonthsAgo
-        );
-        break;
-      }
-      case "Y": {
-        // last 365 days
-        const oneYearAgo = now - 365 * 24 * 60 * 60 * 1000;
-        filtered = weightHistory.filter((e) => e.date.getTime() >= oneYearAgo);
-        break;
-      }
-      case "Max":
-      default:
-        filtered = weightHistory;
-        break;
-    }
+    })();
+
     setFilteredData(filtered);
   };
 
@@ -272,23 +265,15 @@ export default function WeightScreen() {
                     ? `Selected: ${selectedWeight}`
                     : "Slide to see weight"}
                 </Text>
-                <LineGraph
-                  points={prepareWeightDataForGraph(filteredData)}
-                  color="#F86E51"
-                  animated
-                  enablePanGesture
-                  onGestureStart={() => {
-                    // Could trigger haptic feedback here if desired
-                  }}
-                  onPointSelected={(point) => {
-                    setSelectedWeight(`${point.value.toFixed(1)} kg`);
-                  }}
-                  onGestureEnd={() => {
-                    // Reset or keep last value? Currently we reset
-                    setSelectedWeight("");
-                  }}
-                  style={styles.graph}
-                />
+                <View style={styles.graph}>
+                  <WeightLineChart
+                    data={prepareWeightDataForGraph(filteredData)}
+                    color="#F86E51"
+                    onPointSelected={(point) =>
+                      setSelectedWeight(`${point.value.toFixed(1)} kg`)
+                    }
+                  />
+                </View>
 
                 <XStack
                   gap={20}
@@ -332,9 +317,9 @@ export default function WeightScreen() {
                 {filteredData
                   .slice()
                   .sort((a, b) => b.date.getTime() - a.date.getTime())
-                  .map((entry, index) => (
+                  .map((entry) => (
                     <TouchableOpacity
-                      key={index}
+                      key={`${entry.date.getTime()}-${entry.weight}`}
                       style={styles.historyItem}
                       onLongPress={() => deleteWeightEntry(entry)}
                       delayLongPress={500}
