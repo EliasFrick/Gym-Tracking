@@ -1,29 +1,28 @@
-import React, { useState, useEffect } from "react";
+import { auth, firestoreDB } from "@/database/Firebaseconfig";
+import { WeightEntry } from "@/types/interfaces";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
-  View,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  ScrollView,
-  Alert,
-} from "react-native";
-import { Button, Text, XStack } from "tamagui";
-import {
-  collection,
   addDoc,
-  query,
-  orderBy,
-  getDocs,
+  collection,
   deleteDoc,
+  getDocs,
+  orderBy,
+  query,
   where,
 } from "firebase/firestore";
-import { auth, firestoreDB } from "@/database/Firebaseconfig";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { LineGraph } from "react-native-graph";
-import { scale } from "react-native-size-matters";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { WeightEntry } from "@/types/interfaces";
+import { Button, Text, XStack } from "tamagui";
 
 const { width } = Dimensions.get("window");
 

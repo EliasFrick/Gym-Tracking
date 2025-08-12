@@ -1,21 +1,17 @@
+import { IUserLoginCredentials } from "@/types/interfaces";
+import { LinearGradient } from "expo-linear-gradient";
+import { Link, router } from "expo-router";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import React, { useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
-  Dimensions,
-  KeyboardAvoidingView,
-  Platform,
+  View
 } from "react-native";
-import React, { useEffect, useState } from "react";
-import { LinearGradient } from "expo-linear-gradient";
-import { Link, router, useRouter } from "expo-router";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-import { app } from "@/database/Firebaseconfig";
-import { IUserLoginCredentials } from "@/types/interfaces";
-import { ScrollView } from "tamagui";
-import { useUser } from "@/context/UserProvider";
 
 const LoginScreen = () => {
   const [userCredentials, setUserCredentials] = useState<IUserLoginCredentials>(
@@ -24,7 +20,6 @@ const LoginScreen = () => {
       password: "",
     }
   );
-  const { refreshUserData } = useUser();
 
   const handleInputChange = (name: string, value: string) => {
     setUserCredentials({
@@ -54,7 +49,6 @@ const LoginScreen = () => {
       )
         .then((userCredential) => {
           // Signed in
-          const user = userCredential.user;
           router.replace("/");
           // ...
         })
